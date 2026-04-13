@@ -146,8 +146,8 @@
 
     <div class="physics-bg" id="particles"></div>
 
-    <!-- GitHub Back Button -->
-    <a href="../index.html" class="back-btn mb-12 px-6 py-3 rounded-2xl flex items-center space-x-3 text-[11px] uppercase tracking-[0.25em] font-bold text-cyan-400">
+    <!-- GitHub Back Button - FIXED PATH -->
+    <a href="../../index.html" class="back-btn mb-12 px-6 py-3 rounded-2xl flex items-center space-x-3 text-[11px] uppercase tracking-[0.25em] font-bold text-cyan-400">
         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
         </svg>
@@ -250,7 +250,6 @@
         function spawnObstacle() {
             const el = document.createElement("div");
             el.className = "obstacle";
-            // Lightning icon for Physics
             el.innerHTML = `<svg viewBox="0 0 24 24" fill="currentColor" class="text-yellow-400 drop-shadow-[0_0_8px_rgba(250,204,21,0.6)]"><path d="M13,2L3,14H10V22L20,10H13V2Z"/></svg>`;
             container.appendChild(el);
             return { element: el, x: window.innerWidth + 100 };

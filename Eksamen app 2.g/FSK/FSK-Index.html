@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fysik - 2.a</title>
+    <title>Fysik - Sankt Annæ 2.a</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&family=Outfit:wght@200;400;900&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700;900&family=Outfit:wght@200;400;600;900&display=swap');
         
         body {
             font-family: 'Outfit', sans-serif;
@@ -17,7 +17,12 @@
             color: #fff;
         }
 
-        /* Animeret Partikel Baggrund */
+        .hero-text {
+            font-family: 'Space Grotesk', sans-serif;
+            text-transform: uppercase;
+        }
+
+        /* Animeret partikel baggrund */
         .physics-bg {
             position: fixed;
             inset: 0;
@@ -40,12 +45,7 @@
             100% { transform: translateY(-10vh) translateX(100px); opacity: 0; }
         }
 
-        .hero-text {
-            font-family: 'Space Grotesk', sans-serif;
-            text-transform: uppercase;
-        }
-
-        /* Spil-området */
+        /* Spil Elementer */
         #game-container {
             position: absolute;
             bottom: 0;
@@ -54,26 +54,8 @@
             height: 250px;
             cursor: pointer;
             border-top: 1px solid rgba(34, 211, 238, 0.1);
-            background: linear-gradient(to bottom, transparent, rgba(34, 211, 238, 0.03));
+            background: linear-gradient(to bottom, transparent, rgba(34, 211, 238, 0.05));
         }
-
-        #player {
-            position: absolute;
-            bottom: 40px;
-            left: 10%;
-            width: 44px;
-            height: 44px;
-            z-index: 50;
-        }
-
-        .obstacle {
-            position: absolute;
-            bottom: 40px;
-            right: -100px;
-            width: 34px;
-            height: 50px;
-        }
-
         #ground-line {
             position: absolute;
             bottom: 40px;
@@ -83,11 +65,24 @@
             background: rgba(34, 211, 238, 0.3);
             box-shadow: 0 0 20px rgba(34, 211, 238, 0.4);
         }
-
+        #player {
+            position: absolute;
+            bottom: 40px;
+            left: 10%;
+            width: 44px;
+            height: 44px;
+            z-index: 50;
+        }
+        .obstacle {
+            position: absolute;
+            bottom: 40px;
+            right: -100px;
+            width: 34px;
+            height: 50px;
+        }
         .jump-anim {
             animation: jump 0.6s cubic-bezier(0.1, 0.8, 0.3, 1);
         }
-
         @keyframes jump {
             0% { transform: translateY(0) scale(1); }
             30% { transform: translateY(-140px) scale(1.1); }
@@ -95,20 +90,25 @@
             100% { transform: translateY(0) scale(1); }
         }
 
-        .pulse-text {
-            animation: pulse 2s infinite;
+        /* Back Button UI */
+        .back-btn {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-decoration: none;
         }
-
-        @keyframes pulse {
-            0%, 100% { opacity: 1; text-shadow: 0 0 10px rgba(34, 211, 238, 0.5); }
-            50% { opacity: 0.4; text-shadow: none; }
+        .back-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-2px);
+            border-color: rgba(34, 211, 238, 0.4);
         }
 
         #score-display {
             font-family: 'Space Grotesk', monospace;
-            font-size: 6rem;
+            font-size: 8rem;
             font-weight: 900;
-            opacity: 0.03;
+            opacity: 0.05;
             position: absolute;
             top: 50%;
             left: 50%;
@@ -116,6 +116,14 @@
             pointer-events: none;
             white-space: nowrap;
             color: #22d3ee;
+        }
+
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; text-shadow: 0 0 10px rgba(34, 211, 238, 0.5); }
+            50% { opacity: 0.5; text-shadow: none; }
         }
 
         .orbit-dot {
@@ -134,28 +142,37 @@
         }
     </style>
 </head>
-<body class="flex flex-col items-center justify-start pt-20">
+<body class="flex flex-col items-center justify-start pt-16 px-6">
 
     <div class="physics-bg" id="particles"></div>
 
+    <!-- GitHub Back Button -->
+    <a href="../index.html" class="back-btn mb-12 px-6 py-3 rounded-2xl flex items-center space-x-3 text-[11px] uppercase tracking-[0.25em] font-bold text-cyan-400">
+        <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+        </svg>
+        <span>Tilbage til forsiden</span>
+    </a>
+
     <!-- Main Content -->
-    <div class="relative z-10 text-center px-6">
-        <h2 class="text-cyan-400 font-bold tracking-[0.5em] text-xs mb-4 uppercase pulse-text">Kvantetilstand: Venter på observation</h2>
-        <h1 class="hero-text text-6xl md:text-8xl font-black mb-6 leading-none tracking-tighter">
+    <div class="text-center relative z-10">
+        <div class="inline-block px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-500/20 text-cyan-400 text-[10px] font-bold uppercase tracking-widest mb-6 pulse">
+            Kvantetilstand: Venter på observation
+        </div>
+        <h1 class="hero-text text-6xl md:text-9xl font-black mb-6 tracking-tighter leading-none">
             FY<span class="text-transparent" style="-webkit-text-stroke: 1px #22d3ee;">SIK</span>
         </h1>
-        <p class="max-w-xl mx-auto text-slate-400 text-lg md:text-xl font-light tracking-wide">
-            Siden for <span class="text-white font-medium">Sankt Annæ 2.a</span> opdateres så snart de fysiske love (og eksamensspørgsmålene) tillader det.
+        <p class="text-slate-400 max-w-md mx-auto text-lg font-light leading-relaxed">
+            Vi afventer partikelstrømmen af spørgsmål for <span class="text-white font-medium">2.a</span>. Siden opdateres øjeblikkeligt derefter.
         </p>
     </div>
 
-    <!-- Spil sektion -->
+    <!-- Game Area -->
     <div id="game-container" onclick="handleAction()">
         <div id="score-display">0000</div>
-        
         <div id="ground-line"></div>
 
-        <!-- Player (Atom) -->
+        <!-- Player (Atom Icon) -->
         <div id="player">
             <div class="relative w-full h-full">
                 <!-- Nukleus -->
@@ -168,18 +185,18 @@
             </div>
         </div>
 
-        <!-- Game Overlay Message -->
-        <div id="game-msg" class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-            <span class="text-cyan-400/20 uppercase tracking-[0.5em] text-sm">Tap for at trodse tyngdekraften</span>
+        <!-- Start/GameOver Message -->
+        <div id="game-msg" class="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <span class="text-cyan-400/20 uppercase tracking-[0.6em] text-xs font-bold">Tryk for at trodse tyngdekraften</span>
         </div>
     </div>
 
-    <p class="absolute bottom-4 left-1/2 -translate-x-1/2 text-[10px] text-cyan-400/20 tracking-widest uppercase">
+    <p class="absolute bottom-4 left-1/2 -translate-x-1/2 text-[9px] text-cyan-400/10 tracking-[0.3em] uppercase font-bold">
         E=mc² &bull; Sankt Annæ Gymnasium &bull; 2.a
     </p>
 
     <script>
-        // Generer partikler i baggrunden
+        // Generer baggrundspartikler
         const particleContainer = document.getElementById('particles');
         for (let i = 0; i < 30; i++) {
             const p = document.createElement('div');
@@ -220,11 +237,11 @@
         }
 
         function jump() {
-            if (!isJumping) {
+            if (!isJumping && gameStarted) {
                 isJumping = true;
-                player.classList.add("jump-anim");
+                player.classList.add('jump-anim');
                 setTimeout(() => {
-                    player.classList.remove("jump-anim");
+                    player.classList.remove('jump-anim');
                     isJumping = false;
                 }, 600);
             }
@@ -233,22 +250,57 @@
         function spawnObstacle() {
             const el = document.createElement("div");
             el.className = "obstacle";
-            
-            // Fysik-tematiseret forhindringer (Elektricitet eller instabile kerner)
-            const type = Math.random();
-            if (type > 0.6) {
-                // Lyn / Gnister
-                el.innerHTML = `<svg viewBox="0 0 24 24" fill="currentColor" class="text-yellow-400 drop-shadow-[0_0_8px_rgba(250,204,21,0.6)]"><path d="M13,2L3,14H10V22L20,10H13V2Z"/></svg>`;
-            } else {
-                // Instabil kerne
-                el.innerHTML = `<svg viewBox="0 0 24 24" fill="currentColor" class="text-purple-500 opacity-80"><path d="M12,2L4.5,20.29L5.21,21L12,18L18.79,21L19.5,20.29L12,2Z" transform="rotate(180 12 12)"/></svg>`;
-            }
-            
+            // Lightning icon for Physics
+            el.innerHTML = `<svg viewBox="0 0 24 24" fill="currentColor" class="text-yellow-400 drop-shadow-[0_0_8px_rgba(250,204,21,0.6)]"><path d="M13,2L3,14H10V22L20,10H13V2Z"/></svg>`;
             container.appendChild(el);
-            return {
-                element: el,
-                x: window.innerWidth + 100
-            };
+            return { element: el, x: window.innerWidth + 100 };
+        }
+
+        function gameLoop() {
+            if (!gameStarted || isGameOver) return;
+
+            score++;
+            if (score % 500 === 0) speed += 0.5;
+            scoreDisplay.innerText = score.toString().padStart(4, '0');
+
+            nextSpawn--;
+            if (nextSpawn <= 0) {
+                obstacles.push(spawnObstacle());
+                nextSpawn = Math.floor(Math.random() * (120 - speed * 4)) + 70;
+            }
+
+            for (let i = obstacles.length - 1; i >= 0; i--) {
+                obstacles[i].x -= speed;
+                obstacles[i].element.style.left = obstacles[i].x + "px";
+
+                const pRect = player.getBoundingClientRect();
+                const oRect = obstacles[i].element.getBoundingClientRect();
+
+                if (
+                    pRect.right - 12 > oRect.left && 
+                    pRect.left + 12 < oRect.right && 
+                    pRect.bottom - 8 > oRect.top
+                ) {
+                    endGame();
+                }
+
+                if (obstacles[i].x < -100) {
+                    obstacles[i].element.remove();
+                    obstacles.splice(i, 1);
+                }
+            }
+            requestAnimationFrame(gameLoop);
+        }
+
+        function endGame() {
+            isGameOver = true;
+            gameMsg.style.display = 'flex';
+            gameMsg.innerHTML = `
+                <div class="text-center">
+                    <p class="text-cyan-400 font-black text-xl mb-1 tracking-wider uppercase">Kvante-kollision!</p>
+                    <p class="text-white/40 text-[9px] uppercase tracking-widest font-bold">Tryk for at re-materialisere</p>
+                </div>
+            `;
         }
 
         function resetGame() {
@@ -261,53 +313,6 @@
             scoreDisplay.innerText = "0000";
             gameMsg.style.display = 'none';
             gameLoop();
-        }
-
-        function gameLoop() {
-            if (!gameStarted || isGameOver) return;
-
-            score++;
-            if (score % 400 === 0) speed += 0.4;
-            scoreDisplay.innerText = score.toString().padStart(4, '0');
-
-            nextSpawn--;
-            if (nextSpawn <= 0) {
-                obstacles.push(spawnObstacle());
-                nextSpawn = Math.floor(Math.random() * (120 - speed * 4)) + 60;
-            }
-
-            for (let i = obstacles.length - 1; i >= 0; i--) {
-                obstacles[i].x -= speed;
-                obstacles[i].element.style.left = obstacles[i].x + "px";
-
-                const pRect = player.getBoundingClientRect();
-                const oRect = obstacles[i].element.getBoundingClientRect();
-
-                // Collision detection
-                if (
-                    pRect.right - 12 > oRect.left &&
-                    pRect.left + 12 < oRect.right &&
-                    pRect.bottom - 8 > oRect.top
-                ) {
-                    endGame();
-                }
-
-                if (obstacles[i].x < -100) {
-                    obstacles[i].element.remove();
-                    obstacles.splice(i, 1);
-                }
-            }
-
-            requestAnimationFrame(gameLoop);
-        }
-
-        function endGame() {
-            isGameOver = true;
-            gameMsg.style.display = 'flex';
-            gameMsg.innerHTML = `
-                <span class="text-cyan-400 font-black text-2xl mb-2">KVANTE-KOLLISION</span>
-                <span class="text-white/40 text-xs tracking-widest uppercase">Klik for at re-materialisere</span>
-            `;
         }
 
         document.addEventListener("keydown", (e) => {

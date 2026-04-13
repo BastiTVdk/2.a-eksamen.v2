@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Naturgeografi - 2.a</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;500;700&family=Outfit:wght@200;400;900&display=swap');
+        
+        body {
+            font-family: 'Outfit', sans-serif;
+            overflow: hidden;
+            background: #020408;
+            height: 100vh;
+            margin: 0;
+            color: #fff;
+        }
+
+        /* Animeret geologisk baggrund */
+        .geo-bg {
+            position: fixed;
+            inset: 0;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .layer {
+            position: absolute;
+            width: 200%;
+            height: 100%;
+            top: 0;
+            left: -50%;
+            background-repeat: repeat-x;
+            opacity: 0.15;
+            animation: moveLayers 60s linear infinite;
+        }
+
+        .layer-1 {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3%3Cpath fill='%2310b981' fill-opacity='1' d='M0,160L48,176C96,192,192,224,288,224C384,224,480,192,576,165.3C672,139,768,117,864,128C960,139,1056,181,1152,186.7C1248,192,1344,160,1392,144L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z'%3E%3C/path%3E%3C/svg%3E");
+            bottom: -50px;
+            animation-duration: 40s;
+        }
+
+        .layer-2 {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 320'%3%3Cpath fill='%2334d399' fill-opacity='1' d='M0,224L60,213.3C120,203,240,181,360,186.7C480,192,600,224,720,218.7C840,213,960,171,1080,160C1200,149,1320,171,1380,181.3L1440,192L1440,320L1380,320C1320,320,1200,320,1080,320C960,320,840,320,720,320C600,320,480,320,360,320C240,320,120,320,60,320L0,320Z'%3E%3C/path%3E%3C/svg%3E");
+            bottom: -100px;
+            animation-duration: 70s;
+            animation-direction: reverse;
+        }
+
+        @keyframes moveLayers {
+            from { transform: translateX(0); }
+            to { transform: translateX(25%); }
+        }
+
+        .hero-text {
+            font-family: 'Space Grotesk', sans-serif;
+            text-transform: uppercase;
+        }
+
+        /* Spil-området fylder nu bredden */
+        #game-container {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 250px;
+            cursor: pointer;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            background: linear-gradient(to bottom, transparent, rgba(16, 185, 129, 0.05));
+        }
+
+        #dino {
+            position: absolute;
+            bottom: 40px;
+            left: 10%;
+            width: 44px;
+            height: 44px;
+            z-index: 50;
+        }
+
+        .obstacle {
+            position: absolute;
+            bottom: 40px;
+            right: -100px;
+            width: 30px;
+            height: 50px;
+        }
+
+        #ground-line {
+            position: absolute;
+            bottom: 40px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 0 15px rgba(16, 185, 129, 0.3);
+        }
+
+        .jump-anim {
+            animation: jump 0.65s cubic-bezier(0.1, 0.8, 0.3, 1);
+        }
+
+        @keyframes jump {
+            0% { transform: translateY(0) rotate(0deg); }
+            30% { transform: translateY(-130px) rotate(-10deg); }
+            70% { transform: translateY(-130px) rotate(-10deg); }
+            100% { transform: translateY(0) rotate(0deg); }
+        }
+
+        .pulse-text {
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.4; }
+        }
+
+        #score-display {
+            font-family: 'Space Grotesk', monospace;
+            font-size: 5rem;
+            font-weight: 900;
+            opacity: 0.05;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-start pt-20">
+
+    <div class="geo-bg">
+        <div class="layer layer-1"></div>
+        <div class="layer layer-2"></div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="relative z-10 text-center px-6">
+        <h2 class="text-emerald-500 font-bold tracking-[0.4em] text-xs mb-4 uppercase pulse-text">Status: Venter på input</h2>
+        <h1 class="hero-text text-6xl md:text-8xl font-black mb-6 leading-none tracking-tighter">
+            Natur<br><span class="text-transparent" style="-webkit-text-stroke: 1px #fff;">geografi</span>
+        </h1>
+        <p class="max-w-xl mx-auto text-slate-400 text-lg md:text-xl font-light tracking-wide">
+            Siden for <span class="text-white font-medium">Sankt Annæ 2.a</span> opdateres så snart eksamensspørgsmålene lander.
+        </p>
+    </div>
+
+    <!-- Spil sektion -->
+    <div id="game-container" onclick="handleAction()">
+        <div id="score-display">0000</div>
+        
+        <div id="ground-line"></div>
+
+        <!-- Dino (Geolog) -->
+        <div id="dino">
+            <svg viewBox="0 0 24 24" fill="none" class="text-emerald-400 drop-shadow-[0_0_10px_rgba(52,211,153,0.8)]">
+                <path d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z" fill="currentColor" />
+            </svg>
+        </div>
+
+        <!-- Game Overlay Message -->
+        <div id="game-msg" class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+            <span class="text-white/20 uppercase tracking-[0.5em] text-sm">Tryk på Space eller skærm for at starte</span>
+        </div>
+    </div>
+
+    <p class="absolute bottom-4 left-1/2 -translate-x-1/2 text-[10px] text-white/20 tracking-widest uppercase">
+        Designet til 2.a &bull; Ingen adgang før tid
+    </p>
+
+    <script>
+        const dino = document.getElementById("dino");
+        const container = document.getElementById("game-container");
+        const scoreDisplay = document.getElementById("score-display");
+        const gameMsg = document.getElementById("game-msg");
+        
+        let score = 0;
+        let isJumping = false;
+        let isGameOver = false;
+        let gameStarted = false;
+        let obstacles = [];
+        let speed = 6;
+        let nextSpawn = 0;
+
+        function handleAction() {
+            if (isGameOver) {
+                resetGame();
+                return;
+            }
+            if (!gameStarted) {
+                gameStarted = true;
+                gameMsg.style.display = 'none';
+                gameLoop();
+            }
+            jump();
+        }
+
+        function jump() {
+            if (!isJumping) {
+                isJumping = true;
+                dino.classList.add("jump-anim");
+                setTimeout(() => {
+                    dino.classList.remove("jump-anim");
+                    isJumping = false;
+                }, 650);
+            }
+        }
+
+        function spawnObstacle() {
+            const el = document.createElement("div");
+            el.className = "obstacle";
+            // Varierer mellem to typer forhindringer
+            const isVolcano = Math.random() > 0.5;
+            el.innerHTML = isVolcano 
+                ? `<svg viewBox="0 0 24 24" fill="currentColor" class="text-red-500 opacity-80"><path d="M12,2L1,21H23L12,2M12,6L19.53,19H4.47L12,6Z"/></svg>`
+                : `<svg viewBox="0 0 24 24" fill="currentColor" class="text-emerald-700 opacity-60"><path d="M14,6L10.25,11L13.1,14.8L11.5,16C9.81,13.75 7,10 7,10L1,21H23L14,6Z"/></svg>`;
+            
+            container.appendChild(el);
+            return {
+                element: el,
+                x: window.innerWidth + 100
+            };
+        }
+
+        function resetGame() {
+            obstacles.forEach(o => o.element.remove());
+            obstacles = [];
+            score = 0;
+            speed = 6;
+            isGameOver = false;
+            gameStarted = true;
+            scoreDisplay.innerText = "0000";
+            gameMsg.style.display = 'none';
+            gameLoop();
+        }
+
+        function gameLoop() {
+            if (!gameStarted || isGameOver) return;
+
+            // Score og hastighed
+            score++;
+            if (score % 500 === 0) speed += 0.5;
+            scoreDisplay.innerText = score.toString().padStart(4, '0');
+
+            // Spawn logik baseret på tid/hastighed
+            nextSpawn--;
+            if (nextSpawn <= 0) {
+                obstacles.push(spawnObstacle());
+                nextSpawn = Math.floor(Math.random() * (150 - speed * 5)) + 70;
+            }
+
+            // Opdater forhindringer
+            for (let i = obstacles.length - 1; i >= 0; i--) {
+                obstacles[i].x -= speed;
+                obstacles[i].element.style.left = obstacles[i].x + "px";
+
+                // Collision detection
+                const dRect = dino.getBoundingClientRect();
+                const oRect = obstacles[i].element.getBoundingClientRect();
+
+                if (
+                    dRect.right - 15 > oRect.left &&
+                    dRect.left + 15 < oRect.right &&
+                    dRect.bottom - 5 > oRect.top
+                ) {
+                    endGame();
+                }
+
+                if (obstacles[i].x < -100) {
+                    obstacles[i].element.remove();
+                    obstacles.splice(i, 1);
+                }
+            }
+
+            requestAnimationFrame(gameLoop);
+        }
+
+        function endGame() {
+            isGameOver = true;
+            gameMsg.style.display = 'flex';
+            gameMsg.innerHTML = `
+                <span class="text-red-500 font-black text-2xl mb-2">COLLISION DETECTED</span>
+                <span class="text-white/40 text-xs tracking-widest uppercase">Klik for at genstarte</span>
+            `;
+        }
+
+        // Kontrol
+        document.addEventListener("keydown", (e) => {
+            if (e.code === "Space") {
+                e.preventDefault();
+                handleAction();
+            }
+        });
+
+        // Touch fix til mobiler
+        document.addEventListener('touchmove', e => e.preventDefault(), { passive: false });
+    </script>
+</body>
+</html>

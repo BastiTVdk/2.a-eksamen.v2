@@ -56,6 +56,35 @@
             padding: 0 40px;
         }
 
+        .nav-left {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        /* Home Button Styling */
+        .home-link {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 0.7rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: rgba(255, 255, 255, 0.4);
+            text-decoration: none;
+            transition: all 0.4s var(--ease-apple);
+        }
+
+        .home-link:hover {
+            color: var(--blue-base);
+        }
+
+        .home-link svg {
+            width: 14px;
+            height: 14px;
+        }
+
         .nav-logo {
             color: #ffffff;
             font-weight: 600;
@@ -239,13 +268,22 @@
             .hero-split { flex-direction: column; }
             .panel { border-right: none; border-bottom: 0.5px solid rgba(255,255,255,0.1); }
             .nav-links { display: none; }
+            .home-link span { display: none; } /* Gem tekst på mobil for plads */
         }
     </style>
 </head>
 <body>
 
     <nav class="top-nav">
-        <a href="#" class="nav-logo">Matematik Skriftlig B.</a>
+        <div class="nav-left">
+            <a href="index.html" class="home-link">
+                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+                </svg>
+                <span>Forsiden</span>
+            </a>
+            <a href="#" class="nav-logo">Matematik Skriftlig B.</a>
+        </div>
         <ul class="nav-links">
             <li><a href="emner.html">Emner</a></li>
             <li><a href="opgaver.html">Opgaver</a></li>

@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Matematik Skriftlig B | MatheMaster</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --font-main: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --ease-apple: cubic-bezier(0.16, 1, 0.3, 1);
+            
+            /* Farve-palet */
+            --blue-base: #0071e3;
+            --green-base: #34c759;
+            --purple-base: #af52de;
+            
+            --bg-blue: radial-gradient(circle at center, #0071e3 0%, #001d3d 100%);
+            --bg-green: radial-gradient(circle at center, #34c759 0%, #002b0c 100%);
+            --bg-purple: radial-gradient(circle at center, #af52de 0%, #2a003b 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-main);
+            background-color: #000;
+            color: #ffffff;
+            -webkit-font-smoothing: antialiased;
+            overflow: hidden; 
+            height: 100vh;
+            width: 100vw;
+        }
+
+        /* --- TOP NAVIGATION --- */
+        .top-nav {
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            height: 52px;
+            background: rgba(0, 0, 0, 0.2);
+            backdrop-filter: saturate(180%) blur(20px);
+            -webkit-backdrop-filter: saturate(180%) blur(20px);
+            border-bottom: 0.5px solid rgba(255, 255, 255, 0.1);
+            z-index: 1000;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 40px;
+        }
+
+        .nav-logo {
+            color: #ffffff;
+            font-weight: 600;
+            font-size: 0.9rem;
+            letter-spacing: -0.01em;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 28px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            text-decoration: none;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.75rem;
+            font-weight: 500;
+            transition: color 0.4s var(--ease-apple);
+        }
+
+        .nav-links a:hover {
+            color: #ffffff;
+        }
+
+        /* --- VERTICAL SPLIT PANELS --- */
+        .hero-split {
+            display: flex;
+            width: 100vw;
+            height: 100vh;
+            background: #000;
+        }
+
+        .panel {
+            flex: 1;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            color: white;
+            overflow: hidden;
+            border-right: 0.5px solid rgba(255, 255, 255, 0.05);
+            transition: flex 1s var(--ease-apple);
+        }
+
+        .panel:last-child {
+            border-right: none;
+        }
+
+        .panel:hover {
+            flex: 1.6;
+        }
+
+        /* Baggrunds-lag */
+        .panel::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            opacity: 0.4;
+            transition: opacity 1s var(--ease-apple), transform 1.5s var(--ease-apple);
+            z-index: 1;
+        }
+
+        .panel-blue::before { background: var(--bg-blue); }
+        .panel-green::before { background: var(--bg-green); }
+        .panel-purple::before { background: var(--bg-purple); }
+
+        .panel:hover::before {
+            opacity: 0.7;
+            transform: scale(1.05);
+        }
+
+        /* Indhold Container */
+        .panel-content {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            padding: 60px 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            transition: transform 0.8s var(--ease-apple);
+        }
+
+        /* Ikon Styling */
+        .icon-circle {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 32px;
+            transition: all 0.8s var(--ease-apple);
+        }
+
+        .icon-circle svg {
+            width: 32px;
+            height: 32px;
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 1.5;
+            transition: transform 0.8s var(--ease-apple);
+        }
+
+        .panel:hover .icon-circle {
+            background: rgba(255, 255, 255, 0.15);
+            transform: scale(1.1);
+            border-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .panel-blue .icon-circle { color: #80bfff; }
+        .panel-green .icon-circle { color: #8ceda1; }
+        .panel-purple .icon-circle { color: #d69df4; }
+
+        .step-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            opacity: 0.4;
+        }
+
+        .panel h2 {
+            font-size: clamp(1.8rem, 3vw, 2.8rem);
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            margin-bottom: 16px;
+            line-height: 1.1;
+        }
+
+        .panel p {
+            font-size: 1rem;
+            color: rgba(255, 255, 255, 0.5);
+            max-width: 280px;
+            margin: 0 auto;
+            line-height: 1.5;
+            font-weight: 400;
+            transition: color 0.6s var(--ease-apple), transform 0.8s var(--ease-apple);
+        }
+
+        .panel:hover p {
+            color: rgba(255, 255, 255, 0.9);
+            transform: translateY(-5px);
+        }
+
+        /* Subtil pil knap */
+        .arrow-btn {
+            margin-top: 40px;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.6s var(--ease-apple);
+        }
+
+        .panel:hover .arrow-btn {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .arrow-btn:hover {
+            background: #ffffff;
+            color: #000;
+        }
+
+        /* Responsivitet */
+        @media (max-width: 900px) {
+            .hero-split { flex-direction: column; }
+            .panel { border-right: none; border-bottom: 0.5px solid rgba(255,255,255,0.1); }
+            .nav-links { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="top-nav">
+        <a href="#" class="nav-logo">Matematik Skriftlig B.</a>
+        <ul class="nav-links">
+            <li><a href="emner.html">Emner</a></li>
+            <li><a href="opgaver.html">Opgaver</a></li>
+            <li><a href="maple.html">Maple</a></li>
+        </ul>
+    </nav>
+
+    <section class="hero-split">
+        
+        <!-- EMNE SEKTION -->
+        <a href="emner.html" class="panel panel-blue">
+            <div class="panel-content">
+                <div class="icon-circle">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                    </svg>
+                </div>
+                <div class="step-label">Teori & Beviser</div>
+                <h2>Emner</h2>
+                <p>Udforsk pensum og de afgørende matematiske beviser trin for trin.</p>
+                <div class="arrow-btn">
+                    <svg viewBox="0 0 24 24" style="width:18px; height:18px; stroke-width: 2.5;"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                </div>
+            </div>
+        </a>
+
+        <!-- OPGAVE SEKTION -->
+        <a href="opgaver.html" class="panel panel-green">
+            <div class="panel-content">
+                <div class="icon-circle">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M9 11l3 3L22 4"></path>
+                        <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+                    </svg>
+                </div>
+                <div class="step-label">Praksis & Træning</div>
+                <h2>Opgaver</h2>
+                <p>Træn med tidligere eksamenssæt og find de korrekte løsningsmodeller.</p>
+                <div class="arrow-btn">
+                    <svg viewBox="0 0 24 24" style="width:18px; height:18px; stroke-width: 2.5;"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                </div>
+            </div>
+        </a>
+
+        <!-- MAPLE SEKTION -->
+        <a href="maple.html" class="panel panel-purple">
+            <div class="panel-content">
+                <div class="icon-circle">
+                    <svg viewBox="0 0 24 24">
+                        <polyline points="16 18 22 12 16 6"></polyline>
+                        <polyline points="8 6 2 12 8 18"></polyline>
+                    </svg>
+                </div>
+                <div class="step-label">Værktøjer & Genveje</div>
+                <h2>Maple</h2>
+                <p>Mestr Gym-pakken og optimer din tid til den skriftlige eksamen.</p>
+                <div class="arrow-btn">
+                    <svg viewBox="0 0 24 24" style="width:18px; height:18px; stroke-width: 2.5;"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                </div>
+            </div>
+        </a>
+
+    </section>
+
+</body>
+</html>

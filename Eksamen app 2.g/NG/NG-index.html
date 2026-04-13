@@ -22,7 +22,6 @@
             text-transform: uppercase;
         }
 
-        /* Animeret geologisk baggrund */
         .layer {
             position: absolute;
             width: 200%;
@@ -43,7 +42,6 @@
             to { transform: translateX(25%); }
         }
 
-        /* Spil Elementer */
         #game-container {
             position: absolute;
             bottom: 0;
@@ -88,7 +86,6 @@
             100% { transform: translateY(0) rotate(0deg); }
         }
 
-        /* Back Button UI */
         .back-btn {
             background: rgba(255, 255, 255, 0.03);
             backdrop-filter: blur(10px);
@@ -130,15 +127,14 @@
         <div class="layer layer-1"></div>
     </div>
 
-    <!-- GitHub Back Button -->
-    <a href="../index.html" class="back-btn mb-12 px-6 py-3 rounded-2xl flex items-center space-x-3 text-[11px] uppercase tracking-[0.25em] font-bold text-emerald-400">
+    <!-- GitHub Back Button - FIXED PATH -->
+    <a href="../../index.html" class="back-btn mb-12 px-6 py-3 rounded-2xl flex items-center space-x-3 text-[11px] uppercase tracking-[0.25em] font-bold text-emerald-400">
         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
         </svg>
         <span>Tilbage til forsiden</span>
     </a>
 
-    <!-- Main Content -->
     <div class="text-center relative z-10">
         <div class="inline-block px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-500 text-[10px] font-bold uppercase tracking-widest mb-6 pulse">
             Venter på eksamensspørgsmål
@@ -151,19 +147,16 @@
         </p>
     </div>
 
-    <!-- Game Area -->
     <div id="game-container" onclick="handleAction()">
         <div id="score-display">0000</div>
         <div id="ground-line"></div>
 
-        <!-- Player (Geologist Icon) -->
         <div id="player">
             <svg viewBox="0 0 24 24" fill="currentColor" class="text-emerald-400 drop-shadow-[0_0_15px_rgba(16,185,129,0.6)]">
                 <path d="M12 2L4.5 20.29L5.21 21L12 18L18.79 21L19.5 20.29L12 2Z"/>
             </svg>
         </div>
 
-        <!-- Start/GameOver Message -->
         <div id="game-msg" class="absolute inset-0 flex items-center justify-center pointer-events-none">
             <span class="text-white/20 uppercase tracking-[0.6em] text-xs font-bold">Tryk for at starte spillet</span>
         </div>
@@ -214,7 +207,6 @@
         function spawnObstacle() {
             const el = document.createElement("div");
             el.className = "obstacle";
-            // Volcano icon for Naturgeografi
             el.innerHTML = `<svg viewBox="0 0 24 24" fill="currentColor" class="text-red-500/50"><path d="M12,2L1,21H23L12,2M12,6L19.53,19H4.47L12,6Z"/></svg>`;
             container.appendChild(el);
             return { element: el, x: window.innerWidth + 100 };
@@ -240,7 +232,6 @@
                 const pRect = player.getBoundingClientRect();
                 const oRect = obstacles[i].element.getBoundingClientRect();
 
-                // Collision detection with slightly smaller hitboxes
                 if (
                     pRect.right - 15 > oRect.left && 
                     pRect.left + 15 < oRect.right && 
@@ -280,7 +271,6 @@
             gameLoop();
         }
 
-        // Controls
         document.addEventListener("keydown", (e) => {
             if (e.code === "Space" || e.code === "ArrowUp") {
                 e.preventDefault();
@@ -288,7 +278,6 @@
             }
         });
 
-        // Mobile touch support
         document.addEventListener('touchmove', e => e.preventDefault(), { passive: false });
     </script>
 </body>

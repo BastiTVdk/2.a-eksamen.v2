@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spm 1: Eksponentiel Vækst I - MathQuest B</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <style>
+        :root {
+            --mq-slate-50: #f8fafc;
+            --mq-indigo: #4f46e5;
+            --accent: #6366f1;
+            --accent-glow: rgba(99, 102, 241, 0.15);
+            --mathias-float: float 6s ease-in-out infinite;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--mq-slate-50);
+            background-image: radial-gradient(circle at 2px 2px, rgba(0,0,0,0.03) 1px, transparent 0);
+            background-size: 32px 32px;
+            color: #0f172a;
+        }
+
+        .bg-glow-1 { position: fixed; top: -10%; left: -10%; width: 50vw; height: 50vw; background: radial-gradient(circle, rgba(99, 102, 241, 0.05) 0%, transparent 70%); z-index: -1; }
+        
+        .theory-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 2rem;
+            padding: 2.5rem;
+            border: 1px solid rgba(0,0,0,0.05);
+            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.05);
+            margin-bottom: 2rem;
+        }
+
+        .proof-step {
+            border-left: 4px solid var(--accent);
+            padding-left: 1.5rem;
+            margin-bottom: 2rem;
+            transition: all 0.3s ease;
+        }
+        .proof-step:hover { background: white; padding: 1rem 1rem 1rem 1.5rem; border-radius: 0 1rem 1rem 0; box-shadow: 0 4px 20px rgba(0,0,0,0.03); }
+
+        canvas { background: white; border-radius: 1.5rem; width: 100%; height: auto; }
+
+        .speech-bubble {
+            background: white;
+            border-radius: 1.5rem;
+            padding: 1.5rem;
+            border: 1px solid rgba(0,0,0,0.05);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            position: relative;
+            max-width: 320px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            display: none;
+            color: #475569;
+            line-height: 1.6;
+        }
+        .speech-bubble.active { display: block; }
+        .speech-bubble::after {
+            content: '';
+            position: absolute;
+            bottom: -10px;
+            right: 35px;
+            width: 20px;
+            height: 20px;
+            background: white;
+            transform: rotate(45deg);
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            border-right: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .badge-indigo { @apply bg-indigo-50 text-indigo-600 px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border border-indigo-100; }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-12px) rotate(2deg); }
+        }
+    </style>
+</head>
+<body class="p-4 md:p-12">
+
+    <div class="bg-glow-1"></div>
+
+    <!-- Navigation -->
+    <nav class="max-w-6xl mx-auto flex items-center justify-between mb-16">
+        <div class="flex items-center space-x-4">
+            <a href="index.html" class="w-12 h-12 bg-white rounded-2xl border border-slate-200 flex items-center justify-center hover:border-indigo-500 transition-all shadow-sm group">
+                <svg class="w-6 h-6 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M19 12H5M12 19l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </a>
+            <div>
+                <h1 class="text-3xl font-black tracking-tight">Eksponentiel Vækst I</h1>
+                <p class="text-[10px] font-black text-indigo-500 uppercase tracking-[0.3em]">Mundtlig Eksamen // B-Niveau</p>
+            </div>
+        </div>
+        <div class="hidden md:block">
+            <span class="badge-indigo">Quest 01</span>
+        </div>
+    </nav>
+
+    <main class="max-w-6xl mx-auto grid lg:grid-cols-12 gap-12 mb-32">
+        
+        <!-- Venstre kolonne: Teori & Bevis -->
+        <div class="lg:col-span-7">
+            
+            <!-- Sektion 1: Egenskaber -->
+            <section class="theory-card">
+                <div class="flex items-center space-x-3 mb-6">
+                    <span class="w-8 h-8 bg-indigo-600 text-white rounded-lg flex items-center justify-center font-bold italic">f</span>
+                    <h2 class="text-2xl font-black italic">Grundlæggende Egenskaber</h2>
+                </div>
+                <div class="space-y-6 text-slate-600 leading-relaxed">
+                    <p>Forskriften er \(f(x) = b \cdot a^x\). Her er de kritiske detaljer til din fremlæggelse:</p>
+                    
+                    <div class="grid sm:grid-cols-2 gap-4">
+                        <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                            <p class="font-bold text-slate-900 text-sm">Definitionsmængde \(Dm(f)\)</p>
+                            <p class="text-xs">Alle reelle tal \(\mathbb{R}\). Du kan indsætte ethvert \(x\).</p>
+                        </div>
+                        <div class="p-4 bg-slate-50 rounded-2xl border border-slate-100">
+                            <p class="font-bold text-slate-900 text-sm">Værdimængde \(Vm(f)\)</p>
+                            <p class="text-xs">Kun positive tal \(]0; \infty[\). Grafen er altid over x-aksen.</p>
+                        </div>
+                    </div>
+
+                    <ul class="space-y-3">
+                        <li class="flex items-start">
+                            <span class="text-indigo-600 mr-2">•</span>
+                            <span><strong>Monotoni:</strong> Hvis \(a > 1\) er funktionen <em>voksende</em>. Hvis \(0 < a < 1\) er den <em>aftagende</em>.</span>
+                        </li>
+                        <li class="flex items-start">
+                            <span class="text-indigo-600 mr-2">•</span>
+                            <span><strong>Asymptote:</strong> Grafen nærmer sig x-aksen (\(y=0\)), men rører den aldrig. Dette kaldes en vandret asymptote.</span>
+                        </li>
+                    </ul>
+                </div>
+            </section>
+
+            <!-- Sektion 2: Beviset -->
+            <section class="theory-card">
+                <div class="flex items-center space-x-3 mb-8">
+                    <span class="w-8 h-8 bg-indigo-600 text-white rounded-lg flex items-center justify-center font-bold">∑</span>
+                    <h2 class="text-2xl font-black italic">Beviset for \(a\) og \(b\)</h2>
+                </div>
+                
+                <div class="proof-step">
+                    <p class="font-bold text-slate-800 italic mb-1">Trin 1: To ligninger med to ubekendte</p>
+                    <p class="text-sm text-slate-500 mb-3">Vi indsætter to kendte punkter \((x_1, y_1)\) og \((x_2, y_2)\) i forskriften:</p>
+                    <div class="text-lg font-mono bg-slate-50 p-4 rounded-xl inline-block border border-slate-100">
+                        (1) \(y_2 = b \cdot a^{x_2}\) <br>
+                        (2) \(y_1 = b \cdot a^{x_1}\)
+                    </div>
+                </div>
+
+                <div class="proof-step">
+                    <p class="font-bold text-slate-800 italic mb-1">Trin 2: Division for at eliminere \(b\)</p>
+                    <p class="text-sm text-slate-500 mb-3">Vi dividerer ligning (1) med ligning (2). Da \(b/b = 1\), forsvinder \(b\):</p>
+                    <div class="text-lg">
+                        \(\frac{y_2}{y_1} = \frac{b \cdot a^{x_2}}{b \cdot a^{x_1}} \implies \frac{y_2}{y_1} = \frac{a^{x_2}}{a^{x_1}}\)
+                    </div>
+                </div>
+
+                <div class="proof-step">
+                    <p class="font-bold text-slate-800 italic mb-1">Trin 3: Potensregneregel og isolation</p>
+                    <p class="text-sm text-slate-500 mb-3">Vi bruger reglen \(\frac{a^n}{a^m} = a^{n-m}\) og tager derefter roden:</p>
+                    <div class="text-lg font-bold text-indigo-600">
+                        \(\frac{y_2}{y_1} = a^{x_2 - x_1} \implies a = \sqrt[x_2 - x_1]{\frac{y_2}{y_1}}\)
+                    </div>
+                </div>
+
+                <div class="proof-step">
+                    <p class="font-bold text-slate-800 italic mb-1">Trin 4: Find \(b\)</p>
+                    <p class="text-sm text-slate-500 mb-3">Indsæt det fundne \(a\) i ligning (2) for at isolere \(b\):</p>
+                    <div class="text-lg">
+                        \(y_1 = b \cdot a^{x_1} \implies b = \frac{y_1}{a^{x_1}}\)
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- Højre kolonne: Simulator & Mathias -->
+        <div class="lg:col-span-5 space-y-8">
+            
+            <!-- Simulator -->
+            <div class="theory-card bg-slate-900 text-white border-none shadow-2xl">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-xl font-black italic">Live Simulator</h3>
+                    <span class="text-[10px] font-bold text-indigo-400 border border-indigo-500/30 px-2 py-1 rounded tracking-tighter uppercase">Visualisering</span>
+                </div>
+                <canvas id="growthCanvas" width="400" height="300" class="mb-8"></canvas>
+                
+                <div class="space-y-8">
+                    <div>
+                        <div class="flex justify-between text-[10px] font-black uppercase mb-3 tracking-[0.2em] text-indigo-300">
+                            <span>Skæring (b)</span>
+                            <span id="b-val" class="text-white text-sm">2.0</span>
+                        </div>
+                        <input type="range" id="b-slider" min="0.5" max="10" step="0.5" value="2" class="w-full h-1 bg-indigo-800 rounded-lg appearance-none cursor-pointer accent-indigo-400">
+                    </div>
+                    <div>
+                        <div class="flex justify-between text-[10px] font-black uppercase mb-3 tracking-[0.2em] text-indigo-300">
+                            <span>Fremskrivningsfaktor (a)</span>
+                            <span id="a-val" class="text-white text-sm">1.20</span>
+                        </div>
+                        <input type="range" id="a-slider" min="0.5" max="2" step="0.01" value="1.2" class="w-full h-1 bg-indigo-800 rounded-lg appearance-none cursor-pointer accent-indigo-400">
+                    </div>
+                </div>
+                
+                <div class="mt-10 p-5 bg-indigo-600/10 rounded-2xl border border-indigo-500/20 text-center">
+                    <p class="text-[10px] uppercase font-black tracking-widest text-indigo-400 mb-2">Funktionens forskrift</p>
+                    <code id="formula-text" class="text-white font-black text-2xl">f(x) = 2.0 · 1.20^x</code>
+                </div>
+            </div>
+
+            <!-- Eksamens Checklist -->
+            <div class="theory-card border-2 border-indigo-100">
+                <h3 class="text-lg font-black mb-4 flex items-center">
+                    <svg class="w-5 h-5 mr-2 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" stroke-width="2.5"/></svg>
+                    Eksamens-Checklist
+                </h3>
+                <ul class="text-xs space-y-3 font-medium text-slate-600">
+                    <li class="flex items-center"><div class="w-1.5 h-1.5 bg-indigo-400 rounded-full mr-2"></div> Nævn at \(a > 0\) og \(b > 0\).</li>
+                    <li class="flex items-center"><div class="w-1.5 h-1.5 bg-indigo-400 rounded-full mr-2"></div> Forklar at \(a = 1 + r\) (vækstraten).</li>
+                    <li class="flex items-center"><div class="w-1.5 h-1.5 bg-indigo-400 rounded-full mr-2"></div> Vis grafisk forskel på \(a > 1\) og \(0 < a < 1\).</li>
+                    <li class="flex items-center"><div class="w-1.5 h-1.5 bg-indigo-400 rounded-full mr-2"></div> Nævn den vandrette asymptote \(y = 0\).</li>
+                </ul>
+            </div>
+
+            <!-- Mathias Mentor -->
+            <div class="flex flex-col items-end pt-4">
+                <div id="mathias-bubble" class="speech-bubble mb-6">
+                    Husk at fortælle censor, at definitionsmængden er alle tal, fordi vi kan opløfte i hvad som helst – men værdimængden er altid positiv, fordi en positiv grundværdi ganget med sig selv aldrig giver nul eller minus!
+                </div>
+                <div class="mathias-container" onclick="toggleMathias()">
+                    <svg width="100" height="100" viewBox="0 0 100 100" fill="none">
+                        <rect x="5" y="5" width="90" height="90" rx="32" fill="white" stroke="#e2e8f0" stroke-width="2" />
+                        <!-- Minimalistisk ansigt -->
+                        <circle cx="35" cy="45" r="3" fill="#1e293b" />
+                        <circle cx="65" cy="45" r="3" fill="#1e293b" />
+                        <rect x="40" y="68" width="20" height="2" rx="1" fill="#cbd5e1" />
+                        <!-- Status Dot -->
+                        <circle cx="82" cy="18" r="6" fill="#10b981" />
+                    </svg>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        const canvas = document.getElementById('growthCanvas');
+        const ctx = canvas.getContext('2d');
+        const aSlider = document.getElementById('a-slider');
+        const bSlider = document.getElementById('b-slider');
+        const aValText = document.getElementById('a-val');
+        const bValText = document.getElementById('b-val');
+        const formulaText = document.getElementById('formula-text');
+
+        function draw() {
+            const a = parseFloat(aSlider.value);
+            const b = parseFloat(bSlider.value);
+            
+            aValText.innerText = a.toFixed(2);
+            bValText.innerText = b.toFixed(1);
+            formulaText.innerText = `f(x) = ${b.toFixed(1)} · ${a.toFixed(2)}^x`;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Hjælpegitter
+            ctx.strokeStyle = '#1e293b';
+            ctx.lineWidth = 0.5;
+            for(let i=0; i<canvas.width; i+=40) {
+                ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, canvas.height); ctx.stroke();
+            }
+            for(let i=0; i<canvas.height; i+=40) {
+                ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(canvas.width, i); ctx.stroke();
+            }
+
+            // Akser
+            ctx.strokeStyle = '#475569';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(40, 20); ctx.lineTo(40, 260); // Y
+            ctx.moveTo(20, 260); ctx.lineTo(380, 260); // X
+            ctx.stroke();
+
+            // Kurve
+            ctx.strokeStyle = '#6366f1';
+            ctx.lineWidth = 4;
+            ctx.lineJoin = 'round';
+            ctx.beginPath();
+            
+            let started = false;
+            // Vi tegner x fra 0 til 15 enheder
+            for(let x = 0; x <= 16; x += 0.1) {
+                const y = b * Math.pow(a, x);
+                const cx = 40 + (x * 20);
+                const cy = 260 - (y * 20);
+                
+                if (cy >= 10 && cy <= 280) {
+                    if (!started) { ctx.moveTo(cx, cy); started = true; }
+                    else { ctx.lineTo(cx, cy); }
+                }
+            }
+            ctx.stroke();
+            
+            // Marker b-punktet
+            ctx.fillStyle = '#f43f5e';
+            ctx.beginPath();
+            ctx.arc(40, 260 - (b * 20), 5, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        function toggleMathias() {
+            document.getElementById('mathias-bubble').classList.toggle('active');
+        }
+
+        aSlider.addEventListener('input', draw);
+        bSlider.addEventListener('input', draw);
+        window.onload = draw;
+    </script>
+</body>
+</html>

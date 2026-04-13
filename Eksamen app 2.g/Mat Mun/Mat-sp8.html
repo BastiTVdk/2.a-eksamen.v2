@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spm 8: Sandsynlighed & Binomialfordeling | 2.a SAG</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --edu-violet: #8b5cf6;
+            --edu-bg: #f8fafc;
+            --insight-bg: #f5f3ff;
+        }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--edu-bg);
+            color: #1e293b;
+            line-height: 1.6;
+        }
+        .learning-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 1.5rem;
+            padding: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        }
+        .deep-dive {
+            background: var(--insight-bg);
+            border-radius: 1.5rem;
+            padding: 2.5rem;
+            border: 1px solid #ddd6fe;
+            margin-top: 1.5rem;
+            display: none;
+            animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .btn-read-more {
+            @apply flex items-center gap-3 px-6 py-3 rounded-full bg-violet-50 text-violet-700 text-xs font-bold uppercase tracking-wider transition-all hover:bg-violet-100 mt-6 border border-violet-100;
+        }
+        canvas {
+            background: white;
+            border-radius: 1.5rem;
+            width: 100%;
+        }
+        .sticky-nav {
+            position: sticky;
+            top: 2rem;
+        }
+        input[type=range] { accent-color: var(--edu-violet); }
+        .math-container {
+            overflow-x: auto;
+            scrollbar-width: thin;
+            padding: 1rem 0;
+        }
+        .math-container::-webkit-scrollbar { height: 4px; }
+        .math-container::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+    </style>
+</head>
+<body class="p-4 md:p-12">
+
+    <div class="max-w-6xl mx-auto">
+        <!-- Header -->
+        <header class="mb-16">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+                <div>
+                    <a href="Index.html" class="inline-flex items-center text-sm font-bold text-violet-600 hover:gap-3 transition-all gap-2 mb-4 group">
+                        <span class="group-hover:-translate-x-1 transition-transform">←</span> Tilbage til Forsiden
+                    </a>
+                    <h1 class="text-4xl md:text-6xl font-black tracking-tight text-slate-900">
+                        Spm 8: <span class="text-violet-600 italic">Sandsynlighed & Hypoteser</span>
+                    </h1>
+                </div>
+                <div class="md:text-right border-l-0 md:border-l-2 border-slate-200 pl-0 md:pl-6">
+                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 italic">Statistisk Analyse</p>
+                    <p class="text-sm font-extrabold text-slate-700">2.a Sankt Annæ Gymnasium</p>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm text-center">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase mb-1">Emne</p>
+                    <p class="text-sm font-extrabold">Binomialfordeling</p>
+                </div>
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm text-center">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase mb-1">Værktøj</p>
+                    <p class="text-sm font-extrabold text-violet-600 italic">K(n,r)</p>
+                </div>
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm text-center">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase mb-1">Parameter</p>
+                    <p class="text-sm font-extrabold">n og p</p>
+                </div>
+                <div class="bg-violet-600 p-5 rounded-2xl shadow-lg text-center text-white">
+                    <p class="text-[10px] font-bold text-violet-200 uppercase mb-1">Status</p>
+                    <p class="text-sm font-extrabold tracking-tight">Klar til 2.a</p>
+                </div>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+            <!-- Sidebar -->
+            <aside class="lg:col-span-3">
+                <nav class="sticky-nav space-y-6">
+                    <div class="bg-slate-900 rounded-[2rem] p-8 text-white shadow-2xl">
+                        <h3 class="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 mb-8 italic text-center">Vidensbank</h3>
+                        <ul class="space-y-6 text-sm font-bold">
+                            <li><a href="#kombinatorik" class="hover:text-violet-400 transition flex items-center gap-3"><span class="w-1.5 h-1.5 rounded-full bg-violet-500"></span> Kombinatorik</a></li>
+                            <li><a href="#binomial" class="hover:text-violet-400 transition flex items-center gap-3 text-slate-400"><span class="w-1.5 h-1.5 rounded-full bg-slate-700"></span> Binomial-formlen</a></li>
+                            <li><a href="#sim" class="hover:text-violet-400 transition flex items-center gap-3 text-slate-400"><span class="w-1.5 h-1.5 rounded-full bg-slate-700"></span> Fordelings-Sim</a></li>
+                            <li><a href="#hypotese" class="hover:text-violet-400 transition flex items-center gap-3 text-slate-400"><span class="w-1.5 h-1.5 rounded-full bg-slate-700"></span> Hypoteser</a></li>
+                        </ul>
+                    </div>
+                </nav>
+            </aside>
+
+            <!-- Main Content -->
+            <div class="lg:col-span-9 space-y-16 pb-32">
+                
+                <!-- Section 1: Kombinatorik -->
+                <section id="kombinatorik" class="space-y-8">
+                    <div class="flex items-center gap-6">
+                        <h2 class="text-xs font-black uppercase tracking-[0.4em] text-slate-400">01. Grundlaget: Kombinatorik</h2>
+                        <div class="h-px flex-grow bg-slate-200"></div>
+                    </div>
+                    
+                    <div class="learning-card border-t-8 border-violet-500">
+                        <h3 class="text-2xl font-black mb-6 italic text-slate-800">Binomialkoefficienten \( K(n,r) \)</h3>
+                        <p class="text-slate-600 mb-8 text-lg leading-relaxed">
+                            Når vi skal beregne sandsynligheder for komplekse hændelser, skal vi først vide, på hvor mange måder noget kan ske. \( K(n,r) \) fortæller os antallet af måder, vi kan vælge \( r \) elementer ud af \( n \) mulige, når rækkefølgen er ligegyldig.
+                        </p>
+                        
+                        <div class="bg-slate-50 p-8 md:p-12 rounded-3xl shadow-inner text-center border border-slate-100 mb-8 math-container">
+                            <div class="text-2xl md:text-4xl font-light text-slate-800">
+                                $$K(n,r) = \binom{n}{r} = \frac{n!}{r! \cdot (n-r)!}$$
+                            </div>
+                        </div>
+
+                        <button onclick="toggleDeepDive('dd-fakultet')" class="btn-read-more">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                            <span>Hvad er udråbstegnet (!)?</span>
+                        </button>
+
+                        <div id="dd-fakultet" class="deep-dive">
+                            <h4 class="font-bold text-violet-900 mb-4">Fakultet og tælleprincipper</h4>
+                            <p class="text-sm text-slate-700 leading-relaxed italic">
+                                Udråbstegnet \( ! \) står for <strong>fakultet</strong>. Det betyder, at du ganger tallet med alle de hele tal, der er mindre end det. 
+                                <br><br>
+                                F.eks. er \( 5! = 5 \cdot 4 \cdot 3 \cdot 2 \cdot 1 = 120 \).
+                                <br><br>
+                                I formlen for \( K(n,r) \) bruger vi fakulteter til at fjerne de dubletter, der opstår, fordi rækkefølgen ikke betyder noget. Hvis du vælger person A og derefter person B, er det det samme som at vælge B og derefter A. Det sørger \( r! \) i nævneren for at "rydde op" i.
+                            </p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section 2: Binomialfordelingen -->
+                <section id="binomial" class="space-y-8">
+                    <div class="flex items-center gap-6">
+                        <h2 class="text-xs font-black uppercase tracking-[0.4em] text-slate-400">02. Den matematiske model</h2>
+                        <div class="h-px flex-grow bg-slate-200"></div>
+                    </div>
+                    
+                    <div class="learning-card">
+                        <h3 class="text-2xl font-black mb-6 italic text-slate-800">Sandsynlighedsfunktionen \( P(X=r) \)</h3>
+                        <p class="text-slate-600 mb-8 leading-relaxed">
+                            Binomialfordelingen bruges, når vi udfører et eksperiment \( n \) gange, hvor der i hver gang kun er to muligheder: <strong>succes</strong> eller <strong>fiasko</strong>.
+                        </p>
+
+                        <div class="bg-violet-600 p-8 md:p-12 rounded-[2rem] text-white text-center shadow-xl mb-10 math-container">
+                            <span class="text-2xl md:text-3xl font-black">
+                                $$P(X=r) = \binom{n}{r} \cdot p^r \cdot (1-p)^{n-r}$$
+                            </span>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+                            <div class="p-6 bg-slate-50 rounded-2xl border border-slate-100">
+                                <h4 class="font-bold text-slate-800 mb-3 text-sm uppercase">Betingelser</h4>
+                                <ul class="text-xs text-slate-600 space-y-3 italic">
+                                    <li>• Fast antal gentagelser (\( n \)).</li>
+                                    <li>• Kun to mulige udfald (Succes/Fiasko).</li>
+                                    <li>• Uafhængighed mellem hver gentagelse.</li>
+                                    <li>• Konstant succes-sandsynlighed (\( p \)).</li>
+                                </ul>
+                            </div>
+                            <div class="p-6 bg-violet-50 rounded-2xl border border-violet-100">
+                                <h4 class="font-bold text-violet-800 mb-3 text-sm uppercase">Parametre</h4>
+                                <p class="text-xs text-violet-700 italic leading-loose">
+                                    \( n \): Antal forsøg<br>
+                                    \( p \): Sandsynlighed for succes<br>
+                                    \( r \): Ønsket antal succeser<br>
+                                    \( X \): Den stokastiske variabel
+                                </p>
+                            </div>
+                        </div>
+
+                        <button onclick="toggleDeepDive('dd-middel')" class="btn-read-more">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                            <span>Hvad er forventningsværdien?</span>
+                        </button>
+
+                        <div id="dd-middel" class="deep-dive">
+                            <h4 class="font-bold text-violet-900 mb-4">Middelværdi og Spredning</h4>
+                            <p class="text-sm text-slate-700 leading-relaxed italic">
+                                Middelværdien \( \mu \) (my) er det antal succeser, vi "forventer" i gennemsnit. Den beregnes utroligt simpelt:
+                                <br><br>
+                                <span class="text-lg font-bold">\( \mu = n \cdot p \)</span>
+                                <br><br>
+                                Hvis vi kaster en terning 60 gange, og succes er at få en 6'er (\( p = \frac{1}{6} \)), så forventer vi at få \( 60 \cdot \frac{1}{6} = 10 \) seksere. Spredningen \( \sigma \) (sigma) fortæller os, hvor meget resultaterne typisk varierer fra dette gennemsnit.
+                            </p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section 3: Simulator -->
+                <section id="sim" class="space-y-8">
+                    <h2 class="text-3xl font-black text-slate-800 italic text-center">Interaktiv Fordelings-Sim</h2>
+                    <div class="learning-card">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+                            <div class="space-y-8">
+                                <div class="p-6 bg-slate-50 rounded-2xl border border-slate-100">
+                                    <p class="text-xs font-black text-violet-600 mb-6 uppercase tracking-widest text-[10px]">Justér parametre</p>
+                                    
+                                    <div class="space-y-6">
+                                        <div>
+                                            <label class="block text-[10px] font-bold text-slate-500 uppercase">Antal forsøg (n): <span id="nVal" class="text-slate-900 font-black">20</span></label>
+                                            <input type="range" id="nSlider" min="5" max="50" step="1" value="20" class="w-full h-2 bg-slate-200 rounded-full appearance-none cursor-pointer">
+                                        </div>
+                                        <div>
+                                            <label class="block text-[10px] font-bold text-slate-500 uppercase">Sandsynlighed (p): <span id="pVal" class="text-slate-900 font-black">0.50</span></label>
+                                            <input type="range" id="pSlider" min="0.05" max="0.95" step="0.05" value="0.5" class="w-full h-2 bg-slate-200 rounded-full appearance-none cursor-pointer">
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="p-6 bg-slate-900 rounded-[1.5rem] shadow-xl text-white">
+                                    <p class="text-[10px] font-black uppercase text-violet-400 mb-2 tracking-widest text-center italic">Forventet antal succeser (\( \mu \))</p>
+                                    <div id="meanResult" class="text-4xl font-black text-center tracking-tighter">10.0</div>
+                                    <p class="text-center text-[10px] text-slate-400 uppercase mt-4 font-bold">Middelværdien af fordelingen</p>
+                                </div>
+                            </div>
+                            <div class="bg-white rounded-[2rem] shadow-inner border border-slate-100 overflow-hidden relative p-4">
+                                <canvas id="probCanvas" width="400" height="300"></canvas>
+                                <div class="absolute bottom-4 right-4 text-[8px] font-bold text-slate-300 uppercase italic">Binomialfordelings-graf</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section 4: Hypotesetest -->
+                <section id="hypotese" class="space-y-8">
+                    <div class="flex items-center gap-6">
+                        <h2 class="text-xs font-black uppercase tracking-[0.4em] text-slate-400">03. Hypoteser & Signifikans</h2>
+                        <div class="h-px flex-grow bg-slate-200"></div>
+                    </div>
+                    
+                    <div class="learning-card border-l-8 border-violet-700">
+                        <h3 class="text-2xl font-black mb-6 italic text-slate-800">Hvornår er noget "usandsynligt"?</h3>
+                        <p class="text-slate-600 mb-8 leading-relaxed">
+                            Ved en hypotesetest undersøger vi, om en observeret værdi er så usandsynlig, at vi må forkaste vores oprindelige antagelse (Nulhypotesen, \( H_0 \)).
+                        </p>
+
+                        <div class="space-y-6 mb-10">
+                            <div class="flex gap-4 p-5 bg-slate-50 rounded-2xl border border-slate-100 items-start">
+                                <div class="w-8 h-8 rounded-lg bg-violet-600 text-white flex items-center justify-center font-bold flex-shrink-0">1</div>
+                                <div>
+                                    <h4 class="font-bold text-sm">Signifikansniveau (\( \alpha \))</h4>
+                                    <p class="text-xs text-slate-500 italic">Typisk 5%. Det er grænsen for, hvornår vi kalder noget "statistisk signifikant".</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-4 p-5 bg-slate-50 rounded-2xl border border-slate-100 items-start">
+                                <div class="w-8 h-8 rounded-lg bg-violet-600 text-white flex items-center justify-center font-bold flex-shrink-0">2</div>
+                                <div>
+                                    <h4 class="font-bold text-sm">Den kritiske mængde</h4>
+                                    <p class="text-xs text-slate-500 italic">De værdier, der er så ekstreme, at de samlet set har en sandsynlighed under 5%.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button onclick="toggleDeepDive('dd-p')" class="btn-read-more">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                            <span>Hvad er en p-værdi? (Top-karakter viden)</span>
+                        </button>
+
+                        <div id="dd-p" class="deep-dive">
+                            <h4 class="font-bold text-violet-900 mb-4">P-værdien forklaret pædagogisk</h4>
+                            <p class="text-sm text-slate-700 leading-relaxed italic">
+                                P-værdien er sandsynligheden for at få det observerede resultat (eller noget endnu mere ekstremt), hvis nulhypotesen er sand.
+                                <br><br>
+                                <strong>Huskeregel:</strong> "If the p is low, the \( H_0 \) must go". 
+                                <br><br>
+                                Hvis din p-værdi er under dit signifikansniveau (f.eks. 0,02 < 0,05), så forkaster du din nulhypotese. Det betyder, at resultatet er for mærkeligt til at være en tilfældighed.
+                            </p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <footer class="text-center py-24 border-t border-slate-200 mt-20">
+        <p class="text-[10px] font-black uppercase text-slate-400 tracking-[0.5em] italic">Statistisk Forståelse – 2.a SAG</p>
+    </footer>
+
+    <script>
+        function toggleDeepDive(id) {
+            const el = document.getElementById(id);
+            const isVisible = window.getComputedStyle(el).display === 'block';
+            el.style.display = isVisible ? 'none' : 'block';
+        }
+
+        const canvas = document.getElementById('probCanvas');
+        const ctx = canvas.getContext('2d');
+        const nSlider = document.getElementById('nSlider');
+        const pSlider = document.getElementById('pSlider');
+        const nValText = document.getElementById('nVal');
+        const pValText = document.getElementById('pVal');
+        const meanResult = document.getElementById('meanResult');
+
+        function factorial(num) {
+            if (num < 0) return -1;
+            else if (num == 0) return 1;
+            else return (num * factorial(num - 1));
+        }
+
+        function nCr(n, r) {
+            if (r < 0 || r > n) return 0;
+            if (r == 0 || r == n) return 1;
+            if (r > n / 2) r = n - r;
+            
+            let res = 1;
+            for (let i = 1; i <= r; i++) {
+                res = res * (n - i + 1) / i;
+            }
+            return res;
+        }
+
+        function binomialProb(n, p, r) {
+            return nCr(n, r) * Math.pow(p, r) * Math.pow(1 - p, n - r);
+        }
+
+        function draw() {
+            const n = parseInt(nSlider.value);
+            const p = parseFloat(pSlider.value);
+            const mean = n * p;
+
+            nValText.innerText = n;
+            pValText.innerText = p.toFixed(2);
+            meanResult.innerText = mean.toFixed(1);
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            const padding = 40;
+            const chartW = canvas.width - 2 * padding;
+            const chartH = canvas.height - 2 * padding;
+            const barW = chartW / (n + 1);
+
+            // Find max prob for scaling
+            let maxP = 0;
+            const probs = [];
+            for (let i = 0; i <= n; i++) {
+                const prob = binomialProb(n, p, i);
+                probs.push(prob);
+                if (prob > maxP) maxP = prob;
+            }
+
+            // Draw bars
+            probs.forEach((prob, i) => {
+                const h = (prob / maxP) * chartH;
+                const x = padding + i * barW;
+                const y = canvas.height - padding - h;
+                
+                // Color based on distance to mean
+                const dist = Math.abs(i - mean);
+                ctx.fillStyle = dist < 1 ? '#8b5cf6' : '#ddd6fe';
+                
+                ctx.beginPath();
+                ctx.roundRect(x + 2, y, barW - 4, h, [4, 4, 0, 0]);
+                ctx.fill();
+            });
+
+            // Axes
+            ctx.strokeStyle = '#e2e8f0';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.moveTo(padding, canvas.height - padding);
+            ctx.lineTo(canvas.width - padding, canvas.height - padding);
+            ctx.stroke();
+        }
+
+        [nSlider, pSlider].forEach(s => s.addEventListener('input', draw));
+        window.onload = draw;
+    </script>
+</body>
+</html>

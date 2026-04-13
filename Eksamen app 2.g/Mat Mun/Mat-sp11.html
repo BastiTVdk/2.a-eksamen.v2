@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spm 11: Det Gyldne Snit | 2.a SAG</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['\\(', '\\)']],
+                displayMath: [['$$', '$$']],
+                processEscapes: true
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --edu-amber: #f59e0b;
+            --edu-bg: #f8fafc;
+            --insight-bg: #fffbeb;
+        }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--edu-bg);
+            color: #1e293b;
+            line-height: 1.6;
+        }
+        .learning-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 1.5rem;
+            padding: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        }
+        .deep-dive {
+            background: var(--insight-bg);
+            border-radius: 1.5rem;
+            padding: 2.5rem;
+            border: 1px solid #fde68a;
+            margin-top: 1.5rem;
+            display: none;
+            animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .btn-read-more {
+            @apply flex items-center gap-3 px-6 py-3 rounded-full bg-amber-50 text-amber-700 text-xs font-bold uppercase tracking-wider transition-all hover:bg-amber-100 mt-6 border border-amber-100;
+        }
+        canvas {
+            background: white;
+            border-radius: 1.5rem;
+            width: 100%;
+            height: auto;
+        }
+        .sticky-nav {
+            position: sticky;
+            top: 2rem;
+        }
+        .math-container {
+            overflow-x: auto;
+            scrollbar-width: thin;
+            padding: 1rem;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-12">
+
+    <div class="max-w-6xl mx-auto">
+        <!-- Header -->
+        <header class="mb-16">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+                <div>
+                    <a href="index.html" class="inline-flex items-center text-sm font-bold text-amber-600 hover:gap-3 transition-all gap-2 mb-4 group">
+                        <span class="group-hover:-translate-x-1 transition-transform">←</span> Tilbage til Forsiden
+                    </a>
+                    <h1 class="text-4xl md:text-6xl font-black tracking-tight text-slate-900">
+                        Spm 11: <span class="text-amber-500 italic">Det Gyldne Snit</span>
+                    </h1>
+                </div>
+                <div class="md:text-right border-l-0 md:border-l-2 border-slate-200 pl-0 md:pl-6">
+                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 italic">Matematisk Harmoni</p>
+                    <p class="text-sm font-extrabold text-slate-700">2.a Sankt Annæ Gymnasium</p>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm text-center">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase mb-1 italic">Værdi</p>
+                    <p class="text-sm font-extrabold">φ ≈ 1,618</p>
+                </div>
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm text-center">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase mb-1 italic">Geometri</p>
+                    <p class="text-sm font-extrabold text-amber-600 italic">Rektanglet</p>
+                </div>
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm text-center">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase mb-1 italic">Følge</p>
+                    <p class="text-sm font-extrabold">Fibonacci</p>
+                </div>
+                <div class="bg-amber-500 p-5 rounded-2xl shadow-lg text-center text-white">
+                    <p class="text-[10px] font-bold text-amber-200 uppercase mb-1 italic">Status</p>
+                    <p class="text-sm font-extrabold tracking-tight italic">Designet til 2.a</p>
+                </div>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+            <!-- Sidebar -->
+            <aside class="lg:col-span-3">
+                <nav class="sticky-nav space-y-6">
+                    <div class="bg-slate-900 rounded-[2rem] p-8 text-white shadow-2xl border border-white/5">
+                        <h3 class="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 mb-8 italic text-center">Indhold</h3>
+                        <ul class="space-y-6 text-sm font-bold">
+                            <li><a href="#definition" class="hover:text-amber-400 transition flex items-center gap-3"><span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> Definitionen</a></li>
+                            <li><a href="#sim" class="hover:text-amber-400 transition flex items-center gap-3 text-slate-400"><span class="w-1.5 h-1.5 rounded-full bg-slate-700"></span> Simulator</a></li>
+                            <li><a href="#anvendelse" class="hover:text-amber-400 transition flex items-center gap-3 text-slate-400"><span class="w-1.5 h-1.5 rounded-full bg-slate-700"></span> Kunst & Natur</a></li>
+                        </ul>
+                    </div>
+                </nav>
+            </aside>
+
+            <!-- Main Content -->
+            <div class="lg:col-span-9 space-y-16 pb-32">
+                
+                <!-- Section 1: Definition -->
+                <section id="definition" class="space-y-8">
+                    <div class="flex items-center gap-6">
+                        <h2 class="text-xs font-black uppercase tracking-[0.4em] text-slate-400">01. Det ideelle forhold</h2>
+                        <div class="h-px flex-grow bg-slate-200"></div>
+                    </div>
+                    
+                    <div class="learning-card border-t-8 border-amber-500">
+                        <h3 class="text-2xl font-black mb-6 italic text-slate-800">Forholdet mellem a og b</h3>
+                        <p class="text-slate-600 mb-8 text-lg leading-relaxed">
+                            Det gyldne snit opstår, når vi deler et linjestykke \( a+b \) i to dele, så forholdet mellem hele linjen og den lange del \( a \) er præcis det samme som forholdet mellem den lange del og den korte del \( b \).
+                        </p>
+                        
+                        <div class="bg-slate-50 p-8 md:p-12 rounded-3xl shadow-inner text-center border border-slate-100 mb-8 math-container">
+                            <div class="text-2xl md:text-4xl font-light text-slate-800">
+                                $$\frac{a+b}{a} = \frac{a}{b} = \phi$$
+                            </div>
+                        </div>
+
+                        <button onclick="toggleDeepDive('dd-phi')" class="btn-read-more">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                            <span>Hvad er værdien for \(\phi\)?</span>
+                        </button>
+
+                        <div id="dd-phi" class="deep-dive">
+                            <h4 class="font-bold text-amber-900 mb-4 italic text-lg">Den præcise udregning</h4>
+                            <p class="text-sm text-slate-700 leading-relaxed italic mb-6">
+                                Hvis vi sætter \( b = 1 \), bliver ligningen til \( \frac{a+1}{a} = a \). Det fører os til andengradsligningen \( a^2 - a - 1 = 0 \). Den positive løsning til denne ligning er:
+                            </p>
+                            <div class="p-6 bg-white rounded-2xl text-center font-mono text-xl border border-amber-100 text-amber-600">
+                                $$ \phi = \frac{1 + \sqrt{5}}{2} \approx 1,6180339... $$
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section 2: Simulator -->
+                <section id="sim" class="space-y-8">
+                    <h2 class="text-3xl font-black text-slate-800 italic text-center">Det Gyldne Rektangel & Spiral</h2>
+                    <div class="learning-card">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                            <div class="space-y-8">
+                                <div class="p-6 bg-slate-50 rounded-2xl border border-slate-100">
+                                    <p class="text-xs font-black text-amber-600 mb-6 uppercase tracking-widest text-[10px]">Eksperimentér med Konstruktionen</p>
+                                    <div class="space-y-6">
+                                        <div>
+                                            <label class="block text-[10px] font-bold text-slate-500 uppercase italic">Opdelinger i rektanglet: <span id="nVal" class="text-slate-900 font-black">6</span></label>
+                                            <input type="range" id="nSlider" min="2" max="10" step="1" value="6" class="w-full h-2 bg-slate-200 rounded-full appearance-none cursor-pointer">
+                                        </div>
+                                    </div>
+                                    <p class="text-[10px] text-slate-400 mt-6 italic font-bold leading-relaxed">
+                                        Hvis du klipper et kvadrat ud af et gyldent rektangel, er det resterende stykke altid et nyt, mindre gyldent rektangel.
+                                    </p>
+                                </div>
+                                <div class="p-6 bg-slate-900 rounded-[1.5rem] shadow-xl text-white text-center">
+                                    <p class="text-[10px] font-black uppercase text-amber-400 mb-2 tracking-widest italic">Visuelt Bevis</p>
+                                    <div class="text-xs text-slate-400 italic font-medium">Bredde : Højde = 1,618</div>
+                                </div>
+                            </div>
+                            <div class="bg-white rounded-[2rem] shadow-inner border border-slate-100 overflow-hidden flex items-center justify-center p-4 min-h-[350px]">
+                                <canvas id="goldenCanvas" width="500" height="350"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section 3: Anvendelse -->
+                <section id="anvendelse" class="space-y-8">
+                    <div class="flex items-center gap-6">
+                        <h2 class="text-xs font-black uppercase tracking-[0.4em] text-slate-400">02. Kunst, Arkitektur & Natur</h2>
+                        <div class="h-px flex-grow bg-slate-200"></div>
+                    </div>
+                    
+                    <div class="learning-card border-l-8 border-amber-600">
+                        <h3 class="text-2xl font-black mb-6 italic text-slate-800">Hvorfor lærer vi om det?</h3>
+                        <p class="text-slate-600 mb-10 leading-relaxed text-lg">
+                            Det gyldne snit er ikke bare et tal; det er en opskrift på balance og harmoni, som mennesker har brugt i over 2000 år.
+                        </p>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div class="p-6 bg-slate-50 rounded-2xl border border-slate-100 group hover:border-amber-400 transition-colors">
+                                <h4 class="font-black text-amber-600 text-xs mb-3 uppercase tracking-widest">Det visuelle blik</h4>
+                                <p class="text-sm text-slate-600 italic">
+                                    Når vi ser et ansigt eller en bygning, som vi finder "smuk", er det ofte fordi proportionerne rammer tæt på 1,618. Det føles naturligt for vores hjerner.
+                                </p>
+                            </div>
+                            <div class="p-6 bg-slate-50 rounded-2xl border border-slate-100 group hover:border-amber-400 transition-colors">
+                                <h4 class="font-black text-amber-600 text-xs mb-3 uppercase tracking-widest">Fibonacci i naturen</h4>
+                                <p class="text-sm text-slate-600 italic">
+                                    Planter bruger Fibonacci-tal (1, 1, 2, 3, 5...) til at placere deres blade. Da forholdet mellem disse tal nærmer sig \(\phi\), sikrer det, at bladene ikke skygger for hinanden.
+                                </p>
+                            </div>
+                        </div>
+
+                        <button onclick="toggleDeepDive('dd-arkitektur')" class="btn-read-more">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                            <span>Hvor kan man se det i virkeligheden?</span>
+                        </button>
+
+                        <div id="dd-arkitektur" class="deep-dive">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm italic text-slate-700">
+                                <div class="space-y-2">
+                                    <p class="font-black text-amber-700 uppercase text-[10px]">Parthenon</p>
+                                    <p>Facaden på det græske tempel passer præcis ind i et gyldent rektangel.</p>
+                                </div>
+                                <div class="space-y-2">
+                                    <p class="font-black text-amber-700 uppercase text-[10px]">Mona Lisa</p>
+                                    <p>Da Vinci brugte rektanglet til at placere Mona Lisas ansigt og krop i harmoniske linjer.</p>
+                                </div>
+                                <div class="space-y-2">
+                                    <p class="font-black text-amber-700 uppercase text-[10px]">Solsikker</p>
+                                    <p>Frøene i midten vokser i modsat-rettede spiraler baseret på Fibonacci-tal.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <footer class="text-center py-24 border-t border-slate-200 mt-20">
+        <p class="text-[10px] font-black uppercase text-slate-400 tracking-[0.5em] italic">Matematisk HUB – 2.a SAG</p>
+    </footer>
+
+    <script>
+        function toggleDeepDive(id) {
+            const el = document.getElementById(id);
+            const isVisible = window.getComputedStyle(el).display === 'block';
+            el.style.display = isVisible ? 'none' : 'block';
+        }
+
+        const canvas = document.getElementById('goldenCanvas');
+        const ctx = canvas.getContext('2d');
+        const nSlider = document.getElementById('nSlider');
+        const nValText = document.getElementById('nVal');
+
+        function draw() {
+            const n = parseInt(nSlider.value);
+            nValText.innerText = n;
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const phi = (1 + Math.sqrt(5)) / 2;
+            const padding = 20;
+            const availableWidth = canvas.width - padding * 2;
+            const availableHeight = canvas.height - padding * 2;
+
+            // Vi starter med at definere det yderste gyldne rektangel
+            // baseret på den tilgængelige plads
+            let w, h;
+            if (availableWidth / availableHeight > phi) {
+                h = availableHeight;
+                w = h * phi;
+            } else {
+                w = availableWidth;
+                h = w / phi;
+            }
+
+            // Start koordinater (centreret)
+            let x = (canvas.width - w) / 2;
+            let y = (canvas.height - h) / 2;
+
+            // Her bruger vi subdivision logik:
+            // Vi tegner et kvadrat af siden s = h, og det resterende er et nyt rektangel
+            let curW = w;
+            let curH = h;
+            let curX = x;
+            let curY = y;
+
+            for (let i = 0; i < n; i++) {
+                let side;
+                let direction = i % 4; // 0: Right, 1: Down, 2: Left, 3: Up
+
+                // Tegn det nuværende rektangel/kvadrat ramme
+                ctx.strokeStyle = '#e2e8f0';
+                ctx.lineWidth = 1;
+                ctx.strokeRect(curX, curY, curW, curH);
+
+                // Find ud af hvor kvadratet skal være og tegn buen
+                ctx.beginPath();
+                ctx.strokeStyle = '#f59e0b';
+                ctx.lineWidth = 3;
+
+                if (direction === 0) { // Kvadrat til venstre, nyt rektangel til højre
+                    side = curH;
+                    // Arc i kvadratet: Top-venstre til Bund-højre
+                    ctx.arc(curX + side, curY + side, side, Math.PI, 1.5 * Math.PI);
+                    ctx.stroke();
+                    curX += side;
+                    curW -= side;
+                } 
+                else if (direction === 1) { // Kvadrat foroven, nyt rektangel forneden
+                    side = curW;
+                    ctx.arc(curX, curY + side, side, 1.5 * Math.PI, 2 * Math.PI);
+                    ctx.stroke();
+                    curY += side;
+                    curH -= side;
+                }
+                else if (direction === 2) { // Kvadrat til højre, nyt rektangel til venstre
+                    side = curH;
+                    ctx.arc(curX, curY, side, 0, 0.5 * Math.PI);
+                    ctx.stroke();
+                    curW -= side;
+                }
+                else if (direction === 3) { // Kvadrat forneden, nyt rektangel foroven
+                    side = curW;
+                    ctx.arc(curX + side, curY, side, 0.5 * Math.PI, Math.PI);
+                    ctx.stroke();
+                    curH -= side;
+                }
+            }
+        }
+
+        nSlider.addEventListener('input', draw);
+        window.onload = draw;
+    </script>
+</body>
+</html>

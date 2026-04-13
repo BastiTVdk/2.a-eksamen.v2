@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spm 7: Geometri III - Afstande & Cirkler | 2.a SAG</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --edu-blue: #0ea5e9;
+            --edu-bg: #f8fafc;
+            --insight-bg: #f0f9ff;
+            --dist-purple: #8b5cf6;
+        }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--edu-bg);
+            color: #1e293b;
+            line-height: 1.6;
+        }
+        .learning-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 1.5rem;
+            padding: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        }
+        .deep-dive {
+            background: var(--insight-bg);
+            border-radius: 1.5rem;
+            padding: 2.5rem;
+            border: 1px solid #bae6fd;
+            margin-top: 1.5rem;
+            display: none;
+            animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .step-number {
+            @apply w-10 h-10 rounded-xl bg-sky-500 text-white flex items-center justify-center font-bold shadow-lg shadow-sky-200 mb-4;
+        }
+        .btn-read-more {
+            @apply flex items-center gap-3 px-6 py-3 rounded-full bg-sky-50 text-sky-700 text-xs font-bold uppercase tracking-wider transition-all hover:bg-sky-100 mt-6 border border-sky-100;
+        }
+        canvas {
+            background: white;
+            border-radius: 1.5rem;
+            width: 100%;
+        }
+        .sticky-nav {
+            position: sticky;
+            top: 2rem;
+        }
+        input[type=range] { accent-color: var(--edu-blue); }
+        .math-container {
+            overflow-x: auto;
+            scrollbar-width: thin;
+            padding: 1rem 0;
+        }
+        .math-container::-webkit-scrollbar { height: 4px; }
+        .math-container::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+    </style>
+</head>
+<body class="p-4 md:p-12">
+
+    <div class="max-w-6xl mx-auto">
+        <!-- Header -->
+        <header class="mb-16">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+                <div>
+                    <a href="Index.html" class="inline-flex items-center text-sm font-bold text-blue-600 hover:gap-3 transition-all gap-2 mb-4 group">
+                        <span class="group-hover:-translate-x-1 transition-transform">←</span> Tilbage til Forsiden
+                    </a>
+                    <h1 class="text-4xl md:text-6xl font-black tracking-tight text-slate-900">
+                        Spm 7: <span class="text-sky-600 italic text-3xl md:text-5xl">Analytisk Geometri III</span>
+                    </h1>
+                </div>
+                <div class="md:text-right border-l-0 md:border-l-2 border-slate-200 pl-0 md:pl-6">
+                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 italic">Eksamens-optimering</p>
+                    <p class="text-sm font-extrabold text-slate-700">2.a Sankt Annæ Gymnasium</p>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm text-center">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase mb-1">Afstand</p>
+                    <p class="text-sm font-extrabold">Punkt til Linje</p>
+                </div>
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm text-center">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase mb-1">Relation</p>
+                    <p class="text-sm font-extrabold text-sky-600 italic">Linje & Cirkel</p>
+                </div>
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm text-center">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase mb-1">Teknik</p>
+                    <p class="text-sm font-extrabold">Kvadratkomplettering</p>
+                </div>
+                <div class="bg-sky-600 p-5 rounded-2xl shadow-lg text-center text-white">
+                    <p class="text-[10px] font-bold text-sky-200 uppercase mb-1">Status</p>
+                    <p class="text-sm font-extrabold tracking-tight">Klar uden vektorer</p>
+                </div>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+            <!-- Sidebar -->
+            <aside class="lg:col-span-3">
+                <nav class="sticky-nav space-y-6">
+                    <div class="bg-slate-900 rounded-[2rem] p-8 text-white shadow-2xl">
+                        <h3 class="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 mb-8 italic">Vidensbank</h3>
+                        <ul class="space-y-6 text-sm font-bold">
+                            <li><a href="#intro" class="hover:text-sky-400 transition flex items-center gap-3"><span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span> Dist-formlen</a></li>
+                            <li><a href="#komplet" class="hover:text-sky-400 transition flex items-center gap-3 text-slate-400"><span class="w-1.5 h-1.5 rounded-full bg-slate-700"></span> Cirkelligningen</a></li>
+                            <li><a href="#skæring" class="hover:text-sky-400 transition flex items-center gap-3 text-slate-400"><span class="w-1.5 h-1.5 rounded-full bg-slate-700"></span> Skæringspunkter</a></li>
+                        </ul>
+                    </div>
+                </nav>
+            </aside>
+
+            <!-- Main Content -->
+            <div class="lg:col-span-9 space-y-16 pb-32">
+                
+                <!-- Section 1: Dist-formlen -->
+                <section id="intro" class="space-y-8">
+                    <div class="flex items-center gap-6">
+                        <h2 class="text-xs font-black uppercase tracking-[0.4em] text-slate-400">01. Afstandsformlen</h2>
+                        <div class="h-px flex-grow bg-slate-200"></div>
+                    </div>
+                    
+                    <div class="learning-card border-t-8 border-sky-500">
+                        <h3 class="text-2xl font-black mb-6 italic text-slate-800">Hvordan måler vi afstanden?</h3>
+                        <p class="text-slate-600 mb-8 text-lg leading-relaxed">
+                            Afstanden fra et punkt \( P(x₁, y₁) \) til en linje \( ax + by + c = 0 \) er den korteste (vinkelrette) vej. Formlen giver os et tal, der fortæller præcis hvor langt punktet ligger fra linjen.
+                        </p>
+                        
+                        <div class="bg-slate-50 p-8 md:p-12 rounded-3xl shadow-inner text-center border border-slate-100 mb-8 math-container">
+                            <div class="text-2xl md:text-4xl font-light text-slate-800">
+                                $$\text{dist}(P, l) = \frac{|a x_1 + b y_1 + c|}{\sqrt{a^2 + b^2}}$$
+                            </div>
+                        </div>
+
+                        <button onclick="toggleDeepDive('dd-intro')" class="btn-read-more">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                            <span>Hvad skal jeg huske ved formlen?</span>
+                        </button>
+
+                        <div id="dd-intro" class="deep-dive">
+                            <h4 class="font-bold text-sky-900 mb-4">De vigtigste detaljer</h4>
+                            <p class="text-sm text-slate-700 leading-relaxed italic">
+                                1. **Linjen skal stå på formen \( ax + by + c = 0 \)**. Hvis du får \( y = 2x + 1 \), skal du flytte det hele over, så der står \( -2x + y - 1 = 0 \).
+                                <br><br>
+                                2. **De lodrette streger \( |...| \)** kaldes numerisk værdi. De gør alt indeni positivt. Da en afstand ikke kan være negativ (f.eks. -5 meter), sikrer dette, at resultatet giver mening.
+                                <br><br>
+                                3. **Nævneren** er "skaleringen". Uden den ville tallet bare være et udtryk for, hvor meget punktet afviger fra linjen, men ikke en reel fysisk afstand.
+                            </p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section 2: Kvadratkomplettering -->
+                <section id="komplet" class="space-y-8">
+                    <div class="flex items-center gap-6">
+                        <h2 class="text-xs font-black uppercase tracking-[0.4em] text-slate-400">02. Cirklens Ligning</h2>
+                        <div class="h-px flex-grow bg-slate-200"></div>
+                    </div>
+                    
+                    <div class="learning-card border-l-8 border-dist-purple">
+                        <h3 class="text-2xl font-black mb-6 italic text-slate-800">Cirklen og dens centrum</h3>
+                        <p class="text-slate-600 mb-8 leading-relaxed">
+                            For at bruge dist-formlen på en cirkel, skal vi kende dens centrum \( (x₀, y₀) \) og radius \( r \). Standardligningen ser således ud:
+                        </p>
+
+                        <div class="bg-slate-50 p-6 rounded-2xl text-center font-mono text-lg border border-slate-100 mb-10">
+                            \( (x - x_0)^2 + (y - y_0)^2 = r^2 \)
+                        </div>
+
+                        <div class="p-6 bg-amber-50 border-l-4 border-amber-400 rounded-r-2xl">
+                            <h4 class="font-bold text-amber-900 mb-3 uppercase text-xs tracking-widest">Ekspert-viden: Kvadratkomplettering</h4>
+                            <p class="text-sm text-amber-800 mb-4">
+                                Hvis cirklen står som \( x^2 + 4x + y^2 - 6y - 12 = 0 \), skal du "samle" den igen. Man bruger reglen \( (a+b)^2 = a^2 + b^2 + 2ab \) baglæns:
+                            </p>
+                            <ul class="text-xs text-amber-900 space-y-2 font-medium italic">
+                                <li>• Tag det halve af tallet foran x (her 4) og sæt det i parentesen: \( (x + 2)^2 \)</li>
+                                <li>• Husk at trække "det halve tal i anden" fra på den anden side (her \( 2^2 = 4 \))</li>
+                                <li>• Gør det samme for y-leddene.</li>
+                            </ul>
+                        </div>
+
+                        <button onclick="toggleDeepDive('dd-cirkel')" class="btn-read-more" style="color: var(--dist-purple); background: #f5f3ff; border-color: #ddd6fe;">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                            <span>Hvad bruger man centrum-afstanden til?</span>
+                        </button>
+
+                        <div id="dd-cirkel" class="deep-dive" style="background: #f5f3ff; border-color: #ddd6fe;">
+                            <h4 class="font-bold text-purple-900 mb-4">De 3 mulige relationer</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div class="p-4 bg-white rounded-xl border border-purple-100 text-center">
+                                    <p class="font-black text-rose-600 text-sm italic">Dist > r</p>
+                                    <p class="text-[10px] uppercase font-bold text-slate-400 mt-1">Passant (0 skæring)</p>
+                                </div>
+                                <div class="p-4 bg-white rounded-xl border border-purple-100 text-center shadow-sm">
+                                    <p class="font-black text-amber-600 text-sm italic">Dist = r</p>
+                                    <p class="text-[10px] uppercase font-bold text-slate-400 mt-1">Tangent (1 skæring)</p>
+                                </div>
+                                <div class="p-4 bg-white rounded-xl border border-purple-100 text-center">
+                                    <p class="font-black text-emerald-600 text-sm italic">Dist < r</p>
+                                    <p class="text-[10px] uppercase font-bold text-slate-400 mt-1">Sekant (2 skæringer)</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section 3: Skæringspunkter -->
+                <section id="skæring" class="space-y-8">
+                    <div class="flex items-center gap-6">
+                        <h2 class="text-xs font-black uppercase tracking-[0.4em] text-slate-400">03. Skæringer</h2>
+                        <div class="h-px flex-grow bg-slate-200"></div>
+                    </div>
+                    
+                    <div class="learning-card">
+                        <h3 class="text-2xl font-black mb-6 italic text-slate-800">Find de præcise punkter</h3>
+                        <p class="text-slate-600 mb-8 leading-relaxed">
+                            Hvis læreren beder dig om at finde selve koordinaterne for skæringen, er dist-formlen ikke nok. Her skal du bruge <strong>Substitutionsmetoden</strong>.
+                        </p>
+
+                        <div class="space-y-4 mb-10">
+                            <div class="p-5 bg-slate-50 rounded-2xl border border-slate-100 flex gap-4">
+                                <div class="text-sky-600 font-black">1.</div>
+                                <p class="text-sm">Isolér \( y \) i linjens ligning, f.eks. \( y = ax + b \).</p>
+                            </div>
+                            <div class="p-5 bg-slate-50 rounded-2xl border border-slate-100 flex gap-4">
+                                <div class="text-sky-600 font-black">2.</div>
+                                <p class="text-sm">Indsæt hele udtrykket for \( y \) på y's plads i cirklens ligning.</p>
+                            </div>
+                            <div class="p-5 bg-slate-50 rounded-2xl border border-slate-100 flex gap-4">
+                                <div class="text-sky-600 font-black">3.</div>
+                                <p class="text-sm">Dette skaber en <strong>andengradsligning</strong> i \( x \). Løs den for at finde skæringernes x-værdier.</p>
+                            </div>
+                        </div>
+
+                        <button onclick="toggleDeepDive('dd-skæring')" class="btn-read-more">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                            <span>Hvad fortæller diskriminanten (D) os her?</span>
+                        </button>
+
+                        <div id="dd-skæring" class="deep-dive">
+                            <p class="text-sm text-slate-700 leading-relaxed italic">
+                                Diskriminanten \( D \) for den andengradsligning, du lige har skabt, fortæller præcis det samme som dist-formlen:
+                                <br><br>
+                                • Hvis \( D > 0 \), får du to x-værdier (Sekant).
+                                <br>
+                                • Hvis \( D = 0 \), får du én x-værdi (Tangent).
+                                <br>
+                                • Hvis \( D < 0 \), er der ingen løsning (Passant).
+                            </p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <footer class="text-center py-24 border-t border-slate-200 mt-20">
+        <p class="text-[10px] font-black uppercase text-slate-400 tracking-[0.5em] italic">Eksamens-træning uden vektorer – 2.a SAG</p>
+    </footer>
+
+    <script>
+        function toggleDeepDive(id) {
+            const el = document.getElementById(id);
+            const isVisible = window.getComputedStyle(el).display === 'block';
+            el.style.display = isVisible ? 'none' : 'block';
+        }
+    </script>
+</body>
+</html>

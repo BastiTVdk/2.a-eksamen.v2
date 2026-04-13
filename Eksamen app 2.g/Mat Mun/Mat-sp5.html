@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spm 5: Geometri I - Vinkler | 2.a SAG</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --edu-blue: #0ea5e9;
+            --edu-bg: #f8fafc;
+            --insight-bg: #f0f9ff;
+        }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--edu-bg);
+            color: #1e293b;
+            line-height: 1.6;
+        }
+        .learning-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 1.5rem;
+            padding: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        }
+        .deep-dive {
+            background: var(--insight-bg);
+            border-radius: 1.5rem;
+            padding: 2rem;
+            border: 1px solid #bae6fd;
+            margin-top: 1.5rem;
+            display: none;
+            animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .step-number {
+            @apply w-10 h-10 rounded-xl bg-sky-500 text-white flex items-center justify-center font-bold shadow-lg shadow-sky-200 mb-4;
+        }
+        .btn-read-more {
+            @apply flex items-center gap-3 px-6 py-3 rounded-full bg-sky-50 text-sky-700 text-xs font-bold uppercase tracking-wider transition-all hover:bg-sky-100 mt-6 border border-sky-100;
+        }
+        canvas {
+            background: white;
+            border-radius: 1.5rem;
+            width: 100%;
+        }
+        .sticky-nav {
+            position: sticky;
+            top: 2rem;
+        }
+        input[type=range] { accent-color: var(--edu-blue); }
+        .math-container {
+            overflow-x: auto;
+            scrollbar-width: thin;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-12">
+
+    <div class="max-w-6xl mx-auto">
+        <!-- Header -->
+        <header class="mb-16">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+                <div>
+                    <a href="Index.html" class="inline-flex items-center text-sm font-bold text-sky-600 hover:gap-3 transition-all gap-2 mb-4 group">
+                        <span class="group-hover:-translate-x-1 transition-transform">←</span> Tilbage til Forsiden
+                    </a>
+                    <h1 class="text-4xl md:text-6xl font-black tracking-tight text-slate-900">
+                        Spm 5: <span class="text-sky-600 italic">Analytisk Geometri I</span>
+                    </h1>
+                </div>
+                <div class="md:text-right border-l-0 md:border-l-2 border-slate-200 pl-0 md:pl-6 pt-4 md:pt-0">
+                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Vinkler & Linjer</p>
+                    <p class="text-sm font-extrabold text-slate-700">2.a Sankt Annæ Gymnasium</p>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase mb-1 italic">Type</p>
+                    <p class="text-sm font-extrabold">Mundtlig Prøve</p>
+                </div>
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase mb-1 italic">Værktøj</p>
+                    <p class="text-sm font-extrabold">Trigonometri</p>
+                </div>
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase mb-1 italic">Mål</p>
+                    <p class="text-sm font-extrabold text-sky-600">v = tan⁻¹(|a|)</p>
+                </div>
+                <div class="bg-sky-600 p-5 rounded-2xl shadow-lg">
+                    <p class="text-[10px] font-bold text-sky-200 uppercase mb-1 italic">Status</p>
+                    <p class="text-sm font-extrabold text-white">Geometri Hub</p>
+                </div>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+            <!-- Sidebar -->
+            <aside class="lg:col-span-3">
+                <nav class="sticky-nav space-y-6">
+                    <div class="bg-slate-900 rounded-[2rem] p-8 text-white shadow-2xl">
+                        <h3 class="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 mb-8 italic">Disposition</h3>
+                        <ul class="space-y-6 text-sm font-bold">
+                            <li><a href="#definition" class="hover:text-sky-400 transition flex items-center gap-3"><span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span> Hældningsvinklen</a></li>
+                            <li><a href="#sim" class="hover:text-sky-400 transition flex items-center gap-3 text-slate-400"><span class="w-1.5 h-1.5 rounded-full bg-slate-700"></span> Simulator</a></li>
+                            <li><a href="#formel" class="hover:text-sky-400 transition flex items-center gap-3 text-slate-400"><span class="w-1.5 h-1.5 rounded-full bg-slate-700"></span> Vinkel ml. linjer</a></li>
+                        </ul>
+                    </div>
+                </nav>
+            </aside>
+
+            <!-- Main Content -->
+            <div class="lg:col-span-9 space-y-16 pb-32">
+                
+                <!-- Section 1: Hældningsvinklen -->
+                <section id="definition" class="space-y-8">
+                    <div class="flex items-center gap-6">
+                        <h2 class="text-xs font-black uppercase tracking-[0.4em] text-slate-400">01. En linjes hældningsvinkel</h2>
+                        <div class="h-px flex-grow bg-slate-200"></div>
+                    </div>
+                    
+                    <div class="learning-card border-t-8 border-sky-500">
+                        <h3 class="text-2xl font-black mb-6 italic">Sammenhæng mellem \(a\) og \(v\)</h3>
+                        <p class="text-slate-600 mb-8 text-lg">
+                            Hældningsvinklen \(v\) for en ret linje er den vinkel, som linjen danner med den positive del af x-aksen. Der findes en direkte matematisk bro mellem hældningstallet \(a\) og vinklen.
+                        </p>
+                        
+                        <div class="bg-slate-50 p-8 md:p-12 rounded-3xl shadow-inner text-center border border-slate-100 mb-8 math-container">
+                            <div class="text-2xl md:text-4xl font-light text-slate-800">
+                                $$a = \tan(v) \iff v = \tan^{-1}(a)$$
+                            </div>
+                        </div>
+
+                        <div class="p-6 bg-amber-50 border-l-4 border-amber-400 rounded-r-2xl mb-8">
+                            <p class="text-sm text-amber-900 font-bold italic">Vigtig detalje til mundtlig eksamen:</p>
+                            <p class="text-sm text-amber-800">Vi bruger ofte den numeriske værdi \(|a|\) for at finde den spidse vinkel med x-aksen, uanset om linjen er voksende eller aftagende.</p>
+                        </div>
+
+                        <button onclick="toggleDeepDive('dd-vinkel')" class="btn-read-more">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                            <span>Hvorfor tangent? (Geometrisk bevis)</span>
+                        </button>
+
+                        <div id="dd-vinkel" class="deep-dive">
+                            <div class="flex items-start gap-4">
+                                <div class="w-10 h-10 rounded-xl bg-sky-600 flex items-center justify-center flex-shrink-0 text-white shadow-lg shadow-sky-200">!</div>
+                                <div>
+                                    <h4 class="font-bold text-sky-900 mb-2">Den retvinklede trekant</h4>
+                                    <p class="text-sm text-slate-700 leading-relaxed italic">
+                                        Hvis vi ser på en ret linje, kan vi danne en retvinklet trekant ved at gå 1 ud ad x-aksen. "Modstående katete" vil her være præcis hældningen \(a\), og "hosliggende katete" vil være 1.
+                                        <br><br>
+                                        Da \(\tan(v) = \frac{\text{modstående}}{\text{hosliggende}}\), får vi \(\tan(v) = \frac{a}{1}\), altså \(\tan(v) = a\). Det er grunden til, at tangent-funktionen er nøglen til alle vinkelberegninger i analytisk geometri.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section 2: Simulator -->
+                <section id="sim" class="space-y-8">
+                    <h2 class="text-3xl font-black text-slate-800 italic text-center">Interaktiv Vinkel-Simulator</h2>
+                    <div class="learning-card">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+                            <div class="space-y-8">
+                                <div class="p-6 bg-slate-50 rounded-2xl border border-slate-100">
+                                    <p class="text-xs font-black text-sky-600 mb-6 uppercase tracking-widest text-[10px]">Styr linjerne</p>
+                                    
+                                    <div class="space-y-6">
+                                        <div>
+                                            <label class="block text-[10px] font-bold text-slate-500 uppercase">Hældning linje 1 (a₁): <span id="a1Val" class="text-slate-900 font-black">1.0</span></label>
+                                            <input type="range" id="a1Slider" min="-3" max="3" step="0.1" value="1" class="w-full h-2 bg-slate-200 rounded-full appearance-none cursor-pointer">
+                                        </div>
+                                        <div>
+                                            <label class="block text-[10px] font-bold text-slate-500 uppercase">Hældning linje 2 (a₂): <span id="a2Val" class="text-slate-900 font-black">-0.5</span></label>
+                                            <input type="range" id="a2Slider" min="-3" max="3" step="0.1" value="-0.5" class="w-full h-2 bg-slate-200 rounded-full appearance-none cursor-pointer">
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="grid grid-cols-1 gap-4">
+                                    <div class="p-5 bg-slate-900 rounded-[1.5rem] shadow-xl text-white">
+                                        <p class="text-[10px] font-black uppercase text-sky-400 mb-2 tracking-widest italic text-center">Vinkel mellem linjerne</p>
+                                        <div id="vResult" class="text-3xl font-black text-center tracking-tighter">56.3°</div>
+                                    </div>
+                                    <div class="p-4 bg-white border border-slate-200 rounded-xl text-center">
+                                        <p class="text-[10px] font-bold text-slate-400 uppercase">Hældningsvinkler</p>
+                                        <p class="text-xs text-slate-600 italic">v₁ = <span id="v1Deg">45</span>° | v₂ = <span id="v2Deg">-26</span>°</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="bg-white rounded-[2rem] shadow-inner border border-slate-100 overflow-hidden relative">
+                                <canvas id="geoCanvas" width="400" height="400"></canvas>
+                                <div class="absolute bottom-4 right-4 text-[8px] font-bold text-slate-300 uppercase italic">Visuel vinkelberegning</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section 3: Vinkel mellem linjer -->
+                <section id="formel" class="space-y-8">
+                    <div class="flex items-center gap-6">
+                        <h2 class="text-xs font-black uppercase tracking-[0.4em] text-slate-400">02. Vinkel mellem to linjer</h2>
+                        <div class="h-px flex-grow bg-slate-200"></div>
+                    </div>
+                    
+                    <div class="learning-card">
+                        <h3 class="text-2xl font-black mb-6 italic">Hvordan finder vi \(v\)?</h3>
+                        <p class="text-slate-600 mb-8 leading-relaxed">
+                            Når to linjer skærer hinanden, opstår der fire vinkler. Vi er typisk interesserede i den spidse vinkel \(v\), som ligger mellem 0° og 90°.
+                        </p>
+
+                        <div class="space-y-6 mb-10">
+                            <div class="flex gap-6 items-start">
+                                <div class="step-number">1</div>
+                                <div>
+                                    <h4 class="font-bold text-slate-800">Find hældningsvinklerne</h4>
+                                    <p class="text-sm text-slate-500">Beregn \(v_1\) og \(v_2\) ved hjælp af \(\tan^{-1}(a_1)\) og \(\tan^{-1}(a_2)\).</p>
+                                </div>
+                            </div>
+                            <div class="flex gap-6 items-start">
+                                <div class="step-number">2</div>
+                                <div>
+                                    <h4 class="font-bold text-slate-800">Brug differens-metoden</h4>
+                                    <p class="text-sm text-slate-500">Træk vinklerne fra hinanden og brug numeriske tegn for at sikre et positivt resultat:</p>
+                                    <div class="mt-4 p-6 bg-sky-600 rounded-2xl text-white text-center shadow-lg text-2xl font-black italic">
+                                        $$v = |v_1 - v_2|$$
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button onclick="toggleDeepDive('dd-formel')" class="btn-read-more">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                            <span>Hvad hvis vinklen bliver over 90°?</span>
+                        </button>
+
+                        <div id="dd-formel" class="deep-dive">
+                            <p class="text-sm text-slate-700 leading-relaxed italic">
+                                Hvis din beregning \(|v_1 - v_2|\) giver et tal over 90°, har du fundet den stumpe vinkel. For at finde den spidse vinkel skal du blot trække resultatet fra 180°. 
+                                <br><br>
+                                <strong>Eksempel:</strong> Hvis du får 110°, er den spidse vinkel \(180 - 110 = 70^\circ\). Ved mundtlig eksamen er det altid en god idé at nævne begge vinkler for at vise overskud.
+                            </p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Final Exam Checklist -->
+                <section class="bg-slate-900 rounded-[2.5rem] p-12 text-white shadow-2xl relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 w-80 h-80 bg-sky-500/10 rounded-full -mr-40 -mt-40 transition-transform group-hover:scale-110"></div>
+                    <h3 class="text-2xl font-black mb-8 flex items-center gap-4 italic">
+                        <div class="w-10 h-10 bg-sky-600 rounded-xl flex items-center justify-center"><svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" /></svg></div>
+                        Eksamens-tjekliste til 2.a
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                        <div class="space-y-4">
+                            <p class="text-sky-400 text-xs font-black uppercase tracking-widest italic">Visuelt overskud</p>
+                            <ul class="text-sm text-slate-300 space-y-3">
+                                <li class="flex gap-2"><span>•</span> Tegn linjerne i et koordinatsystem på tavlen.</li>
+                                <li class="flex gap-2"><span>•</span> Markér tydeligt vinklerne med x-aksen.</li>
+                                <li class="flex gap-2"><span>•</span> Vis den retvinklede trekant for at forklare \(\tan(v) = a\).</li>
+                            </ul>
+                        </div>
+                        <div class="space-y-4">
+                            <p class="text-sky-400 text-xs font-black uppercase tracking-widest italic">Begreber at nævne</p>
+                            <ul class="text-sm text-slate-300 space-y-3">
+                                <li class="flex gap-2"><span>•</span> "Positiv retning af x-aksen" (mod uret).</li>
+                                <li class="flex gap-2"><span>•</span> "Invers tangent" (\(\tan^{-1}\) eller \(\text{arctan}\)).</li>
+                                <li class="flex gap-2"><span>•</span> "Spids vinkel" vs. "stump vinkel".</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <footer class="text-center py-24 border-t border-slate-200 mt-20">
+        <p class="text-[10px] font-black uppercase text-slate-400 tracking-[0.5em] italic">Geometrisk Præcision – 2.a SAG</p>
+    </footer>
+
+    <script>
+        function toggleDeepDive(id) {
+            const el = document.getElementById(id);
+            const isVisible = window.getComputedStyle(el).display === 'block';
+            el.style.display = isVisible ? 'none' : 'block';
+        }
+
+        const canvas = document.getElementById('geoCanvas');
+        const ctx = canvas.getContext('2d');
+        const a1Slider = document.getElementById('a1Slider');
+        const a2Slider = document.getElementById('a2Slider');
+        const a1ValText = document.getElementById('a1Val');
+        const a2ValText = document.getElementById('a2Val');
+        const vResult = document.getElementById('vResult');
+        const v1Deg = document.getElementById('v1Deg');
+        const v2Deg = document.getElementById('v2Deg');
+
+        function draw() {
+            const a1 = parseFloat(a1Slider.value);
+            const a2 = parseFloat(a2Slider.value);
+
+            const v1Rad = Math.atan(a1);
+            const v2Rad = Math.atan(a2);
+            
+            const v1D = v1Rad * (180 / Math.PI);
+            const v2D = v2Rad * (180 / Math.PI);
+            
+            let vDiff = Math.abs(v1D - v2D);
+            if (vDiff > 90) vDiff = 180 - vDiff;
+
+            // UI Update
+            a1ValText.innerText = a1.toFixed(1);
+            a2ValText.innerText = a2.toFixed(1);
+            v1Deg.innerText = Math.round(v1D);
+            v2Deg.innerText = Math.round(v2D);
+            vResult.innerText = vDiff.toFixed(1) + "°";
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const cx = canvas.width / 2;
+            const cy = canvas.height / 2;
+            const scale = 60;
+
+            // Grid
+            ctx.strokeStyle = '#f1f5f9';
+            ctx.lineWidth = 1;
+            for(let i = 0; i < canvas.width; i+= 40) {
+                ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, canvas.height); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(canvas.width, i); ctx.stroke();
+            }
+
+            // Axes
+            ctx.strokeStyle = '#e2e8f0';
+            ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.moveTo(0, cy); ctx.lineTo(canvas.width, cy); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(cx, 0); ctx.lineTo(cx, canvas.height); ctx.stroke();
+
+            // Line 1 (Blue)
+            ctx.strokeStyle = '#0ea5e9';
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.moveTo(cx - 5*scale, cy - (a1 * -5)*scale);
+            ctx.lineTo(cx + 5*scale, cy - (a1 * 5)*scale);
+            ctx.stroke();
+
+            // Line 2 (Slate)
+            ctx.strokeStyle = '#64748b';
+            ctx.lineWidth = 3;
+            ctx.setLineDash([5, 5]);
+            ctx.beginPath();
+            ctx.moveTo(cx - 5*scale, cy - (a2 * -5)*scale);
+            ctx.lineTo(cx + 5*scale, cy - (a2 * 5)*scale);
+            ctx.stroke();
+            ctx.setLineDash([]);
+
+            // Angle arc
+            ctx.strokeStyle = '#0ea5e9';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(cx, cy, 30, -v1Rad, -v2Rad, v1Rad < v2Rad);
+            ctx.stroke();
+            
+            // Intersection point
+            ctx.fillStyle = '#0f172a';
+            ctx.beginPath(); ctx.arc(cx, cy, 6, 0, Math.PI*2); ctx.fill();
+            ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.stroke();
+        }
+
+        [a1Slider, a2Slider].forEach(s => s.addEventListener('input', draw));
+        window.onload = draw;
+    </script>
+</body>
+</html>

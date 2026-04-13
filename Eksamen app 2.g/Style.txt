@@ -1,0 +1,130 @@
+/* MATHQUEST B - CORE DESIGN SYSTEM 2026
+    Dette er den centrale stil-fil, der sikrer konsistens på alle 11 undersider.
+*/
+
+:root {
+    /* Base farver */
+    --mq-slate-50: #fcfdfe;
+    --mq-slate-100: #f1f5f9;
+    --mq-slate-400: #94a3b8;
+    --mq-slate-900: #0f172a;
+    --mq-indigo: #4f46e5;
+    
+    /* Animationer */
+    --mathias-float: float 6s ease-in-out infinite;
+    --fade-in: fadeIn 0.5s ease-out;
+}
+
+/* 1. TYPOGRAFI & BASE */
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: var(--mq-slate-50);
+    color: var(--mq-slate-900);
+    -webkit-font-smoothing: antialiased;
+}
+
+/* 2. TEMA SYSTEM (Accent farver til de 6 kategorier) */
+.theme-vækst { --accent: #6366f1; --accent-soft: #eef2ff; }
+.theme-diff { --accent: #f43f5e; --accent-soft: #fff1f2; }
+.theme-geo { --accent: #0ea5e9; --accent-soft: #f0f9ff; }
+.theme-prob { --accent: #8b5cf6; --accent-soft: #f5f3ff; }
+.theme-poly { --accent: #10b981; --accent-soft: #ecfdf5; }
+.theme-golden { --accent: #f59e0b; --accent-soft: #fffbeb; }
+
+/* 3. QUEST CARDS */
+.quest-card {
+    background: white;
+    border-radius: 1.5rem;
+    padding: 2rem;
+    border: 1px solid rgba(0,0,0,0.05);
+    border-left: 4px solid var(--accent);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    cursor: pointer;
+}
+
+.quest-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px -15px rgba(0,0,0,0.1);
+    border-color: var(--accent);
+}
+
+/* 4. NAVIGATION (Glassmorphism) */
+.glass-nav {
+    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    position: sticky;
+    top: 0;
+    z-index: 50;
+}
+
+/* 5. MATHIAS MASKOT & BUBBLE */
+.mathias-container {
+    animation: var(--mathias-float);
+    cursor: pointer;
+}
+
+.speech-bubble {
+    background: white;
+    border-radius: 1.5rem;
+    padding: 1.25rem;
+    border: 1px solid rgba(0,0,0,0.05);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.08);
+    position: relative;
+    max-width: 280px;
+    font-weight: 500;
+}
+
+.speech-bubble::after {
+    content: '';
+    position: absolute;
+    bottom: -10px;
+    right: 30px;
+    width: 20px;
+    height: 20px;
+    background: white;
+    transform: rotate(45deg);
+    border-bottom: 1px solid rgba(0,0,0,0.05);
+    border-right: 1px solid rgba(0,0,0,0.05);
+}
+
+/* 6. LABORATORET (The Lab - Dark Theme) */
+.lab-section {
+    background-color: #020617;
+    color: white;
+    border-radius: 3rem;
+    padding: 4rem 2rem;
+    overflow: hidden;
+    position: relative;
+}
+
+.lab-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 1.5rem;
+    padding: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.lab-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--accent);
+}
+
+/* 7. ANIMATION KEYFRAMES */
+@keyframes float {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-12px) rotate(2deg); }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--mq-slate-50); }
+::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+::-webkit-scrollbar-thumb:hover { background: #94a3b8; }

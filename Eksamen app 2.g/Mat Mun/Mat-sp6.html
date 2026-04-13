@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spm 6: Geometri II - Ortogonalitet | 2.a SAG</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --edu-blue: #0ea5e9;
+            --edu-bg: #f8fafc;
+            --insight-bg: #f0f9ff;
+            --ortho-green: #10b981;
+        }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--edu-bg);
+            color: #1e293b;
+            line-height: 1.6;
+        }
+        .learning-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 1.5rem;
+            padding: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        }
+        .deep-dive {
+            background: var(--insight-bg);
+            border-radius: 1.5rem;
+            padding: 2rem;
+            border: 1px solid #bae6fd;
+            margin-top: 1.5rem;
+            display: none;
+            animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .step-number {
+            @apply w-10 h-10 rounded-xl bg-sky-500 text-white flex items-center justify-center font-bold shadow-lg shadow-sky-200 mb-4;
+        }
+        .btn-read-more {
+            @apply flex items-center gap-3 px-6 py-3 rounded-full bg-sky-50 text-sky-700 text-xs font-bold uppercase tracking-wider transition-all hover:bg-sky-100 mt-6 border border-sky-100;
+        }
+        canvas {
+            background: white;
+            border-radius: 1.5rem;
+            width: 100%;
+        }
+        .sticky-nav {
+            position: sticky;
+            top: 2rem;
+        }
+        input[type=range] { accent-color: var(--edu-blue); }
+        .math-container {
+            overflow-x: auto;
+            scrollbar-width: thin;
+        }
+        .success-glow {
+            box-shadow: 0 0 20px rgba(16, 185, 129, 0.2);
+            border-color: var(--ortho-green) !important;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-12">
+
+    <div class="max-w-6xl mx-auto">
+        <!-- Header -->
+        <header class="mb-16">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+                <div>
+                    <a href="Index.html" class="inline-flex items-center text-sm font-bold text-sky-600 hover:gap-3 transition-all gap-2 mb-4 group">
+                        <span class="group-hover:-translate-x-1 transition-transform">←</span> Tilbage til Forsiden
+                    </a>
+                    <h1 class="text-4xl md:text-6xl font-black tracking-tight text-slate-900">
+                        Spm 6: <span class="text-sky-600 italic">Analytisk Geometri II</span>
+                    </h1>
+                </div>
+                <div class="md:text-right border-l-0 md:border-l-2 border-slate-200 pl-0 md:pl-6 pt-4 md:pt-0">
+                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1 italic">Ortogonalitet</p>
+                    <p class="text-sm font-extrabold text-slate-700">2.a Sankt Annæ Gymnasium</p>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase mb-1 italic">Emne</p>
+                    <p class="text-sm font-extrabold">Den rette linje</p>
+                </div>
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase mb-1 italic">Betingelse</p>
+                    <p class="text-sm font-extrabold text-sky-600">a · c = -1</p>
+                </div>
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase mb-1 italic">Værktøj</p>
+                    <p class="text-sm font-extrabold">Hældningstal</p>
+                </div>
+                <div class="bg-sky-600 p-5 rounded-2xl shadow-lg">
+                    <p class="text-[10px] font-bold text-sky-200 uppercase mb-1 italic">Status</p>
+                    <p class="text-sm font-extrabold text-white">Eksamens-klar</p>
+                </div>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+            <!-- Sidebar -->
+            <aside class="lg:col-span-3">
+                <nav class="sticky-nav space-y-6">
+                    <div class="bg-slate-900 rounded-[2rem] p-8 text-white shadow-2xl">
+                        <h3 class="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 mb-8 italic">Disposition</h3>
+                        <ul class="space-y-6 text-sm font-bold">
+                            <li><a href="#intro" class="hover:text-sky-400 transition flex items-center gap-3"><span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span> Den rette linje</a></li>
+                            <li><a href="#sim" class="hover:text-sky-400 transition flex items-center gap-3 text-slate-400"><span class="w-1.5 h-1.5 rounded-full bg-slate-700"></span> Simulator</a></li>
+                            <li><a href="#bevis" class="hover:text-sky-400 transition flex items-center gap-3 text-slate-400"><span class="w-1.5 h-1.5 rounded-full bg-slate-700"></span> Beviset</a></li>
+                        </ul>
+                    </div>
+                </nav>
+            </aside>
+
+            <!-- Main Content -->
+            <div class="lg:col-span-9 space-y-16 pb-32">
+                
+                <!-- Section 1: Intro -->
+                <section id="intro" class="space-y-8">
+                    <div class="flex items-center gap-6">
+                        <h2 class="text-xs font-black uppercase tracking-[0.4em] text-slate-400">01. Definition og Betingelse</h2>
+                        <div class="h-px flex-grow bg-slate-200"></div>
+                    </div>
+                    
+                    <div class="learning-card border-t-8 border-sky-500">
+                        <h3 class="text-2xl font-black mb-6 italic">Hvad vil det sige at være ortogonal?</h3>
+                        <p class="text-slate-600 mb-8 text-lg">
+                            To linjer er ortogonale, når de står vinkelret på hinanden (vinklen er 90°). I analytisk geometri findes der en ekstremt simpel og smuk regel for deres hældningstal.
+                        </p>
+                        
+                        <div class="bg-slate-50 p-8 md:p-12 rounded-3xl shadow-inner text-center border border-slate-100 mb-8 math-container">
+                            <div class="text-2xl md:text-4xl font-light text-slate-800">
+                                $$l \perp m \iff a \cdot c = -1$$
+                            </div>
+                        </div>
+
+                        <button onclick="toggleDeepDive('dd-intro')" class="btn-read-more">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                            <span>Hvordan husker man det nemt?</span>
+                        </button>
+
+                        <div id="dd-intro" class="deep-dive">
+                            <p class="text-sm text-slate-700 leading-relaxed italic">
+                                En anden måde at skrive det på er: \(c = -\frac{1}{a}\). 
+                                <br><br>
+                                Det betyder, at den vinkelrette linje altid har den <strong>negative reciprokke</strong> værdi. Hvis din linje har hældningen 2, så skal den vinkelrette linje have hældningen \(-\frac{1}{2}\). Hvis linjen er vandret (\(a=0\)), findes reglen ikke (da man ikke kan dividere med 0), og man bruger i stedet det faktum, at den vinkelrette linje er lodret.
+                            </p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section 2: Simulator -->
+                <section id="sim" class="space-y-8">
+                    <h2 class="text-3xl font-black text-slate-800 italic text-center">Interaktiv Ortogonalitets-Sim</h2>
+                    <div class="learning-card" id="simCard">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+                            <div class="space-y-8">
+                                <div class="p-6 bg-slate-50 rounded-2xl border border-slate-100">
+                                    <p class="text-xs font-black text-sky-600 mb-6 uppercase tracking-widest text-[10px]">Find den vinkelrette linje</p>
+                                    
+                                    <div class="space-y-6">
+                                        <div>
+                                            <label class="block text-[10px] font-bold text-slate-500 uppercase">Hældning linje 1 (a): <span id="aVal" class="text-slate-900 font-black">1.0</span></label>
+                                            <input type="range" id="aSlider" min="-4" max="4" step="0.1" value="1" class="w-full h-2 bg-slate-200 rounded-full appearance-none cursor-pointer">
+                                        </div>
+                                        <div>
+                                            <label class="block text-[10px] font-bold text-slate-500 uppercase italic">Hældning linje 2 (c): <span id="cVal" class="text-emerald-600 font-black">-1.0</span></label>
+                                            <input type="range" id="cSlider" min="-4" max="4" step="0.1" value="-1" class="w-full h-2 bg-slate-200 rounded-full appearance-none cursor-pointer">
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="p-6 bg-slate-900 rounded-[1.5rem] shadow-xl text-white">
+                                    <p class="text-[10px] font-black uppercase text-sky-400 mb-4 tracking-widest italic text-center italic">Produktet af hældningerne (a · c)</p>
+                                    <div id="productResult" class="text-4xl font-black text-center tracking-tighter">-1.00</div>
+                                    <div id="statusLabel" class="text-center text-[10px] font-bold uppercase mt-4 text-slate-400">Ikke ortogonale endnu</div>
+                                </div>
+                            </div>
+                            <div class="bg-white rounded-[2rem] shadow-inner border border-slate-100 overflow-hidden relative">
+                                <canvas id="orthoCanvas" width="400" height="400"></canvas>
+                                <div class="absolute bottom-4 right-4 text-[8px] font-bold text-slate-300 uppercase italic">Visuelt tjek for 90°</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section 3: Beviset -->
+                <section id="bevis" class="space-y-8">
+                    <div class="flex items-center gap-6">
+                        <h2 class="text-xs font-black uppercase tracking-[0.4em] text-slate-400">02. Beviset for reglen</h2>
+                        <div class="h-px flex-grow bg-slate-200"></div>
+                    </div>
+                    
+                    <div class="learning-card">
+                        <p class="text-slate-600 mb-10 leading-relaxed">
+                            Vi vil bevise, at hvis to linjer er vinkelrette, så gælder \(a \cdot c = -1\). Vi bruger sammenhængen mellem hældningstal og hældningsvinkler (\(a = \tan(v)\)).
+                        </p>
+
+                        <div class="space-y-12">
+                            <div class="proof-step">
+                                <div class="step-number">1</div>
+                                <div>
+                                    <h4 class="font-bold text-slate-800 mb-2">Opskriv hældningerne</h4>
+                                    <p class="text-sm text-slate-500 italic mb-4">Vi har to linjer med hældningsvinklerne \(v_1\) og \(v_2\):</p>
+                                    <div class="p-4 bg-slate-50 rounded-xl font-mono text-sm inline-block">\(a = \tan(v_1)\) og \(c = \tan(v_2)\)</div>
+                                </div>
+                            </div>
+
+                            <div class="proof-step">
+                                <div class="step-number">2</div>
+                                <div>
+                                    <h4 class="font-bold text-slate-800 mb-2">Vinkel-sammenhæng</h4>
+                                    <p class="text-sm text-slate-500 italic mb-4">Da linjerne står vinkelret på hinanden, må forskellen på deres vinkler være 90°:</p>
+                                    <div class="p-4 bg-slate-50 rounded-xl font-mono text-sm inline-block">\(v_2 = v_1 + 90^\circ\)</div>
+                                </div>
+                            </div>
+
+                            <div class="proof-step">
+                                <div class="step-number">3</div>
+                                <div>
+                                    <h4 class="font-bold text-slate-800 mb-2">Brug trigonometri</h4>
+                                    <p class="text-sm text-slate-500 italic mb-4">Vi bruger reglen \(\tan(v + 90^\circ) = -\frac{1}{\tan(v)}\):</p>
+                                    <div class="p-6 bg-sky-600 rounded-2xl text-white text-center shadow-lg math-container mb-6">
+                                        $$c = \tan(v_1 + 90^\circ) = -\frac{1}{\tan(v_1)} = -\frac{1}{a}$$
+                                    </div>
+                                    <p class="text-slate-500 text-sm">Ved at gange med \(a\) på begge sider får vi:</p>
+                                    <div class="text-2xl font-black text-center text-slate-900 mt-4">$$a \cdot c = -1 \quad \square$$</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <button onclick="toggleDeepDive('dd-bevis')" class="btn-read-more">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                            <span>Hvad hvis jeg ikke kender tan-reglen?</span>
+                        </button>
+
+                        <div id="dd-bevis" class="deep-dive">
+                            <p class="text-sm text-slate-700 leading-relaxed italic">
+                                Du kan også forklare det ved at se på linjernes <strong>retningsvektorer</strong>. Hvis linje 1 har retningsvektoren \(\binom{1}{a}\), så vil linje 2 have retningsvektoren \(\binom{1}{c}\). 
+                                <br><br>
+                                Da de er vinkelrette, er deres skalarprodukt 0: 
+                                <br>
+                                \(\binom{1}{a} \cdot \binom{1}{c} = 1 \cdot 1 + a \cdot c = 0 \implies a \cdot c = -1\).
+                                <br><br>
+                                <strong>Tip:</strong> Dette er en super elegant måde at "blære" sig lidt på til eksamen ved at koble to emner sammen!
+                            </p>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Final Checklist -->
+                <section class="bg-slate-900 rounded-[2.5rem] p-12 text-white shadow-2xl relative overflow-hidden group">
+                    <div class="absolute top-0 right-0 w-80 h-80 bg-emerald-500/10 rounded-full -mr-40 -mt-40 transition-transform group-hover:scale-110"></div>
+                    <h3 class="text-2xl font-black mb-8 flex items-center gap-4 italic text-ortho-green">
+                        <div class="w-10 h-10 bg-emerald-600 rounded-xl flex items-center justify-center text-white"><svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg></div>
+                        Husk dette til eksamen
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                        <div class="space-y-4">
+                            <p class="text-emerald-400 text-xs font-black uppercase tracking-widest italic">Det vigtigste</p>
+                            <ul class="text-sm text-slate-300 space-y-3">
+                                <li class="flex gap-2"><span>•</span> Start med at definere begrebet "ortogonal".</li>
+                                <li class="flex gap-2"><span>•</span> Opskriv betingelsen \(a \cdot c = -1\) med det samme.</li>
+                                <li class="flex gap-2"><span>•</span> Vis et hurtigt eksempel (f.eks. \(a=2\) og \(c=-0,5\)).</li>
+                            </ul>
+                        </div>
+                        <div class="space-y-4">
+                            <p class="text-emerald-400 text-xs font-black uppercase tracking-widest italic">Censors favorit-spørgsmål</p>
+                            <ul class="text-sm text-slate-300 space-y-3">
+                                <li class="flex gap-2"><span>•</span> "Hvad hvis linjen er vandret?"</li>
+                                <li class="flex gap-2"><span>•</span> "Hvorfor virker formlen ikke for lodrette linjer?" (Fordi hældningen er uendelig).</li>
+                            </ul>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <footer class="text-center py-24 border-t border-slate-200 mt-20">
+        <p class="text-[10px] font-black uppercase text-slate-400 tracking-[0.5em] italic">Matematisk Struktur – 2.a SAG</p>
+    </footer>
+
+    <script>
+        function toggleDeepDive(id) {
+            const el = document.getElementById(id);
+            const isVisible = window.getComputedStyle(el).display === 'block';
+            el.style.display = isVisible ? 'none' : 'block';
+        }
+
+        const canvas = document.getElementById('orthoCanvas');
+        const ctx = canvas.getContext('2d');
+        const aSlider = document.getElementById('aSlider');
+        const cSlider = document.getElementById('cSlider');
+        const aValText = document.getElementById('aVal');
+        const cValText = document.getElementById('cVal');
+        const productResult = document.getElementById('productResult');
+        const statusLabel = document.getElementById('statusLabel');
+        const simCard = document.getElementById('simCard');
+
+        function draw() {
+            const a = parseFloat(aSlider.value);
+            const c = parseFloat(cSlider.value);
+            const product = a * c;
+
+            aValText.innerText = a.toFixed(1);
+            cValText.innerText = c.toFixed(1);
+            productResult.innerText = product.toFixed(2);
+
+            // Ortogonalitetstjek (med lille tolerance)
+            const isOrtho = Math.abs(product + 1) < 0.05;
+            if(isOrtho) {
+                productResult.style.color = '#10b981';
+                statusLabel.innerText = "De er ortogonale! (90°)";
+                statusLabel.style.color = '#10b981';
+                simCard.classList.add('success-glow');
+            } else {
+                productResult.style.color = '#ffffff';
+                statusLabel.innerText = "Ikke ortogonale endnu";
+                statusLabel.style.color = '#94a3b8';
+                simCard.classList.remove('success-glow');
+            }
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const cx = canvas.width / 2;
+            const cy = canvas.height / 2;
+            const scale = 50;
+
+            // Grid
+            ctx.strokeStyle = '#f1f5f9';
+            ctx.lineWidth = 1;
+            for(let i = 0; i < canvas.width; i+= 40) {
+                ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, canvas.height); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(canvas.width, i); ctx.stroke();
+            }
+
+            // Axes
+            ctx.strokeStyle = '#e2e8f0';
+            ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.moveTo(0, cy); ctx.lineTo(canvas.width, cy); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(cx, 0); ctx.lineTo(cx, canvas.height); ctx.stroke();
+
+            // Line 1 (Blue)
+            ctx.strokeStyle = '#0ea5e9';
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.moveTo(cx - 5*scale, cy - (a * -5)*scale);
+            ctx.lineTo(cx + 5*scale, cy - (a * 5)*scale);
+            ctx.stroke();
+
+            // Line 2 (Green/Slate)
+            ctx.strokeStyle = isOrtho ? '#10b981' : '#64748b';
+            ctx.lineWidth = isOrtho ? 5 : 3;
+            ctx.beginPath();
+            ctx.moveTo(cx - 5*scale, cy - (c * -5)*scale);
+            ctx.lineTo(cx + 5*scale, cy - (c * 5)*scale);
+            ctx.stroke();
+
+            // Point P
+            ctx.fillStyle = '#0f172a';
+            ctx.beginPath(); ctx.arc(cx, cy, 6, 0, Math.PI*2); ctx.fill();
+        }
+
+        [aSlider, cSlider].forEach(s => s.addEventListener('input', draw));
+        window.onload = draw;
+    </script>
+</body>
+</html>

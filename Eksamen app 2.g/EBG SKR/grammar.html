@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grammar Hub | English B-Mastery</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        
+        .grammar-bg {
+            background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col">
+
+    <!-- Navigation -->
+    <nav class="bg-white border-b sticky top-0 z-50">
+        <div class="max-w-full mx-auto px-6">
+            <div class="flex justify-between h-20 items-center">
+                <div class="flex items-center gap-3">
+                    <div class="bg-blue-600 p-2 rounded-xl shadow-lg">
+                        <i class="fas fa-graduation-cap text-white text-xl"></i>
+                    </div>
+                    <span class="font-black text-2xl tracking-tighter uppercase">English<span class="text-blue-600">B</span> Master</span>
+                </div>
+                <div class="hidden lg:flex space-x-8 font-bold text-slate-600 uppercase text-xs tracking-widest">
+                    <a href="ENG-SKR-index.html" class="hover:text-blue-600 transition">Hjem</a>
+                    <a href="grammar.html" class="text-blue-600">Grammatik</a>
+                    <a href="essay.html" class="hover:text-blue-600 transition">Essay</a>
+                    <a href="quiz.html" class="hover:text-blue-600 transition">Quiz</a>
+                </div>
+                <a href="index.html" class="text-slate-500 hover:text-slate-800 transition">
+                    <i class="fas fa-times text-xl"></i>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header Section -->
+    <header class="grammar-bg py-20 border-b border-blue-200">
+        <div class="max-w-5xl mx-auto px-6 text-center lg:text-left">
+            <h1 class="text-5xl font-black mb-4 tracking-tighter">Grammar <span class="text-blue-600 italic">Hub</span></h1>
+            <p class="text-lg text-slate-600 max-w-2xl leading-relaxed">Velkommen til maskinrummet. Her gennemgår vi de grammatiske regler, der sikrer dig mod de klassiske L1-fejl til eksamen.</p>
+        </div>
+    </header>
+
+    <!-- Content Grid -->
+    <main class="max-w-5xl mx-auto px-6 py-16 flex-grow">
+        <div class="grid md:grid-cols-2 gap-8">
+            
+            <!-- Tenses -->
+            <div class="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-sm hover:shadow-xl transition-all group">
+                <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-blue-600 group-hover:text-white transition-colors">
+                    <i class="fas fa-history"></i>
+                </div>
+                <h3 class="text-2xl font-bold mb-3">Tid & Aspekt</h3>
+                <p class="text-slate-500 text-sm mb-6">Mestre forskellen på Past Simple og Present Perfect. Lær hvornår handlingen er afsluttet, og hvornår den stadig har betydning.</p>
+                <a href="grammar-tenses.html" class="inline-flex items-center gap-2 font-black text-blue-600 text-sm uppercase tracking-wider">
+                    Start lektion <i class="fas fa-arrow-right text-[10px]"></i>
+                </a>
+            </div>
+
+            <!-- Pronouns -->
+            <div class="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-sm hover:shadow-xl transition-all group">
+                <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
+                    <i class="fas fa-user-friends"></i>
+                </div>
+                <h3 class="text-2xl font-bold mb-3">Relative Pronominer</h3>
+                <p class="text-slate-500 text-sm mb-6">Who, which, that eller whose? Vi rydder op i forvirringen omkring henførende stedord én gang for alle.</p>
+                <a href="grammar-pronouns.html" class="inline-flex items-center gap-2 font-black text-indigo-600 text-sm uppercase tracking-wider">
+                    Start lektion <i class="fas fa-arrow-right text-[10px]"></i>
+                </a>
+            </div>
+
+            <!-- Adverbs -->
+            <div class="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-sm hover:shadow-xl transition-all group">
+                <div class="w-12 h-12 bg-amber-100 text-amber-600 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-amber-600 group-hover:text-white transition-colors">
+                    <i class="fas fa-highlighter"></i>
+                </div>
+                <h3 class="text-2xl font-bold mb-3">Adjektiver & Adverbier</h3>
+                <p class="text-slate-500 text-sm mb-6">Husk dine -ly endelser! Lær hvordan du beskriver både ting og handlinger korrekt på engelsk.</p>
+                <a href="grammar-adverbs.html" class="inline-flex items-center gap-2 font-black text-amber-600 text-sm uppercase tracking-wider">
+                    Start lektion <i class="fas fa-arrow-right text-[10px]"></i>
+                </a>
+            </div>
+
+            <!-- Concord -->
+            <div class="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-sm hover:shadow-xl transition-all group">
+                <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
+                    <i class="fas fa-align-left"></i>
+                </div>
+                <h3 class="text-2xl font-bold mb-3">Kongruens & Ordstilling</h3>
+                <p class="text-slate-500 text-sm mb-6">Få styr på overensstemmelsen mellem grundled og udsagnsled. Den mest basale – og vigtigste – regel.</p>
+                <a href="grammar-concord.html" class="inline-flex items-center gap-2 font-black text-emerald-600 text-sm uppercase tracking-wider">
+                    Start lektion <i class="fas fa-arrow-right text-[10px]"></i>
+                </a>
+            </div>
+
+        </div>
+    </main>
+
+    <!-- Simple Footer -->
+    <footer class="bg-slate-900 text-slate-500 py-12 px-6">
+        <div class="max-w-5xl mx-auto text-center">
+            <p class="text-[10px] font-black tracking-widest uppercase">English Mastery Grammar Section</p>
+        </div>
+    </footer>
+
+</body>
+</html>

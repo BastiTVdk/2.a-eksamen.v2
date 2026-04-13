@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spm 4: Differentialregning II | 2.a SAG</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --edu-blue: #2563eb;
+            --edu-bg: #f8fafc;
+            --insight-bg: #f0f7ff;
+            --tangent-rose: #e11d48;
+        }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--edu-bg);
+            color: #1e293b;
+            line-height: 1.6;
+        }
+        .learning-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 1.5rem;
+            padding: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        }
+        /* Opgraderet Indsigts-kort */
+        .deep-dive {
+            background: var(--insight-bg);
+            border-radius: 1.5rem;
+            padding: 2rem;
+            border: 1px solid #dbeafe;
+            margin-top: 1.5rem;
+            display: none;
+            animation: fadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+            box-shadow: inset 0 2px 4px rgba(37, 99, 235, 0.03);
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .proof-step {
+            position: relative;
+            padding-left: 3.5rem;
+            margin-bottom: 2.5rem;
+        }
+        .proof-step::before {
+            content: '';
+            position: absolute;
+            left: 1.25rem;
+            top: 2.5rem;
+            bottom: -2.5rem;
+            width: 2px;
+            background: #e2e8f0;
+        }
+        .proof-step:last-child::before { display: none; }
+        .step-number {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 2.5rem;
+            height: 2.5rem;
+            background: var(--edu-blue);
+            color: white;
+            border-radius: 0.85rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            font-weight: 800;
+            z-index: 10;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+        }
+        .btn-read-more {
+            @apply flex items-center gap-3 px-6 py-3 rounded-full bg-blue-50 text-blue-700 text-xs font-bold uppercase tracking-wider transition-all hover:bg-blue-100 mt-6 border border-blue-100 shadow-sm;
+        }
+        canvas {
+            background: white;
+            border-radius: 1.5rem;
+            width: 100%;
+        }
+        .sticky-nav {
+            position: sticky;
+            top: 2rem;
+        }
+        input[type=range] { accent-color: var(--edu-blue); }
+
+        .math-container {
+            overflow-x: auto;
+            scrollbar-width: thin;
+            padding: 1rem 0;
+        }
+        .math-container::-webkit-scrollbar { height: 4px; }
+        .math-container::-webkit-scrollbar-thumb { background: #e2e8f0; border-radius: 10px; }
+    </style>
+</head>
+<body class="p-4 md:p-12">
+
+    <div class="max-w-6xl mx-auto">
+        <!-- Header -->
+        <header class="mb-16">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10 text-center md:text-left">
+                <div>
+                    <a href="Index.html" class="inline-flex items-center text-sm font-bold text-blue-600 hover:gap-3 transition-all gap-2 mb-4 group">
+                        <span class="group-hover:-translate-x-1 transition-transform">←</span> Tilbage til Forsiden
+                    </a>
+                    <h1 class="text-4xl md:text-6xl font-black tracking-tight text-slate-900">
+                        Spm 4: <span class="text-rose-600 italic">Differentialregning II</span>
+                    </h1>
+                </div>
+                <div class="md:text-right border-l-0 md:border-l-2 border-slate-200 pl-0 md:pl-6 pt-4 md:pt-0">
+                    <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">Eksamens-klar v4.1</p>
+                    <p class="text-sm font-extrabold text-slate-700">2.a Sankt Annæ Gymnasium</p>
+                </div>
+            </div>
+            
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase mb-1 italic">Type</p>
+                    <p class="text-sm font-extrabold">Mundtlig Eksamen</p>
+                </div>
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase mb-1 italic">Værktøj</p>
+                    <p class="text-sm font-extrabold">Sum- & Konstantregel</p>
+                </div>
+                <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm">
+                    <p class="text-[10px] font-bold text-slate-400 uppercase mb-1 italic">Mål</p>
+                    <p class="text-sm font-extrabold text-rose-600">Bevis for ax²+bx+c</p>
+                </div>
+                <div class="bg-blue-600 p-5 rounded-2xl shadow-lg">
+                    <p class="text-[10px] font-bold text-blue-200 uppercase mb-1 italic">Status</p>
+                    <p class="text-sm font-extrabold text-white">Læringsoptimeret</p>
+                </div>
+            </div>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-12">
+            <!-- Sidebar -->
+            <aside class="lg:col-span-3">
+                <nav class="sticky-nav space-y-6">
+                    <div class="bg-slate-900 rounded-[2rem] p-8 text-white shadow-2xl">
+                        <h3 class="text-[10px] font-black uppercase tracking-[0.3em] text-slate-500 mb-8 italic">Disposition</h3>
+                        <ul class="space-y-6 text-sm font-bold">
+                            <li><a href="#intro" class="hover:text-rose-400 transition flex items-center gap-3"><span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span> Polynomiet</a></li>
+                            <li><a href="#sim" class="hover:text-blue-400 transition flex items-center gap-3 text-slate-400"><span class="w-1.5 h-1.5 rounded-full bg-slate-700"></span> Simulator</a></li>
+                            <li><a href="#bev-poly" class="hover:text-indigo-400 transition flex items-center gap-3 text-slate-400"><span class="w-1.5 h-1.5 rounded-full bg-slate-700"></span> Beviset</a></li>
+                            <li><a href="#bev-tan" class="hover:text-amber-400 transition flex items-center gap-3 text-slate-400"><span class="w-1.5 h-1.5 rounded-full bg-slate-700"></span> Tangenten</a></li>
+                        </ul>
+                    </div>
+                </nav>
+            </aside>
+
+            <!-- Main Content -->
+            <div class="lg:col-span-9 space-y-16 pb-32">
+                
+                <!-- Section 1: Intro -->
+                <section id="intro" class="space-y-8">
+                    <div class="flex items-center gap-6">
+                        <h2 class="text-xs font-black uppercase tracking-[0.4em] text-slate-400">01. Det generelle polynomium</h2>
+                        <div class="h-px flex-grow bg-slate-200"></div>
+                    </div>
+                    
+                    <div class="learning-card border-t-8 border-rose-500">
+                        <h3 class="text-2xl font-black mb-6 italic">Fra x² til ax² + bx + c</h3>
+                        <p class="text-slate-600 mb-8 text-lg">
+                            I dette spørgsmål beviser vi, hvordan man differentierer et fuldt andengradspolynomium. Vi bruger sumreglen, som siger, at man må differentiere hvert led for sig.
+                        </p>
+                        
+                        <div class="bg-slate-50 p-8 md:p-12 rounded-3xl shadow-inner text-center border border-slate-100 mb-8 math-container">
+                            <div class="text-2xl md:text-4xl font-light text-slate-800">
+                                $$f(x) = ax^2 + bx + c \implies f'(x) = 2ax + b$$
+                            </div>
+                        </div>
+
+                        <button onclick="toggleDeepDive('dd-intro')" class="btn-read-more">
+                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                            <span>Hvorfor forsvinder tallene? (Pædagogisk indsigt)</span>
+                        </button>
+
+                        <div id="dd-intro" class="deep-dive space-y-6">
+                            <div class="flex items-start gap-4">
+                                <div class="w-10 h-10 rounded-xl bg-blue-600 flex items-center justify-center flex-shrink-0 text-white shadow-lg shadow-blue-200">?</div>
+                                <div>
+                                    <h4 class="font-bold text-blue-900 mb-2">Konstant-reglen forklaret</h4>
+                                    <p class="text-sm text-slate-700 leading-relaxed italic">
+                                        Forestil dig grafen for en konstant \(c\) (f.eks. \(y = 5\)). Det er en helt vandret linje. Hvad er hældningen på en vandret linje? Den er altid 0! Derfor forsvinder alle led uden x, når vi differentierer.
+                                        <br><br>
+                                        På samme måde er \(bx\) en ret linje med hældningen \(b\). Derfor bliver \(bx\) bare til \(b\) i den afledede funktion.
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section 2: Simulator -->
+                <section id="sim" class="space-y-8">
+                    <h2 class="text-3xl font-black text-slate-800 italic">Interaktiv Tangent-Simulator</h2>
+                    <div class="learning-card">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+                            <div class="space-y-8">
+                                <div class="p-6 bg-slate-50 rounded-2xl border border-slate-100">
+                                    <p class="text-xs font-black text-blue-600 mb-6 uppercase tracking-widest text-[10px]">Eksperimentér med formen</p>
+                                    
+                                    <div class="space-y-6">
+                                        <div>
+                                            <label class="block text-[10px] font-bold text-slate-500 uppercase">Grundtal (a): <span id="aVal" class="text-slate-900 font-black">1.0</span></label>
+                                            <input type="range" id="aSlider" min="-2" max="2" step="0.1" value="1" class="w-full h-2 bg-slate-200 rounded-full appearance-none cursor-pointer">
+                                        </div>
+                                        <div>
+                                            <label class="block text-[10px] font-bold text-slate-500 uppercase">Hældning (b): <span id="bVal" class="text-slate-900 font-black">0.0</span></label>
+                                            <input type="range" id="bSlider" min="-3" max="3" step="0.1" value="0" class="w-full h-2 bg-slate-200 rounded-full appearance-none cursor-pointer">
+                                        </div>
+                                        <div>
+                                            <label class="block text-[10px] font-bold text-rose-500 uppercase italic">Punkt på x-aksen (x₀): <span id="xLabel" class="font-black">1.0</span></label>
+                                            <input type="range" id="xSlider" min="-3" max="3" step="0.1" value="1" class="w-full h-2 bg-slate-200 rounded-full appearance-none cursor-pointer">
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="p-6 bg-slate-900 rounded-[2rem] shadow-2xl text-white transform hover:scale-105 transition-transform">
+                                    <p class="text-[10px] font-black uppercase text-blue-400 mb-4 tracking-widest italic text-center">Den beregnede tangent</p>
+                                    <div id="tangentFormula" class="text-2xl font-mono text-center tracking-tighter">y = 2.00x - 1.00</div>
+                                </div>
+                            </div>
+                            <div class="bg-white rounded-[2rem] shadow-inner border border-slate-100 overflow-hidden relative">
+                                <canvas id="polyCanvas" width="400" height="400"></canvas>
+                                <div class="absolute bottom-4 right-4 text-[8px] font-bold text-slate-300 uppercase">Graf for ax² + bx</div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section 3: Bevis for f'(x) -->
+                <section id="bev-poly" class="space-y-8">
+                    <h2 class="text-3xl font-black text-slate-800 italic">Hovedbeviset: Tretrinsreglen</h2>
+                    <div class="learning-card">
+                        <div class="space-y-12">
+                            <!-- Step 1 -->
+                            <div class="proof-step">
+                                <div class="step-number">1</div>
+                                <div class="flex-1">
+                                    <h4 class="font-black text-slate-800 mb-4 uppercase text-sm tracking-widest">Tilvæksten Δy</h4>
+                                    <div class="p-6 bg-slate-50 rounded-2xl border border-slate-100 math-container text-sm md:text-base font-mono">
+                                        \(\Delta y = a(x_0+h)^2 + b(x_0+h) + c - (ax_0^2 + bx_0 + c)\)
+                                        <br><br>
+                                        \(\Delta y = 2ax_0h + ah^2 + bh\)
+                                    </div>
+                                    <button onclick="toggleDeepDive('dd-step1')" class="btn-read-more">
+                                        <span>Vis den svære reduktion</span>
+                                    </button>
+                                    <div id="dd-step1" class="deep-dive">
+                                        <p class="text-sm text-slate-700 leading-relaxed">
+                                            Her bruger vi kvadratreglen på den første parentes: \((x_0+h)^2 = x_0^2 + h^2 + 2x_0h\). 
+                                            Når vi ganger \(a\) ind og trækker det oprindelige \(ax_0^2 + bx_0 + c\) fra, så "spiser" de hinanden, og vi står kun tilbage med de led, der har et \(h\) i sig. Det er magien ved beviset!
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Step 2 -->
+                            <div class="proof-step">
+                                <div class="step-number">2</div>
+                                <div class="flex-1">
+                                    <h4 class="font-black text-slate-800 mb-4 uppercase text-sm tracking-widest">Differenskvotienten</h4>
+                                    <div class="p-6 bg-slate-50 rounded-2xl border border-slate-100 math-container text-sm md:text-base font-mono">
+                                        \(\frac{\Delta y}{h} = \frac{h(2ax_0 + ah + b)}{h} = 2ax_0 + ah + b\)
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Step 3 -->
+                            <div class="proof-step">
+                                <div class="step-number">3</div>
+                                <div class="flex-1">
+                                    <h4 class="font-black text-slate-800 mb-4 uppercase text-sm tracking-widest">Grænseværdien</h4>
+                                    <div class="p-10 bg-gradient-to-br from-indigo-600 to-blue-700 rounded-[2.5rem] text-white text-center shadow-xl">
+                                        <p class="text-[10px] font-black uppercase mb-4 opacity-70">Slutresultat</p>
+                                        <span class="text-3xl md:text-5xl font-black italic tracking-tighter">f'(x₀) = 2ax₀ + b</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Section 4: Tangentens Ligning -->
+                <section id="bev-tan" class="space-y-8">
+                    <h2 class="text-3xl font-black text-slate-800 italic">Udledning af Tangentformlen</h2>
+                    <div class="learning-card relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-32 h-32 bg-amber-500/5 rounded-full -mr-16 -mt-16"></div>
+                        
+                        <div class="space-y-8">
+                            <p class="text-slate-600 leading-relaxed">
+                                Tangenten er en ret linje, der rører grafen i punktet \((x₀, f(x₀))\). Dens hældning er \(f'(x₀)\). Vi kan finde dens ligning ved at starte med \(y = ax + b\).
+                            </p>
+
+                            <div class="p-6 bg-amber-50 border-l-4 border-amber-400 rounded-r-2xl">
+                                <h4 class="font-bold text-amber-900 mb-2">Trin-for-trin logik:</h4>
+                                <ol class="list-decimal ml-6 text-sm text-amber-800 space-y-3">
+                                    <li>Hældningen er \(f'(x_0)\).</li>
+                                    <li>Vi indsætter punktet for at finde skæringen \(k\).</li>
+                                    <li>Vi samler det hele i én pæn formel med en parentes.</li>
+                                </ol>
+                            </div>
+
+                            <div class="p-10 bg-amber-500 rounded-[2.5rem] shadow-2xl text-white text-center">
+                                <span class="text-2xl md:text-4xl font-black tracking-tighter">
+                                    $$y = f'(x_0)(x - x_0) + f(x_0)$$
+                                </span>
+                            </div>
+
+                            <button onclick="toggleDeepDive('dd-tan')" class="btn-read-more bg-amber-50 text-amber-700 border-amber-100 hover:bg-amber-100">
+                                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
+                                <span>Hvorfor parentesen (x - x₀)?</span>
+                            </button>
+
+                            <div id="dd-tan" class="deep-dive bg-amber-50 border-amber-100">
+                                <h4 class="font-bold text-amber-900 mb-4">Den smarte matematiske forklaring</h4>
+                                <p class="text-sm text-slate-700 leading-relaxed">
+                                    Ved at skrive \((x - x₀)\) sikrer vi os, at når vi sætter \(x = x₀\) ind i ligningen, så bliver hele parentesen til 0. 
+                                    <br><br>
+                                    Det betyder, at \(y\) bliver præcis lig med \(f(x₀)\). Det er en genial måde at tvinge linjen til at gå gennem det helt rigtige punkt uden at skulle regne skæringspunktet \(b\) ud manuelt hver gang!
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </div>
+    </div>
+
+    <footer class="text-center py-24 border-t border-slate-200 mt-20">
+        <p class="text-[10px] font-black uppercase text-slate-400 tracking-[0.5em] italic">Videnskab & Forståelse – 2.a SAG</p>
+    </footer>
+
+    <script>
+        function toggleDeepDive(id) {
+            const el = document.getElementById(id);
+            const isVisible = window.getComputedStyle(el).display === 'block';
+            el.style.display = isVisible ? 'none' : 'block';
+        }
+
+        const canvas = document.getElementById('polyCanvas');
+        const ctx = canvas.getContext('2d');
+        const aSlider = document.getElementById('aSlider');
+        const bSlider = document.getElementById('bSlider');
+        const xSlider = document.getElementById('xSlider');
+        const aValText = document.getElementById('aVal');
+        const bValText = document.getElementById('bVal');
+        const xLabel = document.getElementById('xLabel');
+        const tangentFormula = document.getElementById('tangentFormula');
+
+        function draw() {
+            const a = parseFloat(aSlider.value);
+            const b = parseFloat(bSlider.value);
+            const x0 = parseFloat(xSlider.value);
+            
+            const y0 = a * x0 * x0 + b * x0;
+            const slope = 2 * a * x0 + b;
+            const k = y0 - slope * x0;
+
+            aValText.innerText = a.toFixed(1);
+            bValText.innerText = b.toFixed(1);
+            xLabel.innerText = x0.toFixed(1);
+            
+            let sign = k >= 0 ? "+" : "-";
+            tangentFormula.innerText = `y = ${slope.toFixed(2)}x ${sign} ${Math.abs(k).toFixed(2)}`;
+
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const scale = 40;
+            const cx = canvas.width / 2;
+            const cy = canvas.height / 2;
+
+            // Grid
+            ctx.strokeStyle = '#f8fafc';
+            ctx.lineWidth = 1;
+            for(let i = 0; i < canvas.width; i+= scale) {
+                ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, canvas.height); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(0, i); ctx.lineTo(canvas.width, i); ctx.stroke();
+            }
+            
+            ctx.strokeStyle = '#e2e8f0';
+            ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.moveTo(0, cy); ctx.lineTo(canvas.width, cy); ctx.stroke();
+            ctx.beginPath(); ctx.moveTo(cx, 0); ctx.lineTo(cx, canvas.height); ctx.stroke();
+
+            // Parabola
+            ctx.strokeStyle = '#cbd5e1';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            for(let x = -6; x <= 6; x += 0.1) {
+                let sx = cx + x * scale;
+                let sy = cy - (a * x * x + b * x) * scale;
+                if(x === -6) ctx.moveTo(sx, sy); else ctx.lineTo(sx, sy);
+            }
+            ctx.stroke();
+
+            // Tangent
+            ctx.strokeStyle = '#e11d48';
+            ctx.lineWidth = 5;
+            ctx.beginPath();
+            const startX = -6;
+            const endX = 6;
+            ctx.moveTo(cx + startX * scale, cy - (slope * startX + k) * scale);
+            ctx.lineTo(cx + endX * scale, cy - (slope * endX + k) * scale);
+            ctx.stroke();
+
+            // Point P
+            ctx.fillStyle = '#1e293b';
+            ctx.beginPath(); ctx.arc(cx + x0 * scale, cy - y0 * scale, 8, 0, Math.PI*2); ctx.fill();
+            ctx.strokeStyle = '#fff'; ctx.lineWidth = 2; ctx.stroke();
+        }
+
+        [aSlider, bSlider, xSlider].forEach(s => s.addEventListener('input', draw));
+        window.onload = draw;
+    </script>
+</body>
+</html>

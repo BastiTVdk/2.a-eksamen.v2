@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2.a SAG | Eksamens Hub</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #6366f1;
+            --accent: #a855f7;
+            --bg: #0f172a;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg);
+            color: #f8fafc;
+            overflow-x: hidden;
+        }
+
+        .glass {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass:hover {
+            border-color: rgba(99, 102, 241, 0.4);
+            transform: translateY(-8px);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #818cf8 0%, #c084fc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .subject-card {
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+
+        /* En mere moderne knap-stil */
+        .btn-subject {
+            @apply flex items-center justify-center py-3.5 px-4 rounded-2xl border border-white/10 bg-white/5 transition-all duration-300 font-bold text-center text-sm backdrop-blur-sm;
+            position: relative;
+            z-index: 1;
+        }
+
+        .btn-subject:hover {
+            @apply border-white/20 transform -translate-y-1 shadow-xl;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        /* Farve-specifikke hover effekter for knapper */
+        .hover-fysik:hover { background: linear-gradient(135deg, rgba(99, 102, 241, 0.8), rgba(168, 85, 247, 0.8)); color: white; border-color: transparent; }
+        .hover-geo:hover { background: linear-gradient(135deg, rgba(16, 185, 129, 0.8), rgba(5, 150, 105, 0.8)); color: white; border-color: transparent; }
+        .hover-mat:hover { background: linear-gradient(135deg, rgba(59, 130, 246, 0.8), rgba(37, 99, 235, 0.8)); color: white; border-color: transparent; }
+        .hover-eng:hover { background: linear-gradient(135deg, rgba(244, 63, 94, 0.8), rgba(225, 29, 72, 0.8)); color: white; border-color: transparent; }
+        .hover-tysk:hover { background: linear-gradient(135deg, rgba(245, 158, 11, 0.8), rgba(217, 119, 6, 0.8)); color: white; border-color: transparent; }
+
+        .btn-primary-gradient {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 10px; }
+    </style>
+</head>
+<body class="min-h-screen">
+
+    <!-- Decorative Glows -->
+    <div class="fixed top-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-600/20 blur-[120px] rounded-full pointer-events-none"></div>
+    <div class="fixed bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-purple-600/20 blur-[120px] rounded-full pointer-events-none"></div>
+
+    <nav class="sticky top-0 z-50 px-6 py-4 glass border-b border-white/5">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-2">
+                <div class="w-10 h-10 rounded-xl btn-primary-gradient flex items-center justify-center font-bold text-xl">2</div>
+                <span class="text-xl font-bold tracking-tight">.a <span class="text-indigo-400">SAG</span></span>
+            </div>
+            <div class="hidden md:flex gap-8 text-sm font-medium">
+                <a href="#fag" class="hover:text-indigo-400 transition">Fag</a>
+                <a href="#timer" class="hover:text-indigo-400 transition">Fokus</a>
+                <a href="#tips" class="hover:text-indigo-400 transition">Eksamenstips</a>
+            </div>
+            <button onclick="document.getElementById('timer').scrollIntoView({behavior: 'smooth'})" class="px-5 py-2 rounded-full text-sm font-semibold glass border-white/10 hover:bg-white/5">Studie Mode</button>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-6 pt-20 pb-32">
+        <!-- Hero Section -->
+        <section class="text-center mb-24">
+            <h1 class="text-5xl md:text-7xl font-extrabold mb-6 tracking-tight">
+                Gør dig klar til <br><span class="gradient-text">Sommereksamen</span>
+            </h1>
+            <p class="text-slate-400 text-lg md:text-xl max-w-2xl mx-auto mb-10">
+                Velkommen tilbage, 2.a. Alle jeres materialer, noter og dispositioner er nu samlet her.
+            </p>
+            <div class="flex flex-wrap justify-center gap-4">
+                <a href="#fag" class="px-10 py-4 rounded-2xl btn-primary-gradient font-bold shadow-lg shadow-indigo-500/20 transform transition hover:scale-105">Vælg dit fag</a>
+                <a href="https://www.lectio.dk/lectio/25/forside.aspx" target="_blank" class="px-10 py-4 rounded-2xl glass font-bold border-white/10 hover:bg-white/5">Lectio login</a>
+            </div>
+        </section>
+
+        <!-- Subjects Grid -->
+        <section id="fag" class="mb-32">
+            <h2 class="text-3xl font-bold mb-12 flex items-center gap-3">
+                <span class="w-8 h-1 bg-indigo-500 rounded-full"></span>
+                Dine Eksamensfag
+            </h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                
+                <!-- Fysik -->
+                <div class="glass p-8 rounded-[2.5rem] subject-card group">
+                    <div class="text-indigo-400 mb-6">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="7"/><path d="M12 9v6"/><path d="M9 12h6"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-2">Fysik</h3>
+                    <p class="text-slate-400 text-sm mb-8 flex-grow">Mundtlig forberedelse. Fokus på forsøg, teori og dataopsamling.</p>
+                    <div class="flex gap-2 mb-8">
+                        <span class="px-3 py-1 bg-indigo-500/10 text-indigo-400 text-xs rounded-full border border-indigo-500/20">Mundtlig</span>
+                    </div>
+                    <div class="grid grid-cols-1">
+                        <a href="fysik-index.html" class="btn-subject hover-fysik">Åbn materialer</a>
+                    </div>
+                </div>
+
+                <!-- Naturgeografi -->
+                <div class="glass p-8 rounded-[2.5rem] subject-card group">
+                    <div class="text-emerald-400 mb-6">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20 14.5 14.5 0 0 0 0-20"/><path d="M2 12h20"/><path d="M12 2a14.5 14.5 0 0 1 0 20 14.5 14.5 0 0 1 0-20"/></svg>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-2">Naturgeografi</h3>
+                    <p class="text-slate-400 text-sm mb-8 flex-grow">Mundtlig eksamen. Pladetektonik, klima og ressourcer.</p>
+                    <div class="flex gap-2 mb-8">
+                        <span class="px-3 py-1 bg-emerald-500/10 text-emerald-400 text-xs rounded-full border border-emerald-500/20">Mundtlig</span>
+                    </div>
+                    <div class="grid grid-cols-1">
+                        <a href="naturgeografi-index.html" class="btn-subject hover-geo">Se cases</a>
+                    </div>
+                </div>
+
+                <!-- Matematik -->
+                <div class="glass p-8 rounded-[2.5rem] subject-card group">
+                    <div class="text-blue-400 mb-6">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 7h10"/><path d="M7 12h10"/><path d="M7 17h10"/></svg>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-2">Matematik</h3>
+                    <p class="text-slate-400 text-sm mb-8 flex-grow">Forberedelse til både skriftlige opgaver og mundtlig fremlæggelse.</p>
+                    <div class="flex gap-2 mb-8">
+                        <span class="px-3 py-1 bg-blue-500/10 text-blue-400 text-xs rounded-full border border-blue-500/20">Skriftlig</span>
+                        <span class="px-3 py-1 bg-blue-500/10 text-blue-400 text-xs rounded-full border border-blue-500/20">Mundtlig</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <a href="matematik-skriftlig.html" class="btn-subject hover-mat">Skriftlig</a>
+                        <a href="Index.html" class="btn-subject hover-mat">Mundtlig</a>
+                    </div>
+                </div>
+
+                <!-- Engelsk -->
+                <div class="glass p-8 rounded-[2.5rem] subject-card group">
+                    <div class="text-rose-400 mb-6">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="m5 8 6 6"/><path d="m4 14 6-6 2-3"/><path d="M2 5h12"/><path d="M7 2h1"/><path d="m22 22-5-10-5 10"/><path d="M14 18h6"/></svg>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-2">Engelsk</h3>
+                    <p class="text-slate-400 text-sm mb-8 flex-grow">Litterær analyse, essays og mundtlig præsentation.</p>
+                    <div class="flex gap-2 mb-8">
+                        <span class="px-3 py-1 bg-rose-500/10 text-rose-400 text-xs rounded-full border border-rose-500/20">Skriftlig</span>
+                        <span class="px-3 py-1 bg-rose-500/10 text-rose-400 text-xs rounded-full border border-rose-500/20">Mundtlig</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-4">
+                        <a href="ENG-SKR-Index.html" class="btn-subject hover-eng">Skriftlig</a>
+                        <a href="engelsk-mundtlig.html" class="btn-subject hover-eng">Mundtlig</a>
+                    </div>
+                </div>
+
+                <!-- Tysk -->
+                <div class="glass p-8 rounded-[2.5rem] subject-card group">
+                    <div class="text-amber-400 mb-6">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="w-12 h-12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    </div>
+                    <h3 class="text-2xl font-bold mb-2">Tysk</h3>
+                    <p class="text-slate-400 text-sm mb-8 flex-grow">Mundtlig forberedelse. Fokus på ordforråd og talefærdighed.</p>
+                    <div class="flex gap-2 mb-8">
+                        <span class="px-3 py-1 bg-amber-500/10 text-amber-400 text-xs rounded-full border border-amber-500/20">Mundtlig</span>
+                    </div>
+                    <div class="grid grid-cols-1">
+                        <a href="tysk-index.html" class="btn-subject hover-tysk">Øv udtale</a>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Focus Timer (Pomodoro) -->
+        <section id="timer" class="mb-32">
+            <div class="glass p-12 rounded-[3.5rem] text-center max-w-3xl mx-auto relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-indigo-500 to-transparent"></div>
+                <h2 class="text-2xl font-bold mb-8">Deep Work Timer</h2>
+                <div class="text-7xl md:text-9xl font-black mb-8 tracking-tighter tabular-nums" id="display">25:00</div>
+                <div class="flex justify-center gap-4">
+                    <button onclick="toggleTimer()" id="timerBtn" class="px-10 py-4 rounded-2xl btn-primary-gradient font-bold shadow-lg shadow-indigo-500/20">Start Session</button>
+                    <button onclick="resetTimer()" class="px-10 py-4 rounded-2xl bg-white/5 hover:bg-white/10 transition-all font-bold border border-white/5">Nulstil</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Exam Tips -->
+        <section id="tips">
+            <h2 class="text-3xl font-bold mb-12 text-center">Sidste tips før det går løs</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div class="p-8 rounded-3xl glass border-l-4 border-indigo-500">
+                    <h4 class="font-bold mb-3 text-lg">Dispositionen</h4>
+                    <p class="text-sm text-slate-400 leading-relaxed">En god disposition er halvdelen af den mundtlige eksamen. Hold den simpel og hav klare fokuspunkter.</p>
+                </div>
+                <div class="p-8 rounded-3xl glass border-l-4 border-purple-500">
+                    <h4 class="font-bold mb-3 text-lg">Hjælpemidler</h4>
+                    <p class="text-sm text-slate-400 leading-relaxed">Tjek at din TI-Nspire eller Geogebra er opdateret og virker uden internetforbindelse.</p>
+                </div>
+                <div class="p-8 rounded-3xl glass border-l-4 border-emerald-500">
+                    <h4 class="font-bold mb-3 text-lg">Fællesskab</h4>
+                    <p class="text-sm text-slate-400 leading-relaxed">Læs sammen i 2.a. Man lærer bedst ved at forklare stoffet til sine klassekammerater.</p>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="py-12 border-t border-white/5 text-center text-slate-500 text-sm">
+        <p>&copy; 2024 Sankt Annæ Gymnasium - Studie Hub til 2.a</p>
+    </footer>
+
+    <script>
+        // Pomodoro Timer Logic
+        let timeLeft = 25 * 60;
+        let timerId = null;
+        const display = document.getElementById('display');
+        const timerBtn = document.getElementById('timerBtn');
+
+        function updateDisplay() {
+            const mins = Math.floor(timeLeft / 60);
+            const secs = timeLeft % 60;
+            display.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+        }
+
+        function toggleTimer() {
+            if (timerId) {
+                clearInterval(timerId);
+                timerId = null;
+                timerBtn.textContent = 'Fortsæt Session';
+            } else {
+                timerId = setInterval(() => {
+                    if (timeLeft > 0) {
+                        timeLeft--;
+                        updateDisplay();
+                    } else {
+                        clearInterval(timerId);
+                        alert('Tid til en velfortjent pause!');
+                    }
+                }, 1000);
+                timerBtn.textContent = 'Pause';
+            }
+        }
+
+        function resetTimer() {
+            clearInterval(timerId);
+            timerId = null;
+            timeLeft = 25 * 60;
+            updateDisplay();
+            timerBtn.textContent = 'Start Session';
+        }
+
+        // Reveal animation on scroll
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('opacity-100', 'translate-y-0');
+                    entry.target.classList.remove('opacity-0', 'translate-y-10');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.glass').forEach(el => {
+            el.classList.add('opacity-0', 'translate-y-10', 'transition-all', 'duration-1000');
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>

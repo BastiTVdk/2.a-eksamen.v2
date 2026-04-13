@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MathQuest B | 2.a SAG</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-glow: rgba(37, 99, 235, 0.15);
+            --slate-bg: #f8fafc;
+            /* Ultra-smooth transition curve */
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--slate-bg);
+            color: #1e293b;
+            overflow-x: hidden;
+        }
+
+        /* Dynamiske Baggrunds-blobs */
+        .bg-blob {
+            position: fixed;
+            z-index: -1;
+            filter: blur(100px);
+            opacity: 0.12;
+            pointer-events: none;
+            border-radius: 50%;
+        }
+
+        .quest-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 2rem;
+            padding: 2.25rem;
+            transition: all 0.5s var(--ease-out-expo);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .quest-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 25px 40px -15px rgba(0, 0, 0, 0.08);
+            border-color: var(--primary);
+        }
+
+        /* Tema-identitet */
+        .section-vækst { --accent: #6366f1; }
+        .section-diff { --accent: #f43f5e; }
+        .section-geo { --accent: #0ea5e9; }
+        .section-sandsyn { --accent: #8b5cf6; }
+        .section-poly { --accent: #10b981; }
+        .section-golden { --accent: #f59e0b; }
+
+        .custom-card { border-left: 6px solid var(--accent); }
+
+        /* DEN NYE OPGRADEREDE KNAP */
+        .btn-start {
+            @apply mt-8 w-full py-4 rounded-full bg-white text-slate-800 font-bold text-sm flex items-center justify-center gap-3;
+            border: 2px solid #e2e8f0;
+            transition: all 0.4s var(--ease-out-expo);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+
+        .quest-card:hover .btn-start {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+            box-shadow: 0 10px 20px -5px rgba(37, 99, 235, 0.3);
+            transform: scale(1.02);
+        }
+
+        .btn-start:active {
+            transform: scale(0.92); /* Den fysiske tryk-effekt */
+            filter: brightness(0.9);
+        }
+
+        .mathias-float {
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
+        }
+
+        .progress-bar-container {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(0,0,0,0.06);
+        }
+    </style>
+</head>
+<body class="min-h-screen pb-32">
+
+    <!-- Ambient Background Elements -->
+    <div class="bg-blob w-[600px] h-[600px] bg-blue-400 top-[-15%] left-[-10%]"></div>
+    <div class="bg-blob w-[500px] h-[500px] bg-indigo-400 bottom-[-10%] right-[-5%]"></div>
+
+    <!-- Navigation Bar -->
+    <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-slate-200">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/25">
+                    <span class="text-white font-black text-2xl italic">3M</span>
+                </div>
+                <div>
+                    <span class="text-xl font-black tracking-tight block leading-none text-slate-900 uppercase">MatMedMarius <span class="text-blue-600">B</span></span>
+                    <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">2.a Sankt Annæ Gymnasium</span>
+                </div>
+            </div>
+            <div class="flex items-center gap-8">
+                <a href="#vækst" class="text-xs font-black text-slate-400 hover:text-blue-600 transition uppercase tracking-widest">Pensum</a>
+                <div class="h-6 w-px bg-slate-200"></div>
+                <button class="px-7 py-2.5 bg-slate-900 text-white rounded-full text-xs font-bold hover:bg-blue-600 transition shadow-xl active:scale-95">STUDIE HUB</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header / Hero Section -->
+    <header class="max-w-7xl mx-auto px-6 pt-24 pb-20 text-center">
+        <h1 class="text-6xl md:text-8xl font-black tracking-tighter text-slate-900 mb-8 uppercase leading-[0.85]">
+            Mestre din <br><span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 italic">Eksamen.</span>
+        </h1>
+        <p class="text-slate-500 text-lg md:text-2xl max-w-2xl mx-auto leading-relaxed font-medium">
+            Din interaktive ruteplan gennem 11 spørgsmål for 2.a. <br>Fra basale vækstmodeller til de sværeste beviser.
+        </p>
+    </header>
+
+    <!-- Main Content: Subject Sections -->
+    <main class="max-w-7xl mx-auto px-6 space-y-32">
+        
+        <!-- Section: Vækstmodeller -->
+        <section id="vækst" class="section-vækst">
+            <div class="flex items-center gap-6 mb-12">
+                <div class="w-16 h-1.5 bg-indigo-500 rounded-full shadow-sm shadow-indigo-200"></div>
+                <h2 class="text-xs font-black uppercase tracking-[0.4em] text-indigo-500/70">Vækstmodeller</h2>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                <a href="mat-sp1.html" class="quest-card custom-card">
+                    <div>
+                        <h3 class="text-2xl font-bold mb-4 italic tracking-tight">01. Eksponentiel Vækst I</h3>
+                        <p class="text-sm text-slate-500 leading-relaxed">Redegør for egenskaber og udled formler for a og b ud fra to punkter i koordinatsystemet.</p>
+                    </div>
+                    <div class="btn-start">Åbn Spørgsmål <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></div>
+                </a>
+                <a href="mat-sp2.html" class="quest-card custom-card">
+                    <div>
+                        <h3 class="text-2xl font-bold mb-4 italic tracking-tight">02. Eksponentiel Vækst II</h3>
+                        <p class="text-sm text-slate-500 leading-relaxed">Bevis formlen for fordoblingskonstanten T₂ og forklar dens praktiske betydning.</p>
+                    </div>
+                    <div class="btn-start">Åbn Spørgsmål <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></div>
+                </a>
+            </div>
+        </section>
+
+        <!-- Section: Differentialregning -->
+        <section id="diff" class="section-diff">
+            <div class="flex items-center gap-6 mb-12">
+                <div class="w-16 h-1.5 bg-rose-500 rounded-full shadow-sm shadow-rose-200"></div>
+                <h2 class="text-xs font-black uppercase tracking-[0.4em] text-rose-500/70">Differentialregning</h2>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                <a href="mat-sp3.html" class="quest-card custom-card">
+                    <div>
+                        <h3 class="text-2xl font-bold mb-4 italic tracking-tight">03. Differentialregning I</h3>
+                        <p class="text-sm text-slate-500 leading-relaxed">Tretrinsreglen for x², begrebet differentialkvotient og analyse af monotoniforhold.</p>
+                    </div>
+                    <div class="btn-start">Åbn Spørgsmål <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></div>
+                </a>
+                <a href="mat-sp4.html" class="quest-card custom-card">
+                    <div>
+                        <h3 class="text-2xl font-bold mb-4 italic tracking-tight">04. Differentialregning II</h3>
+                        <p class="text-sm text-slate-500 leading-relaxed">Udledning for ax² + bx + c og bestemmelse af tangentens ligning i et punkt.</p>
+                    </div>
+                    <div class="btn-start">Åbn Spørgsmål <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></div>
+                </a>
+            </div>
+        </section>
+
+        <!-- Section: Analytisk Geometri -->
+        <section id="geo" class="section-geo">
+            <div class="flex items-center gap-6 mb-12">
+                <div class="w-16 h-1.5 bg-sky-500 rounded-full shadow-sm shadow-sky-200"></div>
+                <h2 class="text-xs font-black uppercase tracking-[0.4em] text-sky-500/70">Analytisk Geometri</h2>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                <a href="mat-sp5.html" class="quest-card custom-card">
+                    <div><h3 class="text-2xl font-bold mb-4 italic tracking-tight">05. Geometri I: Vinkler</h3><p class="text-sm text-slate-500 leading-relaxed">Hældningsvinkler for rette linjer og anvendelse af v = tan⁻¹(|a|).</p></div>
+                    <div class="btn-start">Åbn Spørgsmål <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></div>
+                </a>
+                <a href="mat-sp6.html" class="quest-card custom-card">
+                    <div><h3 class="text-2xl font-bold mb-4 italic tracking-tight">06. Geometri II: Ortogonalitet</h3><p class="text-sm text-slate-500 leading-relaxed">Bevis for betingelsen a · c = -1 for ortogonale linjer i planet.</p></div>
+                    <div class="btn-start">Åbn Spørgsmål <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></div>
+                </a>
+                <a href="mat-sp7.html" class="quest-card custom-card">
+                    <div><h3 class="text-2xl font-bold mb-4 italic tracking-tight">07. Geometri III: Afstande</h3><p class="text-sm text-slate-500 leading-relaxed">Afstanden mellem punkt og linje samt skæringspunkter for cirkler.</p></div>
+                    <div class="btn-start">Åbn Spørgsmål <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></div>
+                </a>
+            </div>
+        </section>
+
+        <!-- Section: Sandsynlighedsregning -->
+        <section id="sandsyn" class="section-sandsyn">
+            <div class="flex items-center gap-6 mb-12">
+                <div class="w-16 h-1.5 bg-violet-500 rounded-full shadow-sm shadow-violet-200"></div>
+                <h2 class="text-xs font-black uppercase tracking-[0.4em] text-violet-500/70">Sandsynlighed</h2>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                <a href="mat-sp8.html" class="quest-card custom-card">
+                    <div><h3 class="text-2xl font-bold mb-4 italic tracking-tight">08. Sandsynlighed & Hypoteser</h3><p class="text-sm text-slate-500 leading-relaxed">Kombinatorik og binomialfordeling. Udledning af koefficienten K(n,r).</p></div>
+                    <div class="btn-start">Åbn Spørgsmål <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></div>
+                </a>
+            </div>
+        </section>
+
+        <!-- Section: Andengradspolynomier -->
+        <section id="poly" class="section-poly">
+            <div class="flex items-center gap-6 mb-12">
+                <div class="w-16 h-1.5 bg-emerald-500 rounded-full shadow-sm shadow-emerald-200"></div>
+                <h2 class="text-xs font-black uppercase tracking-[0.4em] text-emerald-500/70">Polynomier</h2>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                <a href="mat-sp9.html" class="quest-card custom-card">
+                    <div><h3 class="text-2xl font-bold mb-4 italic tracking-tight">09. Polynomier I: Rødder</h3><p class="text-sm text-slate-500 leading-relaxed">Bevis for løsningsformlen til andengradsligningen trin for trin.</p></div>
+                    <div class="btn-start">Åbn Spørgsmål <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></div>
+                </a>
+                <a href="mat-sp10.html" class="quest-card custom-card">
+                    <div><h3 class="text-2xl font-bold mb-4 italic tracking-tight">10. Polynomier II: Toppunkt</h3><p class="text-sm text-slate-500 leading-relaxed">Udledning af toppunktsformlen og redegørelse for faktorisering.</p></div>
+                    <div class="btn-start">Åbn Spørgsmål <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></div>
+                </a>
+            </div>
+        </section>
+
+        <!-- Section: Det Gyldne Snit -->
+        <section id="golden" class="section-golden pb-32">
+            <div class="flex items-center gap-6 mb-12">
+                <div class="w-16 h-1.5 bg-amber-500 rounded-full shadow-sm shadow-amber-200"></div>
+                <h2 class="text-xs font-black uppercase tracking-[0.4em] text-amber-500/70">Det Gyldne Snit</h2>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
+                <a href="mat-sp11.html" class="quest-card custom-card">
+                    <div><h3 class="text-2xl font-bold mb-4 italic tracking-tight">11. Fibonacci & Geometri</h3><p class="text-sm text-slate-500 leading-relaxed">Definition af det gyldne snit, Fibonacci-rækken og rektanglet.</p></div>
+                    <div class="btn-start">Åbn Spørgsmål <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></div>
+                </a>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Interactive Mentor (Mathias) -->
+    <div class="fixed bottom-24 right-8 z-[100] flex flex-col items-end pointer-events-none">
+        <div id="mathias-bubble" class="bg-white p-7 rounded-[2.5rem] shadow-2xl border border-slate-100 mb-6 max-w-[300px] pointer-events-auto hidden">
+            <p class="text-sm font-bold text-slate-700 leading-relaxed italic" id="mathias-text">Klik på mig for at tjekke din status!</p>
+        </div>
+        <div class="mathias-float pointer-events-auto cursor-pointer" onclick="toggleMathias()">
+            <div class="w-24 h-24 bg-white rounded-[2rem] shadow-2xl flex items-center justify-center border border-slate-100 group transition-transform hover:scale-105 active:scale-90">
+                <svg width="60" height="60" viewBox="0 0 100 100" fill="none">
+                    <circle cx="35" cy="45" r="5.5" fill="#0f172a" />
+                    <circle cx="65" cy="45" r="5.5" fill="#0f172a" />
+                    <path d="M38 72 Q50 82 62 72" stroke="#0f172a" stroke-width="5" stroke-linecap="round" />
+                    <circle id="statusDot" cx="82" cy="18" r="9" fill="#cbd5e1" class="transition-colors duration-700 shadow-sm" />
+                </svg>
+            </div>
+        </div>
+    </div>
+
+    <!-- Persistent Progress Bar -->
+    <div class="fixed bottom-0 w-full progress-bar-container p-6 z-50">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-8">
+            <div class="flex-1 w-full space-y-3">
+                <div class="flex justify-between items-end">
+                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-[0.2em]">Eksamens-Parathed</span>
+                    <span id="scoreText" class="text-3xl font-black text-slate-900 leading-none">0%</span>
+                </div>
+                <div class="w-full h-4 bg-slate-100 rounded-full overflow-hidden border border-slate-200 shadow-inner">
+                    <div id="progressBar" class="bg-blue-600 h-full w-[0%] transition-all duration-1000 ease-out shadow-lg"></div>
+                </div>
+            </div>
+            <div class="hidden lg:block whitespace-nowrap">
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-widest border border-slate-200 px-6 py-3 rounded-full bg-slate-50 italic">Status: Analyserer 2.a Mat 2026</span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let points = 0;
+        const totalPossible = 100;
+
+        function toggleMathias() {
+            const bubble = document.getElementById('mathias-bubble');
+            bubble.classList.toggle('hidden');
+            const percent = (points / totalPossible) * 100;
+            const text = document.getElementById('mathias-text');
+            
+            if (percent < 20) text.innerText = "Vi skal i gang, 2.a! Begynd din rejse med Spørgsmål 1 og vis mig dit niveau.";
+            else if (percent < 60) text.innerText = "Godt arbejde indtil videre. Jeg mærker din matematiske selvtillid stige!";
+            else text.innerText = "Du er knivskarp nu. Censor og lærer har intet på dig. Knæk og bræk!";
+        }
+
+        function updateUI() {
+            const percent = Math.min(100, (points / totalPossible) * 100);
+            document.getElementById('progressBar').style.width = percent + "%";
+            document.getElementById('scoreText').innerText = Math.round(percent) + "%";
+            const dot = document.getElementById('statusDot');
+            
+            if (percent > 0) dot.setAttribute('fill', '#f59e0b');
+            if (percent >= 100) dot.setAttribute('fill', '#10b981');
+        }
+
+        window.onload = updateUI;
+    </script>
+</body>
+</html>

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MathQuest B | 2.a SAG</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --primary: #2563eb;
@@ -52,8 +52,8 @@
             backdrop-filter: blur(10px);
             border: 1px solid #e2e8f0;
             border-radius: 2rem;
-            padding: 2.25rem;
-            transition: all 0.5s var(--ease-out-expo);
+            padding: 1.75rem; /* Reduceret lidt for at give mere plads til knappen */
+            transition: all 0.4s ease;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
@@ -63,44 +63,62 @@
             border-left: 6px solid var(--accent);
         }
 
-        .quest-card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: linear-gradient(135deg, transparent, var(--accent-glow), transparent);
-            opacity: 0;
-            transition: 0.5s ease;
-            pointer-events: none;
-        }
-
+        /* Fjernet den forstyrrende gradient hover-effekt. Kun en subtil skygge og løft. */
         .quest-card:hover {
-            transform: translateY(-8px) scale(1.01);
-            box-shadow: 0 30px 50px -15px var(--accent-glow);
+            transform: translateY(-6px);
+            box-shadow: 0 20px 40px -10px var(--accent-glow);
             border-color: var(--accent);
         }
 
-        .quest-card:hover::before {
-            opacity: 1;
-        }
-
-        /* DEN NYE OPGRADEREDE KNAP */
+        /* DEN NYE CLEAN KNAP (Pilleformet og pæn) */
         .btn-start {
-            @apply mt-8 w-full py-4 rounded-full bg-white text-slate-800 font-bold text-sm flex items-center justify-center gap-3 relative overflow-hidden z-10;
-            border: 2px solid #f1f5f9;
-            transition: all 0.4s var(--ease-out-expo);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            @apply w-full bg-slate-50 text-slate-700 z-10;
+            margin-top: auto; /* Skubber knappen helt i bund */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1rem;
+            border-radius: 9999px;
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-size: 0.75rem; /* Lidt mindre tekst for at forhindre overflow */
+            white-space: nowrap; /* Tvinger teksten til at blive på én linje */
         }
 
-        .quest-card:hover .btn-start {
-            background: var(--accent);
-            color: white;
+        .btn-start svg {
+            flex-shrink: 0; /* Forhindrer at ikonet bliver mast sammen */
+            width: 28px;
+            height: 28px;
+            padding: 6px;
+            border-radius: 50%;
+            background-color: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            color: var(--accent);
+            transition: all 0.3s ease;
+        }
+
+        /* Hover effekt der KUN aktiveres, når man holder musen over selve knappen */
+        .btn-start:hover {
             border-color: var(--accent);
-            box-shadow: 0 10px 25px -5px var(--accent-glow);
+            background: white;
+            box-shadow: 0 8px 25px -5px var(--accent-glow);
+            color: var(--accent);
+        }
+
+        .btn-start:hover svg {
+            background-color: var(--accent);
+            color: white;
+            transform: translateX(4px);
+            box-shadow: 0 4px 10px var(--accent-glow);
         }
 
         .btn-start:active {
-            transform: scale(0.95);
-            filter: brightness(0.9);
+            transform: scale(0.97);
         }
 
         .mathias-float {
@@ -145,7 +163,6 @@
                 </div>
             </div>
             <div class="flex items-center gap-6 md:gap-8 hidden sm:flex">
-                <!-- Nyt link til Forsiden -->
                 <a href="Index.html" class="text-xs font-black text-slate-500 hover:text-blue-600 transition uppercase tracking-widest flex items-center gap-1">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
                     Forsiden
@@ -153,13 +170,11 @@
                 <a href="#vækst" class="text-xs font-black text-slate-500 hover:text-blue-600 transition uppercase tracking-widest">Pensum</a>
                 <div class="h-6 w-px bg-slate-300"></div>
                 
-                <!-- Knap til Træningscenteret -->
                 <a href="training_center.html" class="px-6 py-2.5 bg-slate-900 text-white rounded-full text-xs font-bold hover:bg-blue-600 hover:shadow-lg hover:shadow-blue-500/30 transition-all active:scale-95 flex items-center gap-2">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
                     Træningscenter
                 </a>
                 
-                <!-- Ny knap til Arcade -->
                 <a href="Matematik_Arcade.html" class="px-6 py-2.5 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-full text-xs font-bold hover:opacity-90 hover:shadow-lg hover:shadow-pink-500/30 transition-all active:scale-95 flex items-center gap-2">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                     Arcade

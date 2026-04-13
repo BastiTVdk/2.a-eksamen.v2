@@ -3,456 +3,706 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MathQuest B - Træningscenter</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <title>MatheMaster Ultimate | B-Niveau</title>
     
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
-        // Global tilstand gemt lokalt på computeren
-        window.xp = 0;
-        window.completedIds = new Set();
-        const storageKey = 'mathquest_b_local_progress';
-
-        // Indlæs data fra lokal hukommelse
-        function loadProgress() {
-            const saved = localStorage.getItem(storageKey);
-            if (saved) {
-                const data = JSON.parse(saved);
-                window.xp = data.xp || 0;
-                window.completedIds = new Set(data.completedIds || []);
-            }
-        }
-
-        // Gem data i lokal hukommelse
-        window.saveProgress = function() {
-            const data = {
-                xp: window.xp,
-                completedIds: Array.from(window.completedIds)
-            };
-            localStorage.setItem(storageKey, JSON.stringify(data));
-        };
-
-        // Start siden
-        window.onload = function() {
-            loadProgress();
-            window.updateUI();
+        MathJax = {
+            tex: { inlineMath: [['$', '$'], ['\\(', '\\)']] },
+            svg: { fontCache: 'global' }
         };
     </script>
-
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap');
+
         :root {
-            --mq-indigo: #6366f1;
-            --mq-rose: #f43f5e;
-            --mq-sky: #0ea5e9;
-            --mq-emerald: #10b981;
-            --mq-violet: #8b5cf6;
-            --mq-amber: #f59e0b;
-            --mathias-float: float 6s ease-in-out infinite;
+            --bg-color: #0b1120;
+            --panel-bg: rgba(30, 41, 59, 0.7);
+            --panel-border: rgba(148, 163, 184, 0.1);
+            --primary: #8b5cf6;
+            --primary-glow: rgba(139, 92, 246, 0.4);
+            --secondary: #3b82f6;
+            --accent: #10b981;
+            --danger: #ef4444;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --font-main: 'Inter', sans-serif;
+            --font-math: 'JetBrains Mono', monospace;
         }
 
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #020617;
-            background-image: radial-gradient(circle at 2px 2px, rgba(255,255,255,0.05) 1px, transparent 0);
-            background-size: 32px 32px;
-            color: #f8fafc;
-            scroll-behavior: smooth;
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { 
+            font-family: var(--font-main); 
+            background-color: var(--bg-color); 
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(17, 24, 39, 1) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(30, 27, 75, 1) 0px, transparent 50%);
+            background-attachment: fixed;
+            color: var(--text-main);
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
         }
 
-        .training-card {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 2rem;
-            padding: 2rem;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            cursor: pointer;
-            position: relative;
-        }
+        /* --- SCROLLBAR --- */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg-color); }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
 
-        .training-card:hover {
-            transform: translateY(-8px);
-            background: rgba(255, 255, 255, 0.06);
-            border-color: var(--accent);
-            box-shadow: 0 20px 40px -15px var(--glow);
-        }
-
-        .category-pill {
-            font-size: 10px;
-            font-weight: 900;
-            padding: 4px 10px;
-            border-radius: 99px;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            margin-bottom: 1rem;
-            display: inline-block;
-        }
-
-        .speech-bubble {
-            background: white;
-            color: #0f172a;
-            border-radius: 1.5rem;
-            padding: 1.5rem;
-            position: relative;
-            max-width: 300px;
-            font-weight: 600;
-            box-shadow: 0 25px 50px -12px rgba(0,0,0,0.5);
-        }
-
-        .speech-bubble::after {
-            content: '';
-            position: absolute;
-            bottom: -10px;
-            right: 40px;
-            width: 20px;
-            height: 20px;
-            background: white;
-            transform: rotate(45deg);
-        }
-
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9); z-index: 2000; align-items: center; justify-content: center; backdrop-filter: blur(12px); }
-        .modal.active { display: flex; }
-
-        #resultOverlay {
-            display: none;
+        /* --- SIDEBAR --- */
+        nav {
+            width: 280px;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-right: 1px solid var(--panel-border);
+            height: 100vh;
             position: fixed;
-            inset: 0;
-            z-index: 3000;
-            align-items: center;
-            justify-content: center;
-            background: rgba(2, 6, 23, 0.9);
-            backdrop-filter: blur(8px);
+            padding: 2rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+            transition: all 0.3s ease;
         }
-        #resultOverlay.active { display: flex; }
 
-        .sortable-item {
-            background: #f8fafc;
-            border: 2px solid #e2e8f0;
-            padding: 1rem;
-            border-radius: 1rem;
-            margin-bottom: 0.5rem;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-weight: 600;
+        .brand { 
+            font-size: 1.5rem; font-weight: 800; margin-bottom: 2.5rem;
+            background: linear-gradient(135deg, #a855f7, #3b82f6);
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+            display: flex; align-items: center; gap: 10px;
         }
-        .sortable-item.selected { border-color: var(--mq-indigo); background: #eef2ff; color: var(--mq-indigo); }
 
-        @keyframes float { 0%, 100% { transform: translateY(0px); } 50% { transform: translateY(-15px); } }
-        .mathias-container { animation: float 6s ease-in-out infinite; }
+        .nav-btn {
+            background: transparent; color: var(--text-muted); border: none;
+            padding: 14px 16px; border-radius: 12px; cursor: pointer;
+            margin-bottom: 8px; font-size: 1rem; font-weight: 600;
+            display: flex; align-items: center; gap: 12px;
+            transition: all 0.2s ease; width: 100%; text-align: left;
+        }
+        .nav-btn svg { width: 20px; height: 20px; stroke-width: 2.5; }
+        .nav-btn:hover { background: rgba(255,255,255,0.05); color: var(--text-main); transform: translateX(5px); }
+        .nav-btn.active { 
+            background: var(--primary); color: white; 
+            box-shadow: 0 0 20px var(--primary-glow); 
+        }
 
-        .shake { animation: shake 0.4s ease-in-out; }
-        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-10px); } 75% { transform: translateX(10px); } }
+        .xp-container {
+            margin-top: auto; padding: 15px; background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.2); border-radius: 12px; text-align: center;
+        }
+        .xp-title { font-size: 0.8rem; color: var(--accent); font-weight: 800; letter-spacing: 1px; }
+        .xp-value { font-size: 1.5rem; font-weight: 800; color: white; margin-top: 5px; font-family: var(--font-math); }
 
-        /* TEMAER */
-        .theme-vækst { --accent: var(--mq-indigo); --glow: rgba(99, 102, 241, 0.3); }
-        .theme-diff { --accent: var(--mq-rose); --glow: rgba(244, 63, 94, 0.3); }
-        .theme-geo { --accent: var(--mq-sky); --glow: rgba(14, 165, 233, 0.3); }
-        .theme-prob { --accent: var(--mq-violet); --glow: rgba(139, 92, 246, 0.3); }
-        .theme-poly { --accent: var(--mq-emerald); --glow: rgba(16, 185, 129, 0.3); }
-        .theme-golden { --accent: var(--mq-amber); --glow: rgba(245, 158, 11, 0.3); }
+        /* --- MAIN CONTENT --- */
+        main { margin-left: 280px; flex: 1; padding: 2.5rem 3rem; max-width: 1400px; width: 100%; }
+        .page { display: none; animation: scaleUp 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+        .page.active { display: block; }
 
-        .xp-pop { animation: xpPop 0.5s ease-out; }
+        @keyframes scaleUp { from { opacity: 0; transform: translateY(15px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
+
+        /* --- UI COMPONENTS --- */
+        .glass-panel {
+            background: var(--panel-bg); border: 1px solid var(--panel-border);
+            border-radius: 20px; padding: 2rem; margin-bottom: 2rem;
+            backdrop-filter: blur(10px); box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        h1 { font-size: 2.2rem; margin-bottom: 0.5rem; color: white; font-weight: 800; }
+        .subtitle { color: var(--text-muted); margin-bottom: 2rem; font-size: 1.1rem; }
+        h2 { font-size: 1.5rem; margin-bottom: 1.2rem; display: flex; align-items: center; gap: 10px; }
+        h2 svg { color: var(--primary); }
+
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+        .grid-3 { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; }
+
+        /* --- INTERACTIVE SLIDERS --- */
+        .slider-container { margin-bottom: 1.5rem; }
+        .slider-header { display: flex; justify-content: space-between; margin-bottom: 8px; font-weight: 600; }
+        .val-badge { background: rgba(255,255,255,0.1); padding: 2px 10px; border-radius: 8px; font-family: var(--font-math); }
+        
+        input[type="range"] {
+            width: 100%; height: 6px; border-radius: 3px; background: #334155;
+            appearance: none; outline: none; cursor: pointer; transition: 0.2s;
+        }
+        input[type="range"]::-webkit-slider-thumb {
+            appearance: none; width: 18px; height: 18px; border-radius: 50%;
+            background: var(--text-main); cursor: pointer; transition: 0.2s;
+            box-shadow: 0 0 10px rgba(255,255,255,0.5);
+        }
+        input[type="range"]:active::-webkit-slider-thumb { transform: scale(1.2); background: var(--secondary); }
+        
+        /* Tema-farver til a, b, c sliders */
+        #inpA::-webkit-slider-thumb { background: var(--primary); box-shadow: 0 0 10px var(--primary-glow); }
+        #inpB::-webkit-slider-thumb { background: var(--secondary); box-shadow: 0 0 10px rgba(59, 130, 246, 0.4); }
+        #inpC::-webkit-slider-thumb { background: var(--accent); box-shadow: 0 0 10px rgba(16, 185, 129, 0.4); }
+
+        /* --- MATH DISPLAY --- */
+        .math-hero {
+            background: rgba(0,0,0,0.3); padding: 1.5rem; border-radius: 15px;
+            font-family: var(--font-math); font-size: 1.6rem; text-align: center;
+            border: 1px solid rgba(255,255,255,0.05); margin: 1.5rem 0; letter-spacing: 1px;
+        }
+        .math-highlight { color: var(--accent); }
+
+        .stat-box {
+            background: rgba(255,255,255,0.03); padding: 1rem; border-radius: 12px;
+            display: flex; flex-direction: column; align-items: center; border: 1px solid rgba(255,255,255,0.05);
+        }
+        .stat-value { font-family: var(--font-math); font-size: 1.4rem; font-weight: bold; margin-top: 5px; color: white; }
+
+        /* --- GAMIFIED BEVIS --- */
+        .quiz-step {
+            border: 1px solid var(--panel-border); background: rgba(0,0,0,0.2);
+            border-radius: 16px; padding: 1.5rem; margin-bottom: 1rem;
+            transition: all 0.3s ease; position: relative;
+        }
+        .quiz-step.locked { opacity: 0.5; pointer-events: none; filter: grayscale(1); }
+        .quiz-step.success { border-color: var(--accent); background: rgba(16, 185, 129, 0.05); }
+        
+        .quiz-options { display: flex; gap: 10px; margin-top: 15px; flex-wrap: wrap; }
+        .quiz-btn {
+            background: rgba(255,255,255,0.05); border: 1px solid var(--panel-border);
+            color: var(--text-main); padding: 10px 15px; border-radius: 10px;
+            cursor: pointer; transition: 0.2s; font-family: var(--font-math); flex: 1; min-width: 200px;
+        }
+        .quiz-btn:hover { background: rgba(255,255,255,0.1); border-color: var(--secondary); }
+        .quiz-btn.correct { background: var(--accent); border-color: var(--accent); color: white; }
+        .quiz-btn.wrong { background: var(--danger); border-color: var(--danger); color: white; animation: shake 0.4s; }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        /* --- RESPONSIV --- */
+        @media (max-width: 1024px) {
+            .grid-2 { grid-template-columns: 1fr; }
+            nav { width: 80px; padding: 2rem 1rem; }
+            .brand span, .nav-btn span, .xp-title { display: none; }
+            .nav-btn { justify-content: center; }
+            .nav-btn svg { margin: 0; }
+            main { margin-left: 80px; padding: 2rem; }
+        }
     </style>
 </head>
-<body class="p-4 md:p-12 text-slate-100">
+<body>
 
-    <!-- Resultat Overlay -->
-    <div id="resultOverlay" onclick="closeResult()">
-        <div id="resultBox" class="bg-white p-10 rounded-[3rem] text-center max-w-sm shadow-2xl scale-90 transition-all duration-300">
-            <div id="resultEmoji" class="text-7xl mb-6">👏</div>
-            <h2 id="resultTitle" class="text-3xl font-black text-slate-900 mb-4 uppercase italic leading-tight">Godt gået!</h2>
-            <p id="resultMsg" class="text-slate-500 font-medium mb-8">Hver indsats tæller.</p>
-            <button class="w-full py-4 bg-slate-900 text-white rounded-2xl font-black uppercase tracking-widest hover:bg-indigo-600 transition-colors">Videre</button>
+    <!-- SIDEBAR NAVIGATION -->
+    <nav>
+        <div class="brand">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><path d="M16 13H8"/><path d="M16 17H8"/><path d="M10 9H8"/></svg>
+            <span>MatheMaster</span>
         </div>
-    </div>
+        <button class="nav-btn active" onclick="nav('home', this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+            <span>Overblik</span>
+        </button>
+        <button class="nav-btn" onclick="nav('lab', this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+            <span>Parabel Lab</span>
+        </button>
+        <button class="nav-btn" onclick="nav('proofs', this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+            <span>Interaktive Beviser</span>
+        </button>
+        <button class="nav-btn" onclick="nav('geo', this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"/><line x1="22" y1="12" x2="18" y2="12"/><line x1="6" y1="12" x2="2" y2="12"/><line x1="12" y1="6" x2="12" y2="2"/><line x1="12" y1="22" x2="12" y2="18"/></svg>
+            <span>Analytisk Geometri</span>
+        </button>
+        <button class="nav-btn" onclick="nav('exam', this)">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+            <span>Eksamenstræner</span>
+        </button>
 
-    <!-- Quiz Vindue -->
-    <div id="quizModal" class="modal p-4">
-        <div class="bg-white w-full max-w-2xl rounded-[3rem] p-8 md:p-12 shadow-2xl relative text-slate-900 overflow-y-auto max-h-[90vh]">
-            <button onclick="closeQuiz()" class="absolute top-8 right-8 text-slate-300 hover:text-slate-500 transition">
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
-            </button>
-            <div id="quizContent"></div>
-        </div>
-    </div>
-
-    <!-- Top Bar -->
-    <nav class="max-w-7xl mx-auto flex items-center justify-between mb-16">
-        <div class="flex items-center space-x-6">
-            <a href="index.html" class="p-4 bg-slate-900/50 rounded-2xl border border-slate-800 hover:border-indigo-500 transition-all group">
-                <svg class="w-6 h-6" fill="none" stroke="white" viewBox="0 0 24 24" stroke-width="2.5"><path d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
-            </a>
-            <div>
-                <h1 class="text-4xl font-black tracking-tighter italic uppercase">Mestrings<span class="text-indigo-500 font-black">Center</span></h1>
-                <p class="text-slate-500 font-bold uppercase text-[10px] tracking-[0.4em]">Træn lokalt på din computer</p>
-            </div>
-        </div>
-        <div class="hidden lg:flex items-center space-x-10 text-right">
-            <div>
-                <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-1">Status</span>
-                <span class="text-xl font-black text-indigo-400 italic" id="statusLabel">HENTER...</span>
-            </div>
-            <div class="bg-slate-900 border border-slate-800 rounded-2xl p-4 px-8 min-w-[150px] shadow-inner">
-                <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-1">Samlet XP</span>
-                <span class="text-3xl font-black text-white" id="xpDisplay">0</span>
-            </div>
+        <div class="xp-container">
+            <div class="xp-title">DIN ERFARING</div>
+            <div class="xp-value" id="xp-display">0 XP</div>
         </div>
     </nav>
 
-    <main class="max-w-7xl mx-auto grid lg:grid-cols-12 gap-12 mb-40">
-        
-        <div class="lg:col-span-8 space-y-10">
-            <!-- Hero Kort -->
-            <div class="p-8 md:p-10 bg-gradient-to-br from-indigo-600 to-indigo-900 rounded-[3.5rem] relative overflow-hidden flex items-center justify-between shadow-2xl">
-                <div class="relative z-10 text-white">
-                    <span class="inline-block px-4 py-1 bg-white/10 border border-white/20 rounded-full text-[10px] font-black uppercase mb-4 tracking-widest">Faglighed & Indsats</span>
-                    <h2 class="text-4xl font-black mb-4 italic text-white uppercase text-shadow-sm">Niveau: <span id="levelNumber">1</span></h2>
-                    <p class="text-indigo-100 max-w-sm font-medium italic mb-6 leading-relaxed">Gør dit bedste i hver eneste opgave! Dine resultater gemmes automatisk i din browser.</p>
-                    <div class="flex items-center space-x-8">
-                        <div>
-                            <p class="text-[10px] font-black uppercase opacity-60">Gennemførte beviser</p>
-                            <p class="text-3xl font-black" id="progressCounter">0</p>
+    <!-- MAIN CONTENT -->
+    <main>
+
+        <!-- DASHBOARD -->
+        <section id="home" class="page active">
+            <h1>Klar til B-Niveau Eksamen?</h1>
+            <p class="subtitle">Træningscenteret er tilpasset dine noter om andengradspolynomier og geometri.</p>
+            
+            <div class="grid-3">
+                <div class="glass-panel" style="border-top: 4px solid var(--primary);">
+                    <h2>Andengradspolynomier</h2>
+                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 10px;">Spørgsmål 9 & 10 fokuserer på graf, rødder, og faktorisering.</p>
+                    <ul style="list-style-type: none; margin-top: 15px; font-size: 0.95rem;">
+                        <li style="margin-bottom: 8px;">✅ Betydning af <b>a</b>, <b>b</b>, og <b>c</b></li>
+                        <li style="margin-bottom: 8px;">✅ Toppunktsformlen (Udledning)</li>
+                        <li>✅ Faktorisering: $a(x-r_1)(x-r_2)$</li>
+                    </ul>
+                </div>
+                <div class="glass-panel" style="border-top: 4px solid var(--secondary);">
+                    <h2>Analytisk Geometri</h2>
+                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 10px;">Spørgsmål 7 dækker linjens ligning og afstandsformlen.</p>
+                    <ul style="list-style-type: none; margin-top: 15px; font-size: 0.95rem;">
+                        <li style="margin-bottom: 8px;">✅ $y = ax + b$</li>
+                        <li style="margin-bottom: 8px;">✅ Afstand $dist(P, l)$</li>
+                        <li>✅ Ortogonale linjer ($a \cdot c = -1$)</li>
+                    </ul>
+                </div>
+                <div class="glass-panel" style="border-top: 4px solid var(--accent); display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
+                    <h2>Din Status</h2>
+                    <div style="width: 120px; height: 120px; border-radius: 50%; border: 8px solid var(--accent); display: flex; align-items: center; justify-content: center; font-size: 1.8rem; font-weight: 800; color: white; margin-top: 10px; box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);">
+                        100%
+                    </div>
+                    <p style="margin-top: 15px; font-weight: 600; color: var(--accent);">Teori implementeret</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- PARABEL LAB -->
+        <section id="lab" class="page">
+            <h1>Interaktivt Parabel Lab</h1>
+            <p class="subtitle">Eksperimenter med $a$, $b$ og $c$. Grafen markerer rødder og toppunkt automatisk.</p>
+            
+            <div class="grid-2">
+                <div class="glass-panel">
+                    <div class="slider-container">
+                        <div class="slider-header">
+                            <span>Konstant a (Krumning):</span>
+                            <span class="val-badge" id="valA">1</span>
+                        </div>
+                        <input type="range" id="inpA" min="-4" max="4" step="0.1" value="1" oninput="updateLab()">
+                        <div style="font-size: 0.8rem; color: var(--text-muted); margin-top: 5px; display: flex; justify-content: space-between;">
+                            <span id="txtA-desc">"Sur" / Bred / Smal</span>
+                            <span id="badgeA" style="font-weight:bold; color:var(--accent);">Glad parabel</span>
+                        </div>
+                    </div>
+                    
+                    <div class="slider-container">
+                        <div class="slider-header">
+                            <span>Konstant b (Forskydning):</span>
+                            <span class="val-badge" id="valB">0</span>
+                        </div>
+                        <input type="range" id="inpB" min="-10" max="10" step="0.5" value="0" oninput="updateLab()">
+                    </div>
+
+                    <div class="slider-container">
+                        <div class="slider-header">
+                            <span>Konstant c (Skæring y-akse):</span>
+                            <span class="val-badge" id="valC">0</span>
+                        </div>
+                        <input type="range" id="inpC" min="-10" max="10" step="1" value="0" oninput="updateLab()">
+                    </div>
+
+                    <div class="math-hero" id="formula-display">
+                        f(x) = 1x² + 0x + 0
+                    </div>
+
+                    <div class="grid-3" style="gap: 10px;">
+                        <div class="stat-box">
+                            <span style="font-size: 0.8rem; color: var(--text-muted);">Diskriminant (d)</span>
+                            <span class="stat-value" id="dRes">0.00</span>
+                        </div>
+                        <div class="stat-box">
+                            <span style="font-size: 0.8rem; color: var(--text-muted);">Toppunkt ($T_p$)</span>
+                            <span class="stat-value" id="tpRes">(0, 0)</span>
+                        </div>
+                        <div class="stat-box">
+                            <span style="font-size: 0.8rem; color: var(--text-muted);">Antal rødder</span>
+                            <span class="stat-value" id="rootsCount">1</span>
                         </div>
                     </div>
                 </div>
-                <div onclick="openTraining('random')" class="relative z-10 w-40 h-40 bg-white/5 rounded-full border border-white/10 flex items-center justify-center cursor-pointer hover:bg-white/10 transition-all group">
-                    <span class="text-6xl group-hover:scale-125 transition-transform">⚡</span>
-                </div>
-            </div>
 
-            <!-- Trænings Moduler -->
-            <div class="grid sm:grid-cols-2 gap-6">
-                <div onclick="openTraining(1)" class="training-card theme-vækst">
-                    <span class="category-pill bg-indigo-500/20 text-indigo-400">Eksponentiel Logik</span>
-                    <h3 class="text-xl font-black mb-2 italic text-white">Spm 1 & 2</h3>
-                    <p class="text-xs text-slate-500 italic leading-relaxed">Træn sammenhængen mellem a, b og grafen.</p>
-                </div>
-                <div onclick="openTraining(3)" class="training-card theme-diff">
-                    <span class="category-pill bg-rose-500/20 text-rose-400">Differentialregning</span>
-                    <h3 class="text-xl font-black mb-2 italic text-white">Spm 3 & 4</h3>
-                    <p class="text-xs text-slate-500 italic leading-relaxed">Gennemfør tretrinsreglen og find tangenter.</p>
-                </div>
-                <div onclick="openTraining(5)" class="training-card theme-geo">
-                    <span class="category-pill bg-sky-500/20 text-sky-400">Analytisk Geometri</span>
-                    <h3 class="text-xl font-black mb-2 italic text-white">Spm 5 - 7</h3>
-                    <p class="text-xs text-slate-500 italic leading-relaxed">Vinkler, afstande og ortogonale linjer.</p>
-                </div>
-                <div onclick="openTraining(8)" class="training-card theme-prob">
-                    <span class="category-pill bg-violet-500/20 text-violet-400">Sandsynlighedsregning</span>
-                    <h3 class="text-xl font-black mb-2 italic text-white">Spm 8</h3>
-                    <p class="text-xs text-slate-500 italic leading-relaxed">Kombinatorik og binomialfordelingen.</p>
-                </div>
-                <div onclick="openTraining(9)" class="training-card theme-poly">
-                    <span class="category-pill bg-emerald-500/20 text-emerald-400">Andengradspolynomier</span>
-                    <h3 class="text-xl font-black mb-2 italic text-white">Spm 9 & 10</h3>
-                    <p class="text-xs text-slate-500 italic leading-relaxed">Mestrer rødder og toppunktsformler.</p>
-                </div>
-                <div onclick="openTraining(11)" class="training-card theme-golden">
-                    <span class="category-pill bg-amber-500/20 text-amber-400">Det Gyldne Snit</span>
-                    <h3 class="text-xl font-black mb-2 italic text-white">Spm 11</h3>
-                    <p class="text-xs text-slate-500 italic leading-relaxed">Fibonacci-tal og den harmoniske spiral.</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- Right Side -->
-        <div class="lg:col-span-4 space-y-8">
-            <div class="p-8 bg-slate-900/80 border border-slate-800 rounded-[2.5rem] backdrop-blur-xl shadow-xl">
-                <h3 class="font-black mb-8 uppercase tracking-widest text-slate-500 text-[10px]">Min Udvikling</h3>
-                <div class="space-y-8">
-                    <div>
-                        <div class="flex justify-between text-xs mb-3 font-bold uppercase tracking-tighter text-slate-400 italic"><span>Visuel Intuition</span><span id="stat-visual" class="text-indigo-400 font-black">0%</span></div>
-                        <div class="h-1.5 bg-slate-800 rounded-full overflow-hidden shadow-inner"><div id="bar-visual" class="h-full bg-indigo-500 w-[0%] transition-all duration-1000"></div></div>
-                    </div>
-                    <div>
-                        <div class="flex justify-between text-xs mb-3 font-bold uppercase tracking-tighter text-slate-400 italic"><span>Faglig Stolthed</span><span id="stat-flow" class="text-rose-400 font-black">0%</span></div>
-                        <div class="h-1.5 bg-slate-800 rounded-full overflow-hidden shadow-inner"><div id="bar-flow" class="h-full bg-rose-500 w-[0%] transition-all duration-1000"></div></div>
+                <div class="glass-panel" style="position: relative; min-height: 400px; display: flex; flex-direction: column;">
+                    <div style="flex: 1; position: relative;">
+                        <canvas id="parabelChart"></canvas>
                     </div>
                 </div>
             </div>
+        </section>
 
-            <div class="flex flex-col items-center pt-8">
-                <div id="mathias-bubble" class="speech-bubble mb-8 italic">Velkommen! Herinde handler det om at turde lave fejl for at lære mest muligt. Gør dit bedste!</div>
-                <div class="mathias-container">
-                    <svg id="mathias-svg" width="120" height="120" viewBox="0 0 100 100" fill="none">
-                        <rect x="5" y="5" width="90" height="90" rx="30" fill="white" stroke="#1e293b" stroke-width="2" />
-                        <rect x="5" y="20" width="90" height="12" fill="#4f46e5" />
-                        <g id="mathias-eyes"><circle cx="35" cy="50" r="4.5" fill="#0f172a" /><circle cx="65" cy="50" r="4.5" fill="#0f172a" /></g>
-                        <path id="mathias-mouth" d="M40 70L60 70" stroke="#0f172a" stroke-width="4" stroke-linecap="round"/>
-                        <circle cx="80" cy="45" r="3" fill="#38bdf8" />
-                    </svg>
+        <!-- INTERAKTIVE BEVISER -->
+        <section id="proofs" class="page">
+            <h1>Bevis Værkstedet (Gamified)</h1>
+            <p class="subtitle">For at mestre beviset for toppunktsformlen, skal du selv vælge de logiske skridt.</p>
+            
+            <div class="glass-panel">
+                <h2><svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Toppunktsformlen: Find x-koordinaten ($h$)</h2>
+                <p style="margin-bottom: 20px;">Vi ved fra dine noter, at $f(x) = ax^2 + bx + c$ (1. rep) og $f(x) = a(x-h)^2 + k$ (2. rep).</p>
+                
+                <!-- STEP 1 -->
+                <div class="quiz-step" id="q-step-1">
+                    <h3>Trin 1: Startpunktet</h3>
+                    <p>Vi sætter de to udtryk lig hinanden: $ax^2 + bx + c = a(x-h)^2 + k$</p>
+                    <p style="margin-top: 10px; font-weight: bold; color: var(--secondary);">Hvad skal vi gøre ved højre side for at komme videre?</p>
+                    <div class="quiz-options">
+                        <button class="quiz-btn" onclick="checkAnswer(1, false, this)">Brug Nulreglen</button>
+                        <button class="quiz-btn" onclick="checkAnswer(1, true, this)">Brug 2. Kvadratsætning på $(x-h)^2$</button>
+                        <button class="quiz-btn" onclick="checkAnswer(1, false, this)">Isoler $k$</button>
+                    </div>
+                </div>
+
+                <!-- STEP 2 -->
+                <div class="quiz-step locked" id="q-step-2">
+                    <h3>Trin 2: Udvidelsen</h3>
+                    <p>Korrekt! Vi folder parentesen ud: $ax^2 + bx + c = a(x^2 + h^2 - 2xh) + k$</p>
+                    <p style="margin-top: 10px; font-weight: bold; color: var(--secondary);">Hvad er det næste logiske træk?</p>
+                    <div class="quiz-options">
+                        <button class="quiz-btn" onclick="checkAnswer(2, true, this)">Gang 'a' ind i parentesen</button>
+                        <button class="quiz-btn" onclick="checkAnswer(2, false, this)">Divider med 'a' på begge sider</button>
+                    </div>
+                </div>
+
+                <!-- STEP 3 -->
+                <div class="quiz-step locked" id="q-step-3">
+                    <h3>Trin 3: Sammenligningen</h3>
+                    <p>Flot! Vi får: $ax^2 + bx + c = ax^2 + ah^2 - 2ahx + k$</p>
+                    <p>Kig nu kun på de led, der indeholder $x$ (dvs. $bx$ og $-2ahx$). Fordi udtrykkene er ens, må de led være ens.</p>
+                    <p style="margin-top: 10px; font-weight: bold; color: var(--secondary);">Hvordan isolerer vi $h$ fra ligningen $b = -2ah$?</p>
+                    <div class="quiz-options">
+                        <button class="quiz-btn" onclick="checkAnswer(3, false, this)">Træk $2a$ fra på begge sider</button>
+                        <button class="quiz-btn" onclick="checkAnswer(3, true, this)">Divider med $-2a$ på begge sider</button>
+                    </div>
+                </div>
+
+                <!-- SUCCESS -->
+                <div class="quiz-step locked" id="q-step-4" style="text-align: center; border-color: var(--accent);">
+                    <h2 style="justify-content: center; color: var(--accent);">BEVIS GENNEMFØRT! 🎉</h2>
+                    <p style="font-size: 1.2rem;">Du har vist, at $h = -\frac{b}{2a}$</p>
+                    <p style="color: var(--text-muted); margin-top: 10px;">(Dette er x-koordinaten for toppunktet $T_p$)</p>
+                    <button class="nav-btn" style="background: var(--primary); color: white; margin: 20px auto; width: auto; padding: 10px 30px;" onclick="resetQuiz()">Prøv igen</button>
                 </div>
             </div>
-        </div>
+        </section>
+
+        <!-- ANALYTISK GEOMETRI -->
+        <section id="geo" class="page">
+            <h1>Visuel Analytisk Geometri</h1>
+            <p class="subtitle">Forstå afstandsformlen visuelt. Tegn linjen og punktet for at se den korteste (ortogonale) afstand.</p>
+            
+            <div class="grid-2">
+                <div class="glass-panel">
+                    <h2>Punkt til Linje (Spørgsmål 7)</h2>
+                    <p style="margin-bottom: 20px; font-family: var(--font-math); color: var(--secondary);">$$dist(P, l) = \frac{|a \cdot x_1 + b - y_1|}{\sqrt{a^2 + 1}}$$</p>
+                    
+                    <div class="grid-2" style="gap: 15px;">
+                        <div>
+                            <h3 style="font-size: 1rem; color: var(--text-muted); margin-bottom: 10px;">Punkt $P(x_1, y_1)$</h3>
+                            <div style="display: flex; gap: 10px;">
+                                <input type="number" id="geoPx" value="-2" step="0.5" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--panel-border); background: rgba(0,0,0,0.3); color: white;" onchange="updateGeo()">
+                                <input type="number" id="geoPy" value="4" step="0.5" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--panel-border); background: rgba(0,0,0,0.3); color: white;" onchange="updateGeo()">
+                            </div>
+                        </div>
+                        <div>
+                            <h3 style="font-size: 1rem; color: var(--text-muted); margin-bottom: 10px;">Linje $l: y = ax + b$</h3>
+                            <div style="display: flex; gap: 10px;">
+                                <input type="number" id="geoLa" value="1" step="0.5" title="Hældning (a)" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--panel-border); background: rgba(0,0,0,0.3); color: white;" onchange="updateGeo()">
+                                <input type="number" id="geoLb" value="-1" step="0.5" title="Skæring (b)" style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--panel-border); background: rgba(0,0,0,0.3); color: white;" onchange="updateGeo()">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="math-hero" style="background: rgba(16, 185, 129, 0.1); border-color: rgba(16, 185, 129, 0.3);">
+                        Afstand = <span id="geoDistRes" style="color: var(--accent);">0.00</span>
+                    </div>
+                </div>
+
+                <div class="glass-panel" style="min-height: 400px; display: flex; flex-direction: column;">
+                    <div style="flex: 1; position: relative;">
+                        <canvas id="geoChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- EKSAMEN -->
+        <section id="exam" class="page">
+            <h1>Eksamenstræner & Tjekliste</h1>
+            <p class="subtitle">Styr på dine noter til B-Niveau eksamen 2026.</p>
+            
+            <div class="glass-panel">
+                <table style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="border-bottom: 1px solid var(--panel-border); color: var(--text-muted); text-align: left;">
+                            <th style="padding: 15px;">Spørgsmål</th>
+                            <th style="padding: 15px;">Emne & Nøgleord</th>
+                            <th style="padding: 15px;">Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                            <td style="padding: 15px; font-weight: bold; color: var(--secondary);">Spørgsmål 7</td>
+                            <td style="padding: 15px;">Analytisk Geometri. <i>Ret linje, dist-formel.</i></td>
+                            <td style="padding: 15px;"><span style="background: rgba(16,185,129,0.2); color: var(--accent); padding: 5px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: bold;">Trænet i app</span></td>
+                        </tr>
+                        <tr style="border-bottom: 1px solid rgba(255,255,255,0.05);">
+                            <td style="padding: 15px; font-weight: bold; color: var(--primary);">Spørgsmål 9</td>
+                            <td style="padding: 15px;">Andengradspolynomier 1. <i>Graf, rødder, konstanter.</i></td>
+                            <td style="padding: 15px;"><span style="background: rgba(16,185,129,0.2); color: var(--accent); padding: 5px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: bold;">Trænet i app</span></td>
+                        </tr>
+                        <tr>
+                            <td style="padding: 15px; font-weight: bold; color: var(--primary);">Spørgsmål 10</td>
+                            <td style="padding: 15px;">Andengradspolynomier 2. <i>Toppunktsformel, Faktorisering.</i></td>
+                            <td style="padding: 15px;"><span style="background: rgba(16,185,129,0.2); color: var(--accent); padding: 5px 12px; border-radius: 12px; font-size: 0.8rem; font-weight: bold;">Trænet i app</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
     </main>
 
-    <!-- Footer Bar -->
-    <div class="fixed bottom-0 left-0 w-full bg-slate-950/95 backdrop-blur-md border-t border-slate-800 p-6 z-[1000]">
-        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
-            <div class="flex items-center space-x-8 w-full md:w-auto">
-                <div>
-                    <span class="text-[10px] font-black text-slate-500 uppercase tracking-widest block mb-1">Mestrings-grad</span>
-                    <span id="readinessPercent" class="text-2xl font-black text-white leading-none tracking-tighter">0%</span>
-                </div>
-                <div class="flex-1 md:w-96 h-3 bg-slate-800 rounded-full overflow-hidden border border-slate-700">
-                    <div id="mainProgressBar" class="bg-indigo-600 h-full w-[0%] transition-all duration-1000 ease-out shadow-[0_0_20px_#6366f155]"></div>
-                </div>
-            </div>
-            <div class="text-[10px] font-black text-indigo-400 uppercase tracking-[0.3em] italic">RANK: <span id="levelName" class="text-white">...</span></div>
-        </div>
-    </div>
-
     <script>
-        const trainingData = {
-            1: [
-                { id: "1_v1", type: "visual", q: "Hvad viser denne eksponentielle graf?", svg: `<svg viewBox="0 0 100 100" width="200" class="mx-auto mb-4"><path d="M10 90 Q 50 85 90 10" stroke="#6366f1" fill="none" stroke-width="2"/></svg>`, options: ["En voksende funktion (a > 1)", "En aftagende funktion (a < 1)", "En lineær funktion"], ans: 0, p: 40 },
-                { id: "1_t1", type: "theory", q: "I f(x) = b·a^x, hvad betyder b?", options: ["Startværdi (y-skæring)", "Vækstrate", "Hældning"], ans: 0, p: 30 },
-                { id: "1_t2", type: "theory", q: "Hvad er fremskrivningsfaktoren, hvis noget vokser med 5%?", options: ["1,05", "0,05", "5,0"], ans: 0, p: 25 },
-                { id: "2_t1", type: "theory", q: "Hvad bruges formlen log(2)/log(a) til?", options: ["Fordoblingskonstanten T2", "Halveringskonstanten T1/2", "At finde rødder"], ans: 0, p: 35 }
-            ],
-            3: [
-                { id: "3_a1", type: "arrange", q: "Sæt de tre trin i tretrinsreglen i rækkefølge:", steps: ["Bestem grænseværdien for h→0", "Opstil funktionstilvæksten Δy", "Opstil differenskvotienten Δy/h"], correctOrder: [1, 2, 0], p: 60 },
-                { id: "3_t2", type: "theory", q: "Hvad betyder f'(x)?", options: ["Differentialkvotienten (tangentens hældning)", "Differenskvotienten (sekanthældningen)", "Funktionens værdi i x"], ans: 0, p: 30 },
-                { id: "4_t1", type: "theory", q: "Hvad er den afledte af f(x) = x²?", options: ["2x", "x", "2"], ans: 0, p: 40 }
-            ],
-            5: [
-                { id: "5_t1", type: "theory", q: "Hvilken formel finder vinklen ud fra hældningen a?", options: ["tan^-1(|a|)", "sin(a)", "cos(a)"], ans: 0, p: 40 },
-                { id: "6_t1", type: "theory", q: "To linjer er ortogonale hvis a1 * a2 er lig:", options: ["-1", "0", "1"], ans: 0, p: 40 }
-            ],
-            8: [
-                { id: "8_t1", type: "theory", q: "Hvad betyder n i binomialkoefficienten K(n,r)?", options: ["Antal forsøg", "Antal succeser", "Basisværdi"], ans: 0, p: 40 },
-                { id: "8_t2", type: "theory", q: "Hvad er r i formlen for binomialfordelingen?", options: ["Antal succeser", "Antal fiaskoer", "Sandsynlighed for succes"], ans: 0, p: 30 }
-            ],
-            9: [
-                { id: "9_v1", type: "visual", q: "Kig på grafen. Hvor mange rødder er der?", svg: `<svg viewBox="0 0 100 100" width="200" class="mx-auto mb-4"><path d="M10 20 Q 50 140 90 20" stroke="#10b981" fill="none" stroke-width="2"/></svg>`, options: ["To rødder (d > 0)", "Ingen rødder (d < 0)", "En rod (d = 0)"], ans: 0, p: 45 },
-                { id: "10_t1", type: "theory", q: "Hvad er x-koordinaten til toppunktet?", options: ["-b / (2a)", "b / (2a)", "-d / (4a)"], ans: 0, p: 40 }
-            ],
-            11: [
-                { id: "11_t1", type: "theory", q: "Hvad er det gyldne snit (phi) ca. lig med?", options: ["1,618", "3,14", "2,71"], ans: 0, p: 35 },
-                { id: "11_t2", type: "theory", q: "Hvordan finder man det næste Fibonacci-tal?", options: ["Summen af de to forrige", "Produktet af de to forrige", "Ganges med phi"], ans: 0, p: 30 }
-            ]
-        };
+        // --- GLOBALE VARIABLER ---
+        let xp = 0;
+        Chart.defaults.color = '#94a3b8';
+        Chart.defaults.font.family = "'Inter', sans-serif";
 
-        const ranks = [
-            { min: 0, name: "UDVIKLER" },
-            { min: 100, name: "UDFORSKER" },
-            { min: 300, name: "BEVIS-JÆGER" },
-            { min: 600, name: "MAT-STRATEG" },
-            { min: 1000, name: "FAGLIG CHAMPION" },
-            { min: 1500, name: "MAT-LEGENDE" }
-        ];
-
-        let currentSequence = [];
-
-        function showResult(isCorrect, message) {
-            const overlay = document.getElementById('resultOverlay');
-            const box = document.getElementById('resultBox');
-            const mouth = document.getElementById('mathias-mouth');
-            const eyes = document.getElementById('mathias-eyes');
-
-            overlay.classList.add('active');
-            
-            if (isCorrect) {
-                document.getElementById('resultEmoji').innerText = "👏";
-                document.getElementById('resultTitle').innerText = "Fantastisk!";
-                document.getElementById('resultMsg').innerText = message || "Du gør dit bedste, og det kan ses!";
-                mouth.setAttribute('d', 'M35 70C40 75 60 75 65 70');
-                eyes.innerHTML = '<circle cx="35" cy="50" r="4.5" fill="#059669"/><circle cx="65" cy="50" r="4.5" fill="#059669"/>';
-                confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 } });
-            } else {
-                document.getElementById('resultEmoji').innerText = "💪";
-                document.getElementById('resultTitle').innerText = "Bliv ved!";
-                document.getElementById('resultMsg').innerText = "Hver fejl er en mulighed for at lære noget nyt. Prøv igen.";
-                box.classList.add('shake');
-                setTimeout(() => box.classList.remove('shake'), 400);
-                mouth.setAttribute('d', 'M40 75C45 70 55 70 60 75');
-                eyes.innerHTML = '<path d="M30 52 L40 48" stroke="#ef4444" stroke-width="3"/><path d="M60 48 L70 52" stroke="#ef4444" stroke-width="3"/>';
-            }
-        }
-
-        function closeResult() {
-            document.getElementById('resultOverlay').classList.remove('active');
+        function addXP(amount) {
+            xp += amount;
+            const display = document.getElementById('xp-display');
+            display.innerText = xp + " XP";
+            display.style.transform = "scale(1.2)";
+            display.style.color = "var(--accent)";
             setTimeout(() => {
-                document.getElementById('mathias-mouth').setAttribute('d', 'M40 70L60 70');
-                document.getElementById('mathias-eyes').innerHTML = '<circle cx="35" cy="50" r="4.5" fill="#0f172a" /><circle cx="65" cy="50" r="4.5" fill="#0f172a" />';
-            }, 500);
+                display.style.transform = "scale(1)";
+                display.style.color = "white";
+            }, 300);
         }
 
-        function openQuiz(catId) {
-            let category = catId;
-            if (catId === 'random') {
-                const keys = Object.keys(trainingData);
-                category = keys[Math.floor(Math.random() * keys.length)];
-            }
-            const questions = trainingData[category];
-            const q = questions[Math.floor(Math.random() * questions.length)];
-            const content = document.getElementById('quizContent');
+        // --- NAVIGATION ---
+        function nav(id, btn) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            btn.classList.add('active');
             
-            if (q.type === "visual") {
-                content.innerHTML = `<span class="category-pill bg-indigo-500/10 text-indigo-500">Visuel Analyse</span><h3 class="text-2xl font-black mb-6 leading-tight">${q.q}</h3><div class="bg-slate-50 rounded-[2.5rem] p-8 border-2 border-slate-100 mb-8">${q.svg}</div><div class="space-y-4">${q.options.map((o, i) => `<button onclick="checkAnswer('${q.id}', ${i}, ${q.ans}, ${q.p})" class="w-full text-left p-6 border-2 border-slate-100 rounded-2xl hover:border-indigo-500 hover:bg-indigo-50 transition-all font-bold text-slate-700">${o}</button>`).join('')}</div>`;
-            } else if (q.type === "arrange") {
-                currentSequence = [];
-                content.innerHTML = `<span class="category-pill bg-rose-500/10 text-rose-500">Mestring</span><h3 class="text-2xl font-black mb-6 leading-tight">${q.q}</h3><div id="sortable-list" class="space-y-3 mb-8">${q.steps.map((s, i) => `<div id="step-${i}" onclick="addToSequence('${q.id}', ${i}, ${q.p})" class="sortable-item">${s}</div>`).join('')}</div>`;
-            } else {
-                content.innerHTML = `<span class="category-pill bg-sky-500/10 text-sky-500">Videns-Tjek</span><h3 class="text-2xl font-black mb-6 leading-tight italic italic">${q.q}</h3><div class="space-y-4">${q.options.map((o, i) => `<button onclick="checkAnswer('${q.id}', ${i}, ${q.ans}, ${q.p})" class="w-full text-left p-6 border-2 border-slate-100 rounded-2xl hover:border-indigo-500 hover:bg-indigo-50 transition-all font-bold text-slate-700">${o}</button>`).join('')}</div>`;
-            }
-            document.getElementById('quizModal').classList.add('active');
+            if(id === 'lab') setTimeout(updateLab, 100);
+            if(id === 'geo') setTimeout(updateGeo, 100);
         }
 
-        window.openTraining = openQuiz; // Alias for consistency
+        // --- PARABEL LAB (CHART.JS) ---
+        let pChart;
+        function updateLab() {
+            const a = parseFloat(document.getElementById('inpA').value);
+            const b = parseFloat(document.getElementById('inpB').value);
+            const c = parseFloat(document.getElementById('inpC').value);
 
-        function addToSequence(qId, index, points) {
-            if (currentSequence.includes(index)) return;
-            const item = document.getElementById(`step-${index}`);
-            currentSequence.push(index);
-            item.classList.add('selected');
-            item.innerHTML = `<span class="bg-indigo-600 text-white w-6 h-6 inline-flex items-center justify-center rounded-full mr-3 text-xs font-black">${currentSequence.length}</span> ${item.innerText}`;
+            // Opdater UI værdier
+            document.getElementById('valA').innerText = a;
+            document.getElementById('valB').innerText = b;
+            document.getElementById('valC').innerText = c;
+            
+            let signB = b >= 0 ? "+ " + b : "- " + Math.abs(b);
+            let signC = c >= 0 ? "+ " + c : "- " + Math.abs(c);
+            document.getElementById('formula-display').innerHTML = `f(x) = <span class="math-highlight">${a}</span>x² ${signB}x ${signC}`;
 
-            if (currentSequence.length === 3) {
-                const correct = [1, 2, 0];
-                const isCorrect = currentSequence.every((val, i) => val === correct[i]);
-                closeQuiz();
-                if (isCorrect) {
-                    if (!window.completedIds.has(qId)) { window.xp += points; window.completedIds.add(qId); window.saveProgress(); window.updateUI(); }
-                    showResult(true, "Rækkefølgen er helt perfekt!");
-                } else { showResult(false); }
-            }
-        }
+            // Pædagogisk feedback (Glad/Sur)
+            const badge = document.getElementById('badgeA');
+            if (a > 0) { badge.innerText = "Glad parabel 😊"; badge.style.color = "var(--accent)"; }
+            else if (a < 0) { badge.innerText = "Trist parabel ☹️"; badge.style.color = "var(--danger)"; }
+            else { badge.innerText = "Lineær (ikke et polynomium)"; badge.style.color = "var(--text-muted)"; }
 
-        function checkAnswer(qId, choice, correct, points) {
-            closeQuiz();
-            if (choice === correct) {
-                if (!window.completedIds.has(qId)) {
-                    window.xp += points;
-                    window.completedIds.add(qId);
-                    window.saveProgress();
-                    window.updateUI();
-                    document.getElementById('xpDisplay').classList.add('xp-pop');
-                    setTimeout(() => document.getElementById('xpDisplay').classList.remove('xp-pop'), 500);
+            // Beregn Matematik
+            const h = a !== 0 ? -b / (2 * a) : 0;
+            const d = (b * b) - (4 * a * c);
+            const k = a !== 0 ? -d / (4 * a) : (b*h + c);
+            
+            document.getElementById('dRes').innerText = d.toFixed(2);
+            document.getElementById('tpRes').innerText = `(${h.toFixed(2)}, ${k.toFixed(2)})`;
+            
+            // Beregn Rødder
+            let roots = [];
+            if (a !== 0) {
+                if (d > 0) {
+                    roots.push((-b + Math.sqrt(d)) / (2 * a));
+                    roots.push((-b - Math.sqrt(d)) / (2 * a));
+                    document.getElementById('rootsCount').innerText = "2 rødder";
+                } else if (d === 0) {
+                    roots.push(h);
+                    document.getElementById('rootsCount').innerText = "1 rod";
+                } else {
+                    document.getElementById('rootsCount').innerText = "Ingen rødder";
                 }
-                showResult(true);
-            } else { showResult(false); }
+            }
+
+            // Chart Data
+            const xValues = [];
+            const yValues = [];
+            for (let x = h - 8; x <= h + 8; x += 0.2) {
+                xValues.push(x.toFixed(1));
+                yValues.push(a * x * x + b * x + c);
+            }
+
+            // Scatter Data for mærkater (Toppunkt og rødder)
+            const pointsData = [{x: h, y: k, label: 'Toppunkt'}];
+            roots.forEach(r => pointsData.push({x: r, y: 0, label: 'Rod'}));
+
+            const ctx = document.getElementById('parabelChart').getContext('2d');
+            if (pChart) pChart.destroy();
+            
+            pChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: xValues,
+                    datasets: [
+                        {
+                            label: 'f(x)',
+                            data: yValues,
+                            borderColor: '#8b5cf6',
+                            borderWidth: 3,
+                            fill: true,
+                            backgroundColor: 'rgba(139, 92, 246, 0.1)',
+                            pointRadius: 0,
+                            tension: 0.4
+                        },
+                        {
+                            type: 'scatter',
+                            label: 'Kritiske Punkter',
+                            data: pointsData,
+                            backgroundColor: '#10b981',
+                            borderColor: '#fff',
+                            borderWidth: 2,
+                            pointRadius: 6,
+                            pointHoverRadius: 8
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        y: { grid: { color: 'rgba(255,255,255,0.05)' }, min: -20, max: 20 },
+                        x: { grid: { display: true, color: 'rgba(255,255,255,0.05)' },
+                             ticks: { callback: function(val, index) { return index % 10 === 0 ? this.getLabelForValue(val) : ''; } } 
+                        }
+                    }
+                }
+            });
+            
+            // Lille XP boost for at interagere
+            if(Math.random() > 0.8) addXP(5);
         }
 
-        function closeQuiz() { document.getElementById('quizModal').classList.remove('active'); }
-
-        window.updateUI = function() {
-            document.getElementById('xpDisplay').innerText = window.xp;
-            document.getElementById('progressCounter').innerText = window.completedIds.size;
-            let currentRank = ranks[0];
-            ranks.forEach(r => { if(window.xp >= r.min) currentRank = r; });
-            document.getElementById('statusLabel').innerText = currentRank.name;
-            document.getElementById('levelName').innerText = currentRank.name;
-            document.getElementById('levelNumber').innerText = ranks.indexOf(currentRank) + 1;
-            const totalGoalXP = 3000;
-            const percent = Math.min(100, (window.xp / totalGoalXP) * 100);
-            document.getElementById('mainProgressBar').style.width = percent + "%";
-            document.getElementById('readinessPercent').innerText = Math.round(percent) + "%";
-            document.getElementById('stat-visual').innerText = Math.min(100, Math.round(window.xp / 20)) + "%";
-            document.getElementById('bar-visual').style.width = Math.min(100, Math.round(window.xp / 20)) + "%";
-            document.getElementById('stat-flow').innerText = Math.min(100, Math.round(window.xp / 25)) + "%";
-            document.getElementById('bar-flow').style.width = Math.min(100, Math.round(window.xp / 25)) + "%";
+        // --- GAMIFIED BEVIS LOGIK ---
+        function checkAnswer(stepNum, isCorrect, btnElement) {
+            if (isCorrect) {
+                btnElement.classList.add('correct');
+                addXP(50);
+                setTimeout(() => {
+                    document.getElementById(`q-step-${stepNum}`).classList.add('success');
+                    const nextStep = document.getElementById(`q-step-${stepNum + 1}`);
+                    if(nextStep) {
+                        nextStep.classList.remove('locked');
+                        nextStep.scrollIntoView({behavior: 'smooth', block: 'center'});
+                    }
+                }, 500);
+            } else {
+                btnElement.classList.add('wrong');
+                setTimeout(() => btnElement.classList.remove('wrong'), 400);
+            }
         }
+
+        function resetQuiz() {
+            [1, 2, 3, 4].forEach(i => {
+                const el = document.getElementById(`q-step-${i}`);
+                el.classList.remove('success');
+                if(i > 1) el.classList.add('locked');
+            });
+            document.querySelectorAll('.quiz-btn').forEach(b => {
+                b.classList.remove('correct', 'wrong');
+            });
+            document.getElementById('q-step-1').scrollIntoView({behavior: 'smooth'});
+        }
+
+        // --- VISUEL GEOMETRI LOGIK ---
+        let gChart;
+        function updateGeo() {
+            const px = parseFloat(document.getElementById('geoPx').value);
+            const py = parseFloat(document.getElementById('geoPy').value);
+            const a = parseFloat(document.getElementById('geoLa').value);
+            const b = parseFloat(document.getElementById('geoLb').value);
+
+            // Formel: dist = |a*x1 - y1 + b| / sqrt(a^2 + 1)
+            // Bemærk: Linjen er ax - y + b = 0
+            const dist = Math.abs(a * px - py + b) / Math.sqrt(a * a + 1);
+            document.getElementById('geoDistRes').innerText = dist.toFixed(2);
+
+            // Find projektionen P' (skæringspunkt mellem l og ortogonal linje)
+            // Ortogonal linje m: y = (-1/a) * x + c_m. Går gennem P(px, py).
+            let projX, projY;
+            if (a === 0) {
+                projX = px; projY = b;
+            } else {
+                const a_perp = -1 / a;
+                const b_perp = py - a_perp * px;
+                projX = (b_perp - b) / (a - a_perp);
+                projY = a * projX + b;
+            }
+
+            // Chart Data
+            const labels = [];
+            const lineData = [];
+            for(let x = -10; x <= 10; x += 1) {
+                labels.push(x);
+                lineData.push(a * x + b);
+            }
+
+            const ctx = document.getElementById('geoChart').getContext('2d');
+            if(gChart) gChart.destroy();
+
+            gChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Linje l: y=ax+b',
+                            data: lineData,
+                            borderColor: '#3b82f6',
+                            borderWidth: 2,
+                            pointRadius: 0
+                        },
+                        {
+                            type: 'scatter',
+                            label: 'Punkt P',
+                            data: [{x: px, y: py}],
+                            backgroundColor: '#ef4444',
+                            pointRadius: 8
+                        },
+                        {
+                            type: 'line',
+                            label: 'Korteste Afstand',
+                            data: [{x: px, y: py}, {x: projX, y: projY}],
+                            borderColor: '#10b981',
+                            borderDash: [5, 5],
+                            borderWidth: 2,
+                            pointRadius: 0
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { type: 'linear', position: 'bottom', min: -10, max: 10, grid: {color: 'rgba(255,255,255,0.05)'} },
+                        y: { min: -10, max: 10, grid: {color: 'rgba(255,255,255,0.05)'} }
+                    }
+                }
+            });
+            
+            if(Math.random() > 0.5) addXP(10);
+        }
+
+        // Init
+        window.onload = () => {
+            updateLab();
+            updateGeo();
+        };
     </script>
 </body>
 </html>

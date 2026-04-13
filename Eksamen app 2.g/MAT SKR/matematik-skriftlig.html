@@ -14,14 +14,13 @@
             --font-main: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             --ease-apple: cubic-bezier(0.16, 1, 0.3, 1);
             
-            /* Farve-palet */
-            --blue-base: #0071e3;
-            --green-base: #34c759;
-            --purple-base: #af52de;
+            /* Farve-temaer med dybde */
+            --bg-blue: radial-gradient(circle at 50% 50%, #0071e3 0%, #001d3d 100%);
+            --bg-green: radial-gradient(circle at 50% 50%, #34c759 0%, #002b0c 100%);
+            --bg-purple: radial-gradient(circle at 50% 50%, #af52de 0%, #2a003b 100%);
             
-            --bg-blue: radial-gradient(circle at center, #0071e3 0%, #001d3d 100%);
-            --bg-green: radial-gradient(circle at center, #34c759 0%, #002b0c 100%);
-            --bg-purple: radial-gradient(circle at center, #af52de 0%, #2a003b 100%);
+            --nav-bg: rgba(0, 0, 0, 0.3);
+            --border-white: rgba(255, 255, 255, 0.1);
         }
 
         * {
@@ -40,15 +39,15 @@
             width: 100vw;
         }
 
-        /* --- TOP NAVIGATION --- */
+        /* --- TOP NAVIGATION (Apple Style) --- */
         .top-nav {
             position: fixed;
             top: 0; left: 0; right: 0;
-            height: 52px;
-            background: rgba(0, 0, 0, 0.2);
+            height: 54px;
+            background: var(--nav-bg);
             backdrop-filter: saturate(180%) blur(20px);
             -webkit-backdrop-filter: saturate(180%) blur(20px);
-            border-bottom: 0.5px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 0.5px solid var(--border-white);
             z-index: 1000;
             display: flex;
             justify-content: space-between;
@@ -59,43 +58,43 @@
         .nav-left {
             display: flex;
             align-items: center;
-            gap: 24px;
+            gap: 32px;
         }
 
-        /* Home Button Styling */
-        .home-link {
+        /* Den specifikke Forsiden-knap (Linker ud af mappen) */
+        .home-btn {
             display: flex;
             align-items: center;
             gap: 6px;
-            font-size: 0.7rem;
-            font-weight: 800;
+            font-size: 11px;
+            font-weight: 900;
+            color: rgba(255, 255, 255, 0.5);
             text-transform: uppercase;
-            letter-spacing: 0.1em;
-            color: rgba(255, 255, 255, 0.4);
+            letter-spacing: 0.15em;
             text-decoration: none;
-            transition: all 0.4s var(--ease-apple);
+            transition: color 0.3s var(--ease-apple);
         }
 
-        .home-link:hover {
-            color: var(--blue-base);
+        .home-btn:hover {
+            color: #0071e3;
         }
 
-        .home-link svg {
-            width: 14px;
-            height: 14px;
+        .home-btn svg {
+            width: 16px;
+            height: 16px;
         }
 
-        .nav-logo {
+        .nav-title {
             color: #ffffff;
             font-weight: 600;
             font-size: 0.9rem;
             letter-spacing: -0.01em;
-            text-decoration: none;
+            opacity: 0.9;
         }
 
         .nav-links {
             display: flex;
-            gap: 28px;
+            gap: 24px;
             list-style: none;
         }
 
@@ -104,19 +103,18 @@
             color: rgba(255, 255, 255, 0.5);
             font-size: 0.75rem;
             font-weight: 500;
-            transition: color 0.4s var(--ease-apple);
+            transition: color 0.3s var(--ease-apple);
         }
 
         .nav-links a:hover {
             color: #ffffff;
         }
 
-        /* --- VERTICAL SPLIT PANELS --- */
+        /* --- VERTIKAL SPLIT PANELER --- */
         .hero-split {
             display: flex;
             width: 100vw;
             height: 100vh;
-            background: #000;
         }
 
         .panel {
@@ -128,14 +126,15 @@
             text-decoration: none;
             color: white;
             overflow: hidden;
-            border-right: 0.5px solid rgba(255, 255, 255, 0.05);
-            transition: flex 1s var(--ease-apple);
+            border-right: 0.5px solid var(--border-white);
+            transition: flex 0.8s var(--ease-apple);
         }
 
         .panel:last-child {
             border-right: none;
         }
 
+        /* Hover: Panelet udvider sig jævnt */
         .panel:hover {
             flex: 1.6;
         }
@@ -145,8 +144,8 @@
             content: '';
             position: absolute;
             top: 0; left: 0; right: 0; bottom: 0;
-            opacity: 0.4;
-            transition: opacity 1s var(--ease-apple), transform 1.5s var(--ease-apple);
+            opacity: 0.5;
+            transition: opacity 0.8s var(--ease-apple), transform 1.2s var(--ease-apple);
             z-index: 1;
         }
 
@@ -155,7 +154,7 @@
         .panel-purple::before { background: var(--bg-purple); }
 
         .panel:hover::before {
-            opacity: 0.7;
+            opacity: 0.8;
             transform: scale(1.05);
         }
 
@@ -164,18 +163,17 @@
             position: relative;
             z-index: 10;
             text-align: center;
-            padding: 60px 40px;
+            padding: 40px;
             display: flex;
             flex-direction: column;
             align-items: center;
             width: 100%;
-            transition: transform 0.8s var(--ease-apple);
         }
 
-        /* Ikon Styling */
+        /* Ikon Cirkel */
         .icon-circle {
-            width: 72px;
-            height: 72px;
+            width: 80px;
+            height: 80px;
             border-radius: 50%;
             background: rgba(255, 255, 255, 0.08);
             backdrop-filter: blur(10px);
@@ -184,7 +182,8 @@
             align-items: center;
             justify-content: center;
             margin-bottom: 32px;
-            transition: all 0.8s var(--ease-apple);
+            transition: all 0.6s var(--ease-apple);
+            color: rgba(255, 255, 255, 0.8);
         }
 
         .icon-circle svg {
@@ -193,96 +192,82 @@
             fill: none;
             stroke: currentColor;
             stroke-width: 1.5;
-            transition: transform 0.8s var(--ease-apple);
         }
 
         .panel:hover .icon-circle {
             background: rgba(255, 255, 255, 0.15);
             transform: scale(1.1);
             border-color: rgba(255, 255, 255, 0.3);
+            color: #ffffff;
         }
-
-        .panel-blue .icon-circle { color: #80bfff; }
-        .panel-green .icon-circle { color: #8ceda1; }
-        .panel-purple .icon-circle { color: #d69df4; }
 
         .step-label {
             font-size: 0.7rem;
             font-weight: 700;
-            letter-spacing: 0.2em;
+            letter-spacing: 0.25em;
             text-transform: uppercase;
-            margin-bottom: 12px;
-            opacity: 0.4;
+            margin-bottom: 16px;
+            opacity: 0.5;
         }
 
         .panel h2 {
-            font-size: clamp(1.8rem, 3vw, 2.8rem);
+            font-size: clamp(1.8rem, 3.5vw, 2.8rem);
             font-weight: 700;
-            letter-spacing: -0.03em;
+            letter-spacing: -0.04em;
             margin-bottom: 16px;
             line-height: 1.1;
         }
 
+        /* Statisk tekst der ikke rykker layout */
         .panel p {
-            font-size: 1rem;
+            font-size: 1.05rem;
             color: rgba(255, 255, 255, 0.5);
-            max-width: 280px;
+            max-width: 300px;
             margin: 0 auto;
             line-height: 1.5;
-            font-weight: 400;
-            transition: color 0.6s var(--ease-apple), transform 0.8s var(--ease-apple);
+            transition: color 0.6s var(--ease-apple);
         }
 
         .panel:hover p {
             color: rgba(255, 255, 255, 0.9);
-            transform: translateY(-5px);
         }
 
-        /* Subtil pil knap */
-        .arrow-btn {
-            margin-top: 40px;
-            width: 44px;
-            height: 44px;
-            border-radius: 50%;
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        /* Piletast-indikator */
+        .action-arrow {
+            margin-top: 32px;
             opacity: 0;
-            transform: translateY(20px);
+            transform: translateY(10px);
             transition: all 0.6s var(--ease-apple);
         }
 
-        .panel:hover .arrow-btn {
+        .panel:hover .action-arrow {
             opacity: 1;
             transform: translateY(0);
         }
 
-        .arrow-btn:hover {
-            background: #ffffff;
-            color: #000;
-        }
-
-        /* Responsivitet */
-        @media (max-width: 900px) {
+        /* Mobil-optimering */
+        @media (max-width: 768px) {
             .hero-split { flex-direction: column; }
-            .panel { border-right: none; border-bottom: 0.5px solid rgba(255,255,255,0.1); }
-            .nav-links { display: none; }
-            .home-link span { display: none; } /* Gem tekst på mobil for plads */
+            .panel { border-right: none; border-bottom: 0.5px solid var(--border-white); }
+            .nav-links, .home-btn span { display: none; }
+            .top-nav { padding: 0 20px; }
+            .panel p { font-size: 0.9rem; }
         }
     </style>
 </head>
 <body>
 
+    <!-- Top Navigation -->
     <nav class="top-nav">
         <div class="nav-left">
-            <a href="index.html" class="home-link">
+            <!-- Forsiden link (Går ud af mappen) -->
+            <a href="../../index.html" class="home-btn">
                 <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
                 </svg>
                 <span>Forsiden</span>
             </a>
-            <a href="#" class="nav-logo">Matematik Skriftlig B.</a>
+            <span class="nav-title">Matematik Skriftlig B.</span>
         </div>
         <ul class="nav-links">
             <li><a href="emner.html">Emner</a></li>
@@ -291,58 +276,59 @@
         </ul>
     </nav>
 
+    <!-- STORSLÅET VERTIKAL MENU -->
     <section class="hero-split">
         
-        <!-- EMNE SEKTION -->
+        <!-- 01 EMNER -->
         <a href="emner.html" class="panel panel-blue">
             <div class="panel-content">
                 <div class="icon-circle">
                     <svg viewBox="0 0 24 24">
-                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
-                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
                     </svg>
                 </div>
                 <div class="step-label">Teori & Beviser</div>
                 <h2>Emner</h2>
-                <p>Udforsk pensum og de afgørende matematiske beviser trin for trin.</p>
-                <div class="arrow-btn">
-                    <svg viewBox="0 0 24 24" style="width:18px; height:18px; stroke-width: 2.5;"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                <p>Gennemgå de afgørende beviser og fundamentale principper i pensum.</p>
+                <div class="action-arrow">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
                 </div>
             </div>
         </a>
 
-        <!-- OPGAVE SEKTION -->
+        <!-- 02 OPGAVER -->
         <a href="opgaver.html" class="panel panel-green">
             <div class="panel-content">
                 <div class="icon-circle">
                     <svg viewBox="0 0 24 24">
-                        <path d="M9 11l3 3L22 4"></path>
-                        <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
+                        <path d="M9 11l3 3L22 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+                        <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
                     </svg>
                 </div>
-                <div class="step-label">Praksis & Træning</div>
+                <div class="step-label">Træning & Eksamen</div>
                 <h2>Opgaver</h2>
-                <p>Træn med tidligere eksamenssæt og find de korrekte løsningsmodeller.</p>
-                <div class="arrow-btn">
-                    <svg viewBox="0 0 24 24" style="width:18px; height:18px; stroke-width: 2.5;"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                <p>Sæt din viden i spil med tidligere eksamenssæt og løsningsforslag.</p>
+                <div class="action-arrow">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
                 </div>
             </div>
         </a>
 
-        <!-- MAPLE SEKTION -->
+        <!-- 03 MAPLE -->
         <a href="maple.html" class="panel panel-purple">
             <div class="panel-content">
                 <div class="icon-circle">
                     <svg viewBox="0 0 24 24">
-                        <polyline points="16 18 22 12 16 6"></polyline>
-                        <polyline points="8 6 2 12 8 18"></polyline>
+                        <polyline points="16 18 22 12 16 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></polyline>
+                        <polyline points="8 6 2 12 8 18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></polyline>
                     </svg>
                 </div>
-                <div class="step-label">Værktøjer & Genveje</div>
+                <div class="step-label">Genveje & Workflow</div>
                 <h2>Maple</h2>
-                <p>Mestr Gym-pakken og optimer din tid til den skriftlige eksamen.</p>
-                <div class="arrow-btn">
-                    <svg viewBox="0 0 24 24" style="width:18px; height:18px; stroke-width: 2.5;"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                <p>Optimer din problemløsning med de rigtige kommandoer i Gym-pakken.</p>
+                <div class="action-arrow">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
                 </div>
             </div>
         </a>

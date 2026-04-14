@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="da" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ordstilling | Tysk Mundtlig 2.a</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        darkBg: '#0b0f1a',
+                        darkCard: 'rgba(30, 41, 59, 0.4)',
+                        lightBg: '#f8fafc',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+            transition: background-color 0.3s ease, color 0.3s ease;
+            margin: 0;
+            overflow-x: hidden;
+        }
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+        .tile {
+            backdrop-filter: blur(10px);
+            border-radius: 1.5rem;
+            padding: 2rem;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        .tile:hover {
+            transform: translateY(-5px);
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+        .glass-nav {
+            backdrop-filter: blur(16px);
+        }
+        .badge {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            padding: 0.3rem 0.8rem;
+            border-radius: 2rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            display: inline-block;
+        }
+        .verb-pos {
+            background: rgba(59, 130, 246, 0.2);
+            color: #60a5fa;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 800;
+        }
+        .sub-pos {
+            background: rgba(239, 68, 68, 0.2);
+            color: #f87171;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 800;
+        }
+        .rule-box {
+            border-left: 4px solid #3b82f6;
+            padding-left: 1rem;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-lightBg text-slate-900 dark:bg-darkBg dark:text-slate-100">
+
+    <!-- Navigation -->
+    <nav class="glass-nav sticky top-0 z-50 px-8 py-4 bg-white/80 dark:bg-darkBg/80 border-b border-slate-200 dark:border-white/5">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-4">
+                <button onclick="window.location.href='tysk_eksamen_hub.html'" class="bg-blue-600 p-2.5 rounded-xl shadow-lg hover:bg-blue-700 transition flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                </button>
+                <div>
+                    <h1 class="text-xl font-black tracking-tighter uppercase">Wort<span class="text-blue-500">stellung</span></h1>
+                </div>
+            </div>
+            <button id="theme-toggle" class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-white/10 transition-transform hover:scale-110">
+                <svg id="sun-icon" class="hidden w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707m12.728 12.728L12 12l.01.01H12z"></path></svg>
+                <svg id="moon-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+            </button>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-8 mt-16 pb-20">
+        
+        <!-- Hero Section -->
+        <div class="mb-16 border-l-8 border-blue-600 pl-8 py-4">
+            <span class="badge bg-blue-100 text-blue-600 dark:bg-blue-500/10 dark:text-blue-500 border border-blue-200 dark:border-blue-500/20">Grammatik Lab: Ordstilling</span>
+            <h2 class="text-6xl font-black mb-6 tracking-tight uppercase leading-none text-slate-900 dark:text-white">Die <br><span class="text-blue-600 italic">V2-Regel</span></h2>
+            <p class="text-slate-500 dark:text-slate-400 text-xl max-w-3xl font-medium leading-relaxed italic">
+                Verbet er hjertet i den tyske sætning. Lær at placere det rigtigt hver gang.
+            </p>
+        </div>
+
+        <div class="dashboard-grid">
+            
+            <!-- V2 Reglen (Hovedsætninger) -->
+            <div class="tile bg-white/80 dark:bg-slate-800/40 border border-slate-200 dark:border-white/5 shadow-sm md:col-span-2">
+                <h4 class="text-2xl font-black mb-6 uppercase italic text-blue-500 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
+                    Hovedsætninger: Verbet på 2. plads
+                </h4>
+                <div class="space-y-6">
+                    <div class="rule-box border-blue-500">
+                        <p class="font-bold text-lg mb-2 uppercase tracking-tighter italic">Normal Ordstilling</p>
+                        <div class="flex flex-wrap gap-2 text-xl font-medium">
+                            <span class="text-slate-400">Ich</span>
+                            <span class="verb-pos uppercase">kaufe</span>
+                            <span class="text-slate-400">heute einen Apfel.</span>
+                        </div>
+                    </div>
+                    
+                    <div class="rule-box border-amber-500">
+                        <p class="font-bold text-lg mb-2 uppercase tracking-tighter italic">Inversion (Omvendt ordstilling)</p>
+                        <p class="text-sm text-slate-500 mb-2 italic">Hvis noget andet end grundleddet starter sætningen, kommer verbet stadig på 2. plads!</p>
+                        <div class="flex flex-wrap gap-2 text-xl font-medium">
+                            <span class="text-amber-500">Heute</span>
+                            <span class="verb-pos uppercase">kaufe</span>
+                            <span class="sub-pos uppercase">ich</span>
+                            <span class="text-slate-400">einen Apfel.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ledsætninger (Weil, Dass, Wenn) -->
+            <div class="tile bg-white/80 dark:bg-slate-800/40 border border-slate-200 dark:border-white/5 shadow-sm">
+                <h4 class="text-xl font-black mb-6 uppercase italic text-red-500 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    Ledsætninger: Verbet til sidst
+                </h4>
+                <div class="space-y-4 text-sm">
+                    <p class="leading-relaxed">Når en sætning starter med en konjunktion (bindeord), bliver verbet "skubbet" helt til slut.</p>
+                    <div class="p-4 bg-red-500/5 rounded-xl border border-red-500/10">
+                        <p class="font-medium mb-2">Eksempel:</p>
+                        <div class="flex flex-wrap gap-1 text-base">
+                            <span class="font-black text-red-500 uppercase italic tracking-tighter">Weil</span>
+                            <span>ich hunger</span>
+                            <span class="verb-pos uppercase">habe</span>.
+                        </div>
+                    </div>
+                    <div class="space-y-2 mt-4">
+                        <p class="font-bold text-xs uppercase text-slate-400">Husk disse "skubbe-ord":</p>
+                        <div class="flex flex-wrap gap-2">
+                            <span class="bg-red-500/20 text-red-500 px-2 py-1 rounded text-[10px] font-bold">WEIL</span>
+                            <span class="bg-red-500/20 text-red-500 px-2 py-1 rounded text-[10px] font-bold">DASS</span>
+                            <span class="bg-red-500/20 text-red-500 px-2 py-1 rounded text-[10px] font-bold">WENN</span>
+                            <span class="bg-red-500/20 text-red-500 px-2 py-1 rounded text-[10px] font-bold">OB</span>
+                            <span class="bg-red-500/20 text-red-500 px-2 py-1 rounded text-[10px] font-bold">DA</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- USOBD (De ord der IKKE ændrer noget) -->
+            <div class="tile bg-white/80 dark:bg-slate-800/40 border border-slate-200 dark:border-white/5 shadow-sm">
+                <h4 class="text-xl font-black mb-6 uppercase italic text-emerald-500 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                    USOBD: Fri bane
+                </h4>
+                <div class="space-y-4 text-sm text-slate-600 dark:text-slate-300">
+                    <p>Disse bindeord tæller som "plads nul". De ændrer <strong>intet</strong> ved ordstillingen.</p>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div class="bg-emerald-500/10 p-2 rounded text-center">
+                            <span class="font-black text-emerald-500 block">UND</span>
+                            <span class="text-[9px] uppercase font-bold text-slate-500">Og</span>
+                        </div>
+                        <div class="bg-emerald-500/10 p-2 rounded text-center">
+                            <span class="font-black text-emerald-500 block">SONDERN</span>
+                            <span class="text-[9px] uppercase font-bold text-slate-500">Men (derimod)</span>
+                        </div>
+                        <div class="bg-emerald-500/10 p-2 rounded text-center">
+                            <span class="font-black text-emerald-500 block">ODER</span>
+                            <span class="text-[9px] uppercase font-bold text-slate-500">Eller</span>
+                        </div>
+                        <div class="bg-emerald-500/10 p-2 rounded text-center">
+                            <span class="font-black text-emerald-500 block">ABER</span>
+                            <span class="text-[9px] uppercase font-bold text-slate-500">Men</span>
+                        </div>
+                        <div class="bg-emerald-500/10 p-2 rounded text-center col-span-2">
+                            <span class="font-black text-emerald-500 block">DENN</span>
+                            <span class="text-[9px] uppercase font-bold text-slate-500">For / Fordi</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sammensatte verber (Tekno-festen) -->
+            <div class="tile bg-white/80 dark:bg-slate-800/40 border border-slate-200 dark:border-white/5 shadow-sm">
+                <h4 class="text-xl font-black mb-6 uppercase italic text-pink-500 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+                    Sammensatte tider
+                </h4>
+                <div class="space-y-4 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+                    <p>Når vi bruger hjælpeverber (har, er, vil, kan), deles verbet i to.</p>
+                    <div class="p-4 bg-pink-500/5 rounded-xl border border-pink-500/10">
+                        <p class="font-medium mb-2 italic">Hjælpeverbet på 2. plads – hovedverbet til sidst!</p>
+                        <div class="flex flex-wrap gap-1 text-base">
+                            <span>Ich</span>
+                            <span class="verb-pos uppercase">habe</span>
+                            <span>einen Apfel</span>
+                            <span class="verb-pos uppercase">gekauft</span>.
+                        </div>
+                    </div>
+                    <p class="text-[10px] italic">Dette gælder også for: Ich <u>kann</u> Deutsch <u>sprechen</u>.</p>
+                </div>
+            </div>
+
+            <!-- Eksamens-sætninger -->
+            <div class="tile bg-slate-900 text-white dark:bg-slate-800/60 border border-slate-700 dark:border-white/10 shadow-xl md:col-span-2">
+                <h4 class="text-xl font-black mb-6 uppercase italic text-emerald-400">Oral Exam: Smart Tricks</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+                    <div class="space-y-4">
+                        <div class="p-4 bg-emerald-500/10 rounded-xl border border-emerald-500/20">
+                            <p class="font-bold text-slate-100 italic">"Ich finde, dass..."</p>
+                            <p class="text-emerald-400/80 text-xs mt-1">Brug denne til at vise, at du kan "skubbe" verbet: "Ich finde, dass der Film <u>gut ist</u>."</p>
+                        </div>
+                        <div class="p-4 bg-emerald-500/10 rounded-xl border border-emerald-500/20">
+                            <p class="font-bold text-slate-100 italic">"In dem Text..."</p>
+                            <p class="text-emerald-400/80 text-xs mt-1">Pas på her! Inversion: "In dem Text <u>geht</u> es um..." (IKKE: "In dem Text es geht...")</p>
+                        </div>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="p-4 bg-emerald-500/10 rounded-xl border border-emerald-500/20">
+                            <p class="font-bold text-slate-100 italic">"Weil..."</p>
+                            <p class="text-emerald-400/80 text-xs mt-1">Den klassiske fælde. Øv dig på at vente med verbet til allersidst i sætningen.</p>
+                        </div>
+                        <div class="p-4 bg-emerald-500/10 rounded-xl border border-emerald-500/20 text-center flex flex-col justify-center">
+                            <p class="font-black text-2xl uppercase italic tracking-widest text-white">Pause?</p>
+                            <p class="text-slate-400 text-xs mt-2 uppercase font-bold">Tag en tænkepause før verbet – det viser overskud!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Bonus Info -->
+        <div class="mt-12 p-8 bg-blue-600/10 rounded-3xl border border-blue-500/20">
+            <h5 class="font-black text-blue-500 uppercase mb-2">Pro Tip:</h5>
+            <p class="text-sm text-slate-500 leading-relaxed italic">
+                Hvis du kommer til at starte en ledsætning forkert, så stop op, sig "Entschuldigung" og start sætningen forfra. Læreren belønner dig for at rette din egen grammatik! Det viser, at du kender reglen.
+            </p>
+        </div>
+    </main>
+
+    <script>
+        const themeToggle = document.getElementById('theme-toggle');
+        const sunIcon = document.getElementById('sun-icon');
+        const moonIcon = document.getElementById('moon-icon');
+        const html = document.documentElement;
+
+        function updateIcons() {
+            if (html.classList.contains('dark')) {
+                sunIcon.classList.remove('hidden');
+                moonIcon.classList.add('hidden');
+            } else {
+                sunIcon.classList.add('hidden');
+                moonIcon.classList.remove('hidden');
+            }
+        }
+
+        if (localStorage.theme === 'light') {
+            html.classList.remove('dark');
+        } else {
+            html.classList.add('dark');
+        }
+        updateIcons();
+
+        themeToggle.addEventListener('click', () => {
+            html.classList.toggle('dark');
+            localStorage.theme = html.classList.contains('dark') ? 'dark' : 'light';
+            updateIcons();
+        });
+    </script>
+</body>
+</html>

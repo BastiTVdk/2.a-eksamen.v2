@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="da" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nachhaltigkeit und Klima | Tysk Mundtlig 2.a</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        darkBg: '#0b0f1a',
+                        darkCard: 'rgba(30, 41, 59, 0.4)',
+                        lightBg: '#f8fafc',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+            transition: background-color 0.3s ease, color 0.3s ease;
+            margin: 0;
+            overflow-x: hidden;
+        }
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+        .tile {
+            backdrop-filter: blur(10px);
+            border-radius: 1.5rem;
+            padding: 2rem;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        .tile:hover {
+            transform: translateY(-5px);
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+        .glass-nav {
+            backdrop-filter: blur(16px);
+        }
+        .badge {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            padding: 0.3rem 0.8rem;
+            border-radius: 2rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            display: inline-block;
+        }
+        .dilemma-card {
+            border-left: 4px solid #10b981;
+            padding: 1rem;
+            background: rgba(16, 185, 129, 0.05);
+            border-radius: 0 1rem 1rem 0;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-lightBg text-slate-900 dark:bg-darkBg dark:text-slate-100">
+
+    <!-- Navigation -->
+    <nav class="glass-nav sticky top-0 z-50 px-8 py-4 bg-white/80 dark:bg-darkBg/80 border-b border-slate-200 dark:border-white/5">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-4">
+                <button onclick="window.location.href='tysk_eksamen_hub.html'" class="bg-blue-600 p-2.5 rounded-xl shadow-lg hover:bg-blue-700 transition flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                </button>
+                <div>
+                    <h1 class="text-xl font-black tracking-tighter uppercase">Klima & <span class="text-emerald-500">Umwelt</span></h1>
+                </div>
+            </div>
+            <button id="theme-toggle" class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-white/10 transition-transform hover:scale-110">
+                <svg id="sun-icon" class="hidden w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707m12.728 12.728L12 12l.01.01H12z"></path></svg>
+                <svg id="moon-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+            </button>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-8 mt-16 pb-20">
+        
+        <!-- Hero Section -->
+        <div class="mb-16 border-l-8 border-emerald-600 pl-8 py-4">
+            <span class="badge bg-emerald-100 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-500 border border-emerald-200 dark:border-emerald-500/20">Modul 6: Samfund & Ansvar</span>
+            <h2 class="text-6xl font-black mb-6 tracking-tight uppercase leading-none">Vores planet <br><span class="text-emerald-600 italic">Vores fremtid</span></h2>
+            <p class="text-slate-500 dark:text-slate-400 text-xl max-w-3xl font-medium leading-relaxed italic">
+                En analyse af bæredygtighed i Tyskland – fra økologiske bydele til de svære valg i hverdagen.
+            </p>
+        </div>
+
+        <div class="dashboard-grid">
+            
+            <!-- Tekstanalyse: Unter Ökos -->
+            <div class="tile bg-white/80 dark:bg-slate-800/40 border border-slate-200 dark:border-white/5 shadow-sm md:col-span-2">
+                <h4 class="text-2xl font-black mb-6 uppercase italic text-emerald-500 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                    Hovedtekst: "Unter Ökos"
+                </h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="space-y-4">
+                        <h5 class="font-black uppercase text-sm text-blue-500">Om teksten</h5>
+                        <p class="text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+                            En reportage om bydelen <strong>Vauban i Freiburg</strong>, som er kendt for at være ekstremt miljøvenlig. Teksten bruger humor til at beskrive de "perfekte" økologiske familier.
+                        </p>
+                        <div class="p-4 bg-emerald-500/5 rounded-xl border border-emerald-500/10 text-xs">
+                            <p class="font-bold mb-1">Centralt spørgsmål:</p>
+                            <p class="italic">"Hvor går grænsen mellem at redde miljøet og at blive fanatisk?"</p>
+                        </div>
+                    </div>
+                    <div class="space-y-4">
+                        <h5 class="font-black uppercase text-sm text-blue-500">Vauban-kvarteret</h5>
+                        <ul class="space-y-2 text-sm text-slate-600 dark:text-slate-300">
+                            <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span> Bilfrie zoner</li>
+                            <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span> Plus-energi-huse</li>
+                            <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span> Stærkt fællesskab (Baugruppen)</li>
+                            <li class="flex items-center gap-2"><span class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span> Social kontrol (hvem sorterer ikke affaldet?)</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dilemma-Træner (Fra dine noter) -->
+            <div class="tile bg-white/80 dark:bg-slate-800/40 border border-slate-200 dark:border-white/5 shadow-sm">
+                <h4 class="text-xl font-black mb-6 uppercase italic text-amber-500 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m7 15 5 5 5-5"/><path d="m7 9 5-5 5 5"/></svg>
+                    Hverdagens Dilemmaer
+                </h4>
+                <div class="space-y-6">
+                    <div class="dilemma-card">
+                        <h6 class="font-bold text-xs uppercase mb-1">Iphone: Ny eller Brugt?</h6>
+                        <p class="text-xs text-slate-500 italic">"Bei Technik mag ich es einfach neu" vs. Miljøet.</p>
+                    </div>
+                    <div class="dilemma-card" style="border-left-color: #3b82f6; background: rgba(59, 130, 246, 0.05);">
+                        <h6 class="font-bold text-xs uppercase mb-1">Festival-rejsen</h6>
+                        <p class="text-xs text-slate-500 italic">Flyve tilbage til en festival vs. at blive i Rom for at spare CO2.</p>
+                    </div>
+                </div>
+                <div class="mt-6 p-3 bg-slate-100 dark:bg-slate-900/50 rounded-lg">
+                    <p class="text-[10px] font-bold uppercase text-slate-500 mb-1">Eksamens-tip:</p>
+                    <p class="text-xs italic">Brug ordet "Nachhaltigkeit" (bæredygtighed) og "Verantwortung" (ansvar).</p>
+                </div>
+            </div>
+
+            <!-- Statistik & Fakta (Visuelt) -->
+            <div class="tile bg-white/80 dark:bg-slate-800/40 border border-slate-200 dark:border-white/5 shadow-sm">
+                <h4 class="text-xl font-black mb-6 uppercase italic text-red-500 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20V16"/></svg>
+                    Verpackungsmüll
+                </h4>
+                <div class="space-y-4">
+                    <p class="text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+                        Tyskland producerer mere og mere emballageaffald.
+                    </p>
+                    <div class="space-y-2">
+                        <div class="h-2 w-full bg-slate-200 dark:bg-slate-700 rounded-full">
+                            <div class="h-full bg-red-500 rounded-full" style="width: 85%;"></div>
+                        </div>
+                        <p class="text-[10px] text-slate-500 font-bold uppercase">Plastik & Papirforbrug i Tyskland</p>
+                    </div>
+                    <ul class="text-xs space-y-2 text-slate-500">
+                        <li>• "Plastik ist überall."</li>
+                        <li>• Løsning: Genbrug (Recycling) og Unverpackt-butikker.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Nøglebegreber -->
+            <div class="tile bg-white/80 dark:bg-slate-800/40 border border-slate-200 dark:border-white/5 shadow-sm">
+                <h4 class="text-xl font-black mb-6 uppercase italic text-blue-500 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    Kernbegreber
+                </h4>
+                <div class="space-y-3 text-sm">
+                    <div class="flex justify-between border-b border-slate-100 dark:border-white/5 pb-2">
+                        <span class="font-bold">Umweltschutz</span>
+                        <span class="text-slate-500">Miljøbeskyttelse</span>
+                    </div>
+                    <div class="flex justify-between border-b border-slate-100 dark:border-white/5 pb-2">
+                        <span class="font-bold">Klimawandel</span>
+                        <span class="text-slate-500">Klimaforandring</span>
+                    </div>
+                    <div class="flex justify-between border-b border-slate-100 dark:border-white/5 pb-2">
+                        <span class="font-bold">Verzicht</span>
+                        <span class="text-slate-500">Afkald</span>
+                    </div>
+                    <div class="flex justify-between border-b border-slate-100 dark:border-white/5 pb-2">
+                        <span class="font-bold">Erneuerbare Energien</span>
+                        <span class="text-slate-500">Vedvarende energi</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Guld-gloser til Eksamen -->
+            <div class="tile bg-slate-900 text-white dark:bg-slate-800/60 border border-slate-700 dark:border-white/10 shadow-xl md:col-span-2">
+                <h4 class="text-xl font-black mb-6 uppercase italic text-emerald-400">Eksamens-træner</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+                    <div class="space-y-4">
+                        <div class="p-4 bg-emerald-500/10 rounded-xl border border-emerald-500/20">
+                            <p class="font-bold italic">"Wir müssen unseren Lebensstil ändern, um die Umwelt zu schützen."</p>
+                            <p class="text-emerald-400/80 text-xs mt-2">Vi skal ændre vores livsstil for at beskytte miljøet.</p>
+                        </div>
+                        <div class="p-4 bg-emerald-500/10 rounded-xl border border-emerald-500/20">
+                            <p class="font-bold italic">"In Vauban versuchen die Menschen, nachhaltig zu leben."</p>
+                            <p class="text-emerald-400/80 text-xs mt-2">I Vauban forsøger folk at leve bæredygtigt.</p>
+                        </div>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="p-4 bg-emerald-500/10 rounded-xl border border-emerald-500/20">
+                            <p class="font-bold italic">"Es ist ein Dilemma zwischen Komfort und Klima."</p>
+                            <p class="text-emerald-400/80 text-xs mt-2">Det er et dilemma mellem komfort og klima.</p>
+                        </div>
+                        <div class="p-4 bg-emerald-500/10 rounded-xl border border-emerald-500/20">
+                            <p class="font-bold italic">"Plastikmüll ist ein großes Problem in Deutschland."</p>
+                            <p class="text-emerald-400/80 text-xs mt-2">Plastikaffald er et stort problem i Tyskland.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Bonus Info -->
+        <div class="mt-12 p-8 bg-emerald-600/10 rounded-3xl border border-emerald-500/20">
+            <h5 class="font-black text-emerald-500 uppercase mb-2">Husk til samtalen:</h5>
+            <p class="text-sm text-slate-500 leading-relaxed italic">
+                Når du taler om klima, kan du perspektivere til <strong>"Fridays for Future"</strong> eller <strong>"Letzte Generation"</strong> (klimaaktivister). Er deres metoder for ekstreme? Dette giver dig mulighed for at bruge udtryk som "Ich bin der Meinung, dass..." eller "Einerseits... andererseits...".
+            </p>
+        </div>
+    </main>
+
+    <script>
+        const themeToggle = document.getElementById('theme-toggle');
+        const sunIcon = document.getElementById('sun-icon');
+        const moonIcon = document.getElementById('moon-icon');
+        const html = document.documentElement;
+
+        function updateIcons() {
+            if (html.classList.contains('dark')) {
+                sunIcon.classList.remove('hidden');
+                moonIcon.classList.add('hidden');
+            } else {
+                sunIcon.classList.add('hidden');
+                moonIcon.classList.remove('hidden');
+            }
+        }
+
+        if (localStorage.theme === 'light') {
+            html.classList.remove('dark');
+        } else {
+            html.classList.add('dark');
+        }
+        updateIcons();
+
+        themeToggle.addEventListener('click', () => {
+            html.classList.toggle('dark');
+            localStorage.theme = html.classList.contains('dark') ? 'dark' : 'light';
+            updateIcons();
+        });
+    </script>
+</body>
+</html>

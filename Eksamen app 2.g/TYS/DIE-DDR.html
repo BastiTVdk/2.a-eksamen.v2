@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="da" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Die DDR | Dybdegående Analyse</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        darkBg: '#0b0f1a',
+                        darkCard: 'rgba(30, 41, 59, 0.4)',
+                        lightBg: '#f8fafc',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+            transition: background-color 0.3s ease, color 0.3s ease;
+            margin: 0;
+            overflow-x: hidden;
+        }
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+        .tile {
+            backdrop-filter: blur(10px);
+            border-radius: 1.5rem;
+            padding: 2rem;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        .tile:hover {
+            transform: translateY(-5px);
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+        .glass-nav {
+            backdrop-filter: blur(16px);
+        }
+        .badge {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            padding: 0.3rem 0.8rem;
+            border-radius: 2rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            display: inline-block;
+        }
+        .timeline-line {
+            position: absolute;
+            left: 20px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: rgba(239, 68, 68, 0.2);
+        }
+        .quote-box {
+            border-left: 4px solid #ef4444;
+            padding-left: 1rem;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-lightBg text-slate-900 dark:bg-darkBg dark:text-slate-100">
+
+    <!-- Navigation -->
+    <nav class="glass-nav sticky top-0 z-50 px-8 py-4 bg-white/80 dark:bg-darkBg/80 border-b border-slate-200 dark:border-white/5">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-4">
+                <button onclick="window.location.href='tysk_eksamen_hub.html'" class="bg-blue-600 p-2.5 rounded-xl shadow-lg hover:bg-blue-700 transition flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                </button>
+                <div>
+                    <h1 class="text-xl font-black tracking-tighter uppercase">Die <span class="text-red-500">DDR</span> <span class="hidden md:inline text-slate-400 dark:text-slate-500 ml-2">| Eksamensforberedelse</span></h1>
+                </div>
+            </div>
+            <button id="theme-toggle" class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-white/10 transition-transform hover:scale-110">
+                <svg id="sun-icon" class="hidden w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707m12.728 12.728L12 12l.01.01H12z"></path></svg>
+                <svg id="moon-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+            </button>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-8 mt-16 pb-20">
+        
+        <!-- Hero Section -->
+        <div class="mb-16 border-l-8 border-red-600 pl-8 py-4">
+            <span class="badge bg-red-100 text-red-600 dark:bg-red-500/10 dark:text-red-500 border border-red-200 dark:border-red-500/20">Modul 4: Historie & Film</span>
+            <h2 class="text-6xl font-black mb-6 tracking-tight uppercase leading-none">Das Leben <br><span class="text-red-600 italic">der Anderen</span></h2>
+            <p class="text-slate-500 dark:text-slate-400 text-xl max-w-3xl font-medium leading-relaxed italic">
+                "HGW XX/7, wir wissen alles." — En analyse af overvågning, kunst og menneskelig moral i en diktaturstat.
+            </p>
+        </div>
+
+        <!-- 1. Historisk Tidslinje (Visuelt element) -->
+        <div class="mb-20">
+            <div class="flex items-center gap-3 mb-8">
+                <div class="h-8 w-1.5 bg-red-600 rounded-full"></div>
+                <h3 class="text-2xl font-black uppercase tracking-tight">DDR's Tidslinje</h3>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <div class="p-6 bg-white dark:bg-slate-800/20 border border-slate-200 dark:border-white/5 rounded-2xl relative">
+                    <span class="text-3xl font-black text-red-500/30 block mb-2">1949</span>
+                    <h5 class="font-bold text-sm mb-1">Grundlæggelse</h5>
+                    <p class="text-xs text-slate-500">DDR opstår i den sovjetiske zone efter 2. verdenskrig.</p>
+                </div>
+                <div class="p-6 bg-white dark:bg-slate-800/20 border border-slate-200 dark:border-white/5 rounded-2xl">
+                    <span class="text-3xl font-black text-red-500/30 block mb-2">1961</span>
+                    <h5 class="font-bold text-sm mb-1">Muren bygges</h5>
+                    <p class="text-xs text-slate-500">"Antifaschistischer Schutzwall" forsegler grænsen til Vesten.</p>
+                </div>
+                <div class="p-6 bg-white dark:bg-slate-800/20 border border-slate-200 dark:border-white/5 rounded-2xl">
+                    <span class="text-3xl font-black text-red-500/30 block mb-2">1984</span>
+                    <h5 class="font-bold text-sm mb-1">Film-setting</h5>
+                    <p class="text-xs text-slate-500">Tidspunktet for handlingen i "Das Leben der Anderen".</p>
+                </div>
+                <div class="p-6 bg-white dark:bg-slate-800/20 border border-slate-200 dark:border-white/5 rounded-2xl">
+                    <span class="text-3xl font-black text-red-500/30 block mb-2">1989</span>
+                    <h5 class="font-bold text-sm mb-1">Murens fald</h5>
+                    <p class="text-xs text-slate-500">9. november bryder muren sammen, og DDR ophører snart.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-grid">
+            
+            <!-- Karakter-Galleri (Visuelt) -->
+            <div class="tile bg-white/80 dark:bg-slate-800/40 border border-slate-200 dark:border-white/5 shadow-sm md:col-span-2">
+                <h4 class="text-2xl font-black mb-6 uppercase italic text-blue-500 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    Karakteranalyse
+                </h4>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- Wiesler -->
+                    <div class="space-y-4">
+                        <div class="h-1 bg-blue-500 w-12"></div>
+                        <h5 class="font-black uppercase text-sm">Gerd Wiesler</h5>
+                        <p class="text-xs text-slate-500 italic">"HGW XX/7"</p>
+                        <p class="text-sm leading-relaxed">
+                            Starten: En kold, perfekt Stasi-funktionær. Han lever et tomt liv i en grå lejlighed. 
+                            <br><br>
+                            <strong>Vendepunktet:</strong> Da han hører musikken og ser Dreymans kærlighed. Han indser, at systemet ødelægger menneskelighed.
+                        </p>
+                    </div>
+                    <!-- Dreyman -->
+                    <div class="space-y-4">
+                        <div class="h-1 bg-amber-500 w-12"></div>
+                        <h5 class="font-black uppercase text-sm">Georg Dreyman</h5>
+                        <p class="text-xs text-slate-500 italic">"Der Dichter"</p>
+                        <p class="text-sm leading-relaxed">
+                            Regimeloyal kunstner, der vågner op, da hans ven Jerska begår selvmord. Han bliver dissident og skriver artiklen til "Der Spiegel".
+                        </p>
+                    </div>
+                    <!-- Christa-Maria -->
+                    <div class="space-y-4">
+                        <div class="h-1 bg-red-500 w-12"></div>
+                        <h5 class="font-black uppercase text-sm">Christa-Maria</h5>
+                        <p class="text-xs text-slate-500 italic">"Die Schauspielerin"</p>
+                        <p class="text-sm leading-relaxed">
+                            En tragisk figur. Hun er fanget mellem sin kærlighed til Dreyman og frygten for systemet (Minister Hempf). Hun ender med at forråde Dreyman.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stasi-metoder (Visuel liste) -->
+            <div class="tile bg-white/80 dark:bg-slate-800/40 border border-slate-200 dark:border-white/5 shadow-sm">
+                <h4 class="text-xl font-black mb-6 uppercase italic text-red-500 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
+                    Stasi-metoder
+                </h4>
+                <div class="space-y-6">
+                    <div class="flex gap-4">
+                        <div class="w-10 h-10 bg-red-500/10 flex items-center justify-center rounded-lg text-red-500 font-bold">1</div>
+                        <div>
+                            <h6 class="font-bold text-sm uppercase">Abhören</h6>
+                            <p class="text-xs text-slate-500">Aflytning af lejligheder med mikrofoner (Wanzen).</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-4">
+                        <div class="w-10 h-10 bg-red-500/10 flex items-center justify-center rounded-lg text-red-500 font-bold">2</div>
+                        <div>
+                            <h6 class="font-bold text-sm uppercase">Zersetzung</h6>
+                            <p class="text-xs text-slate-500">Psykologisk nedbrydning af modstandere.</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-4">
+                        <div class="w-10 h-10 bg-red-500/10 flex items-center justify-center rounded-lg text-red-500 font-bold">3</div>
+                        <div>
+                            <h6 class="font-bold text-sm uppercase">Erpressung</h6>
+                            <p class="text-xs text-slate-500">Afpresning (som set med Christa-Maria og pillerne).</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vigtig Symbolik -->
+            <div class="tile bg-white/80 dark:bg-slate-800/40 border border-slate-200 dark:border-white/5 shadow-sm md:col-span-1">
+                <h4 class="text-xl font-black mb-6 uppercase italic text-amber-500">Symbolik</h4>
+                <div class="space-y-4">
+                    <div class="p-4 bg-amber-500/5 rounded-xl border border-amber-500/10">
+                        <h6 class="font-bold text-sm mb-1 uppercase tracking-tighter">Sonate vom guten Menschen</h6>
+                        <p class="text-xs text-slate-500 leading-relaxed">Musikken repræsenterer sandhed og følelser. Det er her, Wiesler græder for første gang.</p>
+                    </div>
+                    <div class="p-4 bg-red-500/5 rounded-xl border border-red-500/10">
+                        <h6 class="font-bold text-sm mb-1 uppercase tracking-tighter">Die rote Schreibmaschine</h6>
+                        <p class="text-xs text-slate-500 leading-relaxed">Symbolet på modstand. Den bruges til at skrive sandheden om DDR til Vesten.</p>
+                    </div>
+                    <div class="p-4 bg-slate-500/5 rounded-xl border border-slate-500/10">
+                        <h6 class="font-bold text-sm mb-1 uppercase tracking-tighter">Die Farbe Grau</h6>
+                        <p class="text-xs text-slate-500 leading-relaxed">Farven grå dominerer filmen og repræsenterer den monotone og glædesløse stat.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Eksamens-sætninger (Udvidet) -->
+            <div class="tile bg-slate-900 text-white dark:bg-slate-800/60 border border-slate-700 dark:border-white/10 shadow-xl md:col-span-2">
+                <h4 class="text-xl font-black mb-6 uppercase italic text-emerald-400">Guld-gloser til Eksamen</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm font-medium">
+                    <div class="space-y-4">
+                        <div class="quote-box border-emerald-500 bg-emerald-500/5 p-4 rounded-r-xl">
+                            <p class="italic text-white">"Wiesler ist ein Opfer des Systems, aber am Ende wird er zum Helden."</p>
+                            <p class="text-emerald-400/80 text-xs mt-2">Wiesler er et offer for systemet, men til sidst bliver han en helt.</p>
+                        </div>
+                        <div class="quote-box border-emerald-500 bg-emerald-500/5 p-4 rounded-r-xl">
+                            <p class="italic text-white">"Die Kunst verändert Wieslers Weltbild."</p>
+                            <p class="text-emerald-400/80 text-xs mt-2">Kunsten ændrer Wieslers verdensbillede.</p>
+                        </div>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="quote-box border-emerald-500 bg-emerald-500/5 p-4 rounded-r-xl">
+                            <p class="italic text-white">"Das Leben der Anderen thematiseriert die totale Überwachung."</p>
+                            <p class="text-emerald-400/80 text-xs mt-2">Filmen tematiserer den totale overvågning.</p>
+                        </div>
+                        <div class="quote-box border-emerald-500 bg-emerald-500/5 p-4 rounded-r-xl">
+                            <p class="italic text-white">"Es gibt eine Parallele zwischen Wiesler und Jerska."</p>
+                            <p class="text-emerald-400/80 text-xs mt-2">Der er en parallel mellem Wiesler og Jerska (gennem kunsten).</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Footer Info -->
+        <div class="mt-12 p-8 bg-blue-600/10 rounded-3xl border border-blue-500/20">
+            <h5 class="font-black text-blue-500 uppercase mb-2">Husk til samtalen:</h5>
+            <p class="text-sm text-slate-500 leading-relaxed italic">
+                Prøv altid at perspektivere til nutiden. Findes der overvågning i dag? (Kina, sociale medier, data-høst). 
+                Dette viser et højere refleksionsniveau til tysk B eksamen.
+            </p>
+        </div>
+    </main>
+
+    <script>
+        const themeToggle = document.getElementById('theme-toggle');
+        const sunIcon = document.getElementById('sun-icon');
+        const moonIcon = document.getElementById('moon-icon');
+        const html = document.documentElement;
+
+        function updateIcons() {
+            if (html.classList.contains('dark')) {
+                sunIcon.classList.remove('hidden');
+                moonIcon.classList.add('hidden');
+            } else {
+                sunIcon.classList.add('hidden');
+                moonIcon.classList.remove('hidden');
+            }
+        }
+
+        if (localStorage.theme === 'light') {
+            html.classList.remove('dark');
+        } else {
+            html.classList.add('dark');
+        }
+        updateIcons();
+
+        themeToggle.addEventListener('click', () => {
+            html.classList.toggle('dark');
+            localStorage.theme = html.classList.contains('dark') ? 'dark' : 'light';
+            updateIcons();
+        });
+    </script>
+</body>
+</html>

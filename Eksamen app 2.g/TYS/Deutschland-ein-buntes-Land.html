@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="da" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deutschland ein buntes Land | Tysk Mundtlig 2.a</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        darkBg: '#0b0f1a',
+                        darkCard: 'rgba(30, 41, 59, 0.4)',
+                        lightBg: '#f8fafc',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+            transition: background-color 0.3s ease, color 0.3s ease;
+            margin: 0;
+            overflow-x: hidden;
+        }
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+        .tile {
+            backdrop-filter: blur(10px);
+            border-radius: 1.5rem;
+            padding: 2rem;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        .tile:hover {
+            transform: translateY(-5px);
+            border-color: rgba(16, 185, 129, 0.3);
+        }
+        .glass-nav {
+            backdrop-filter: blur(16px);
+        }
+        .badge {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            padding: 0.3rem 0.8rem;
+            border-radius: 2rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            display: inline-block;
+        }
+        .vs-divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 1rem 0;
+        }
+        .vs-divider::before, .vs-divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+        }
+        .vs-divider:not(:empty)::before { margin-right: .5em; }
+        .vs-divider:not(:empty)::after { margin-left: .5em; }
+        
+        .quote-box {
+            border-left: 4px solid #10b981;
+            padding-left: 1rem;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-lightBg text-slate-900 dark:bg-darkBg dark:text-slate-100">
+
+    <!-- Navigation -->
+    <nav class="glass-nav sticky top-0 z-50 px-8 py-4 bg-white/80 dark:bg-darkBg/80 border-b border-slate-200 dark:border-white/5">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-4">
+                <button onclick="window.location.href='tysk_eksamen_hub.html'" class="bg-blue-600 p-2.5 rounded-xl shadow-lg hover:bg-blue-700 transition flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                </button>
+                <div>
+                    <h1 class="text-xl font-black tracking-tighter uppercase">Ein buntes <span class="text-green-500">Land</span></h1>
+                </div>
+            </div>
+            <button id="theme-toggle" class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-white/10 transition-transform hover:scale-110">
+                <svg id="sun-icon" class="hidden w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707m12.728 12.728L12 12l.01.01H12z"></path></svg>
+                <svg id="moon-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+            </button>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-8 mt-16 pb-20">
+        
+        <!-- Hero Section -->
+        <div class="mb-16 border-l-8 border-green-600 pl-8 py-4">
+            <span class="badge bg-green-100 text-green-600 dark:bg-green-500/10 dark:text-green-500 border border-green-200 dark:border-green-500/20">Modul 5: Integration & Identitet</span>
+            <h2 class="text-6xl font-black mb-6 tracking-tight uppercase leading-none">Heimat ist <br><span class="text-green-600 italic">kein Ort, sondern ein Gefühl</span></h2>
+            <p class="text-slate-500 dark:text-slate-400 text-xl max-w-3xl font-medium leading-relaxed italic">
+                En undersøgelse af det moderne Tyskland gennem film, mad og menneskelige kontraster.
+            </p>
+        </div>
+
+        <div class="dashboard-grid">
+            
+            <!-- Cennet vs. Antonella (Visuel sammenligning) -->
+            <div class="tile bg-white/80 dark:bg-slate-800/40 border border-slate-200 dark:border-white/5 shadow-sm md:col-span-2">
+                <h4 class="text-2xl font-black mb-6 uppercase italic text-green-500 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5"/><path d="M8 3H3v5"/><path d="M21 16v5h-5"/><path d="M3 16v5h5"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>
+                    Das Wunder von Kreuzberg: Cennet vs. Antonella
+                </h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-500 font-bold">C</div>
+                            <h5 class="font-black uppercase text-sm">Cennet (Migranten)</h5>
+                        </div>
+                        <ul class="space-y-2 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+                            <li>• Repræsentere det "gamle" Kreuzberg.</li>
+                            <li>• Traditionel og religiøs (muslimsk baggrund).</li>
+                            <li>• Frygter forandring og tab af fællesskab.</li>
+                            <li>• Ser kvarteret som sit hjem (Heimat).</li>
+                        </ul>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="flex items-center gap-2">
+                            <div class="w-8 h-8 rounded-full bg-pink-500/20 flex items-center justify-center text-pink-500 font-bold">A</div>
+                            <h5 class="font-black uppercase text-sm">Antonella (Gentrifieren)</h5>
+                        </div>
+                        <ul class="space-y-2 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+                            <li>• Repræsentere den moderne, vestlige livsstil.</li>
+                            <li>• Fokus på karriere, caféer og æstetik.</li>
+                            <li>• Ser Kreuzberg som et "cool" og hipt sted.</li>
+                            <li>• Forstår ikke nødvendigvis Cennet's bekymringer.</li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="mt-8 p-4 bg-green-500/5 rounded-xl border border-green-500/10 text-sm italic text-center">
+                    "Teksten viser spændingen mellem tradition og gentrificering i Berlin."
+                </div>
+            </div>
+
+            <!-- Film: Almanya - Willkommen in Deutschland -->
+            <div class="tile bg-white/80 dark:bg-slate-800/40 border border-slate-200 dark:border-white/5 shadow-sm">
+                <h4 class="text-xl font-black mb-6 uppercase italic text-blue-500 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="7" x2="7" y2="7"/><line x1="2" y1="17" x2="7" y2="17"/><line x1="17" y1="17" x2="22" y2="17"/><line x1="17" y1="7" x2="22" y2="7"/></svg>
+                    Almanya: 3 Generationer
+                </h4>
+                <div class="space-y-6 text-sm">
+                    <div>
+                        <h6 class="font-bold uppercase text-xs text-blue-400">1. Generation (Hüseyin)</h6>
+                        <p class="text-slate-500 italic">"Wer bin ich? Türke oder Deutscher?"</p>
+                        <p class="mt-1">Kom som Gastarbeiter i 1960'erne. Han søger tilbage til sine rødder.</p>
+                    </div>
+                    <div>
+                        <h6 class="font-bold uppercase text-xs text-blue-400">2. Generation (Børnene)</h6>
+                        <p class="mt-1">Fanget mellem to kulturer. De taler tysk, men mærker stadig de tyrkiske rødder.</p>
+                    </div>
+                    <div>
+                        <h6 class="font-bold uppercase text-xs text-blue-400">3. Generation (Cenk)</h6>
+                        <p class="mt-1">Den unge dreng, der spørger "Hvem er vi?". Han er fuldt integreret, men nysgerrig på historien.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Begreber og Definitioner -->
+            <div class="tile bg-white/80 dark:bg-slate-800/40 border border-slate-200 dark:border-white/5 shadow-sm">
+                <h4 class="text-xl font-black mb-6 uppercase italic text-red-500 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                    Nøglebegreber
+                </h4>
+                <div class="space-y-4">
+                    <div class="flex items-start gap-3">
+                        <div class="w-2 h-2 mt-1.5 bg-red-500 rounded-full"></div>
+                        <div>
+                            <p class="font-bold text-sm">Gastarbeiter</p>
+                            <p class="text-xs text-slate-500">Gæstearbejdere, der kom for at hjælpe med Wirtschaftswunder.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <div class="w-2 h-2 mt-1.5 bg-red-500 rounded-full"></div>
+                        <div>
+                            <p class="font-bold text-sm">Integration vs. Assimilation</p>
+                            <p class="text-xs text-slate-500">Integration er at blive en del af samfundet; Assimilation er at opgive sin egen kultur.</p>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-3">
+                        <div class="w-2 h-2 mt-1.5 bg-red-500 rounded-full"></div>
+                        <div>
+                            <p class="font-bold text-sm">Kulturschock</p>
+                            <p class="text-xs text-slate-500">Følelsen af forvirring i mødet med en ny kultur (som Hüseyin i Tyskland).</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Monsieur Vuong (Kultur via mad) -->
+            <div class="tile bg-white/80 dark:bg-slate-800/40 border border-slate-200 dark:border-white/5 shadow-sm">
+                <h4 class="text-xl font-black mb-6 uppercase italic text-amber-500 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
+                    Monsieur Vuong
+                </h4>
+                <div class="text-sm space-y-4">
+                    <p class="leading-relaxed">
+                        Teksten om den vietnamesiske restaurant i Berlin viser, hvordan <strong>gastronomi</strong> er en vej til integration.
+                    </p>
+                    <div class="p-3 bg-amber-500/5 rounded-lg border border-amber-500/10">
+                        <p class="text-xs font-bold uppercase tracking-tighter">Vigtig pointe:</p>
+                        <p class="text-xs text-slate-500">Identitet er ikke kun sprog, men også smage, dufte og traditioner, man tager med sig.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Guld-gloser til Eksamen -->
+            <div class="tile bg-slate-900 text-white dark:bg-slate-800/60 border border-slate-700 dark:border-white/10 shadow-xl md:col-span-2">
+                <h4 class="text-xl font-black mb-6 uppercase italic text-emerald-400 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    Eksamens-træner
+                </h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+                    <div class="space-y-4">
+                        <div class="quote-box">
+                            <p class="font-bold">"Deutschland ist heute ein Einwanderungsland."</p>
+                            <p class="text-emerald-400/80 text-xs mt-1">Tyskland er i dag et indvandringsland.</p>
+                        </div>
+                        <div class="quote-box">
+                            <p class="font-bold">"Es gibt oft Vorurteile zwischen den Kulturen."</p>
+                            <p class="text-emerald-400/80 text-xs mt-1">Der er ofte fordomme mellem kulturerne.</p>
+                        </div>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="quote-box">
+                            <p class="font-bold">"Integration bedeutet, dass man Teil der Gesellschaft wird."</p>
+                            <p class="text-emerald-400/80 text-xs mt-1">Integration betyder, at man bliver en del af samfundet.</p>
+                        </div>
+                        <div class="quote-box">
+                            <p class="font-bold">"Cennet und Antonella haben verschiedene Weltbilder."</p>
+                            <p class="text-emerald-400/80 text-xs mt-1">Cennet og Antonella har forskellige verdensbilleder.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Bonus Info -->
+        <div class="mt-12 p-8 bg-green-600/10 rounded-3xl border border-green-500/20">
+            <h5 class="font-black text-green-500 uppercase mb-2">Husk til perspektiveringen:</h5>
+            <p class="text-sm text-slate-500 leading-relaxed italic">
+                Sammenlign migrationen i 60'erne (Gastarbeiter) med flygtningestrømmen i 2015. Hvordan har Tyskland ændret sig? 
+                Brug udtrykket "Wir schaffen das" af Angela Merkel som et kontrastpunkt til Hüseyins oplevelser.
+            </p>
+        </div>
+    </main>
+
+    <script>
+        const themeToggle = document.getElementById('theme-toggle');
+        const sunIcon = document.getElementById('sun-icon');
+        const moonIcon = document.getElementById('moon-icon');
+        const html = document.documentElement;
+
+        function updateIcons() {
+            if (html.classList

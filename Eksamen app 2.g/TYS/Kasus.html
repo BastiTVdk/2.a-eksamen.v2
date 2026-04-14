@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="da" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kasus-Karrusellen | Tysk Mundtlig 2.a</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        darkBg: '#0b0f1a',
+                        darkCard: 'rgba(30, 41, 59, 0.4)',
+                        lightBg: '#f8fafc',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+            transition: background-color 0.3s ease, color 0.3s ease;
+            margin: 0;
+            overflow-x: hidden;
+        }
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+        .tile {
+            backdrop-filter: blur(10px);
+            border-radius: 1.25rem;
+            padding: 2rem;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        .tile:hover {
+            transform: translateY(-5px);
+            border-color: rgba(236, 72, 153, 0.3);
+        }
+        .glass-nav {
+            backdrop-filter: blur(16px);
+        }
+        .badge {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            padding: 0.3rem 0.8rem;
+            border-radius: 2rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            display: inline-block;
+        }
+        .kasus-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.75rem;
+        }
+        .kasus-table th, .kasus-table td {
+            padding: 0.75rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        .dark .kasus-table th { color: #ec4899; }
+        .light .kasus-table th { color: #db2777; }
+    </style>
+</head>
+<body class="min-h-screen bg-lightBg text-slate-900 dark:bg-darkBg dark:text-slate-100">
+
+    <!-- Navigation -->
+    <nav class="glass-nav sticky top-0 z-50 px-8 py-4 bg-white/80 dark:bg-darkBg/80 border-b border-slate-200 dark:border-white/5">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-4">
+                <button onclick="window.location.href='tysk_eksamen_hub.html'" class="bg-blue-600 p-2.5 rounded-xl shadow-lg hover:bg-blue-700 transition flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                </button>
+                <div>
+                    <h1 class="text-xl font-black tracking-tighter uppercase">Kasus<span class="text-pink-500">Lab</span></h1>
+                </div>
+            </div>
+            <button id="theme-toggle" class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-white/10 transition-transform hover:scale-110">
+                <svg id="sun-icon" class="hidden w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707m12.728 12.728L12 12l.01.01H12z"></path></svg>
+                <svg id="moon-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+            </button>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-8 mt-16 pb-20">
+        
+        <!-- Hero Section -->
+        <div class="mb-16 border-l-8 border-pink-600 pl-8 py-4">
+            <span class="badge bg-pink-100 text-pink-600 dark:bg-pink-500/10 dark:text-pink-500 border border-pink-200 dark:border-pink-500/20">Grammatik Lab: Kasus</span>
+            <h2 class="text-6xl font-black mb-6 tracking-tight uppercase leading-none text-slate-900 dark:text-white">Der, Die, <br><span class="text-pink-500 italic">Das & Kasus</span></h2>
+            <p class="text-slate-500 dark:text-slate-400 text-xl max-w-3xl font-medium leading-relaxed italic">
+                Hvem gør hvad mod hvem? Få styr på det tyske bøjningssystem én gang for alle.
+            </p>
+        </div>
+
+        <div class="dashboard-grid">
+            
+            <!-- Kasus Overblik (Artikler) -->
+            <div class="tile bg-white/80 dark:bg-slate-800/40 border border-slate-200 dark:border-white/5 shadow-sm md:col-span-2">
+                <h4 class="text-2xl font-black mb-6 uppercase italic text-pink-500 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3h18v18H3z"/><path d="M3 9h18"/><path d="M3 15h18"/><path d="M9 3v18"/><path d="M15 3v18"/></svg>
+                    Bestemte Artikler (Kendeord)
+                </h4>
+                <div class="overflow-x-auto">
+                    <table class="kasus-table">
+                        <thead>
+                            <tr class="uppercase tracking-widest text-[10px] font-black">
+                                <th>Kasus / Funktion</th>
+                                <th>Maskulinum (Han)</th>
+                                <th>Femininum (Hun)</th>
+                                <th>Neutrum (Intet)</th>
+                                <th>Pluralis (Flere)</th>
+                            </tr>
+                        </thead>
+                        <tbody class="font-medium text-sm">
+                            <tr>
+                                <td><strong>Nominativ</strong> (Grundled)</td>
+                                <td class="text-blue-500 font-bold">DER</td>
+                                <td class="text-pink-500 font-bold">DIE</td>
+                                <td class="text-emerald-500 font-bold">DAS</td>
+                                <td class="text-purple-500 font-bold">DIE</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Akkusativ</strong> (Genstandsled)</td>
+                                <td class="text-blue-500 font-bold underline">DEN</td>
+                                <td class="text-pink-500 font-bold">DIE</td>
+                                <td class="text-emerald-500 font-bold">DAS</td>
+                                <td class="text-purple-500 font-bold">DIE</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Dativ</strong> (Hensynsled)</td>
+                                <td class="text-blue-500 font-bold">DEM</td>
+                                <td class="text-pink-500 font-bold">DER</td>
+                                <td class="text-emerald-500 font-bold">DEM</td>
+                                <td class="text-purple-500 font-bold">DEN (+n)</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Genitiv</strong> (Ejeform)</td>
+                                <td class="text-blue-500 font-bold">DES (+s)</td>
+                                <td class="text-pink-500 font-bold">DER</td>
+                                <td class="text-emerald-500 font-bold">DES (+s)</td>
+                                <td class="text-purple-500 font-bold">DER</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <p class="mt-6 text-xs text-slate-500 italic">*Læg mærke til: Kun hankøn ændrer sig i akkusativ!</p>
+            </div>
+
+            <!-- Akkusativ Præpositioner -->
+            <div class="tile bg-white/80 dark:bg-slate-800/40 border border-slate-200 dark:border-white/5 shadow-sm">
+                <h4 class="text-xl font-black mb-4 uppercase italic text-blue-500">Akkusativ</h4>
+                <div class="bg-blue-500/10 p-4 rounded-xl border border-blue-500/20 mb-4">
+                    <p class="text-xs font-black uppercase text-blue-500 mb-1">Huskeremse:</p>
+                    <p class="text-lg font-bold italic">"Fud-dog-gennem"</p>
+                </div>
+                <ul class="space-y-2 text-sm font-medium">
+                    <li class="flex justify-between border-b border-slate-100 dark:border-white/5 pb-1"><span>Für</span> <span class="text-slate-500">For / Til</span></li>
+                    <li class="flex justify-between border-b border-slate-100 dark:border-white/5 pb-1"><span>Um</span> <span class="text-slate-500">Om / Omkring</span></li>
+                    <li class="flex justify-between border-b border-slate-100 dark:border-white/5 pb-1"><span>Durch</span> <span class="text-slate-500">Gennem</span></li>
+                    <li class="flex justify-between border-b border-slate-100 dark:border-white/5 pb-1"><span>Ohne</span> <span class="text-slate-500">Uden</span></li>
+                    <li class="flex justify-between border-b border-slate-100 dark:border-white/5 pb-1"><span>Gegen</span> <span class="text-slate-500">Mod</span></li>
+                    <li class="flex justify-between border-b border-slate-100 dark:border-white/5 pb-1"><span>Bis</span> <span class="text-slate-500">Indtil</span></li>
+                    <li class="flex justify-between"><span>Entlang</span> <span class="text-slate-500">Langs</span></li>
+                </ul>
+            </div>
+
+            <!-- Dativ Præpositioner -->
+            <div class="tile bg-white/80 dark:bg-slate-800/40 border border-slate-200 dark:border-white/5 shadow-sm">
+                <h4 class="text-xl font-black mb-4 uppercase italic text-emerald-500">Dativ</h4>
+                <div class="bg-emerald-500/10 p-4 rounded-xl border border-emerald-500/20 mb-4">
+                    <p class="text-xs font-black uppercase text-emerald-500 mb-1">Huskeremse:</p>
+                    <p class="text-lg font-bold italic">"Aus-bei-mit-efter..."</p>
+                </div>
+                <ul class="space-y-2 text-sm font-medium">
+                    <li class="flex justify-between border-b border-slate-100 dark:border-white/5 pb-1"><span>Aus</span> <span class="text-slate-500">Fra / Af</span></li>
+                    <li class="flex justify-between border-b border-slate-100 dark:border-white/5 pb-1"><span>Bei</span> <span class="text-slate-500">Hos / Ved</span></li>
+                    <li class="flex justify-between border-b border-slate-100 dark:border-white/5 pb-1"><span>Mit</span> <span class="text-slate-500">Med</span></li>
+                    <li class="flex justify-between border-b border-slate-100 dark:border-white/5 pb-1"><span>Nach</span> <span class="text-slate-500">Efter / Til</span></li>
+                    <li class="flex justify-between border-b border-slate-100 dark:border-white/5 pb-1"><span>Seit</span> <span class="text-slate-500">Siden</span></li>
+                    <li class="flex justify-between border-b border-slate-100 dark:border-white/5 pb-1"><span>Von</span> <span class="text-slate-500">Fra / Af</span></li>
+                    <li class="flex justify-between"><span>Zu</span> <span class="text-slate-500">Til</span></li>
+                </ul>
+            </div>
+
+            <!-- Vekselpræpositioner (Wohin vs. Wo) -->
+            <div class="tile bg-white/80 dark:bg-slate-800/40 border border-slate-200 dark:border-white/5 shadow-sm md:col-span-2">
+                <h4 class="text-xl font-black mb-6 uppercase italic text-amber-500 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12H3"/><path d="M12 3v18"/></svg>
+                    Vekselpræpositioner: Bevægelse vs. Stilstand
+                </h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-sm">
+                    <div class="p-6 bg-blue-500/5 rounded-2xl border border-blue-500/10">
+                        <h5 class="font-black text-blue-500 uppercase mb-2">Wohin? (Bevægelse)</h5>
+                        <p class="text-2xl font-black mb-2 uppercase">AKKUSATIV</p>
+                        <p class="italic text-slate-500">"Ich gehe in <u>den</u> Park."</p>
+                    </div>
+                    <div class="p-6 bg-emerald-500/5 rounded-2xl border border-emerald-500/10">
+                        <h5 class="font-black text-emerald-500 uppercase mb-2">Wo? (Stilstand)</h5>
+                        <p class="text-2xl font-black mb-2 uppercase">DATIV</p>
+                        <p class="italic text-slate-500">"Ich bin in <u>dem</u> Park."</p>
+                    </div>
+                </div>
+                <div class="mt-6 flex flex-wrap gap-2">
+                    <span class="bg-slate-100 dark:bg-slate-900/50 px-3 py-1 rounded-full text-[10px] font-bold">AN</span>
+                    <span class="bg-slate-100 dark:bg-slate-900/50 px-3 py-1 rounded-full text-[10px] font-bold">AUF</span>
+                    <span class="bg-slate-100 dark:bg-slate-900/50 px-3 py-1 rounded-full text-[10px] font-bold">HINTER</span>
+                    <span class="bg-slate-100 dark:bg-slate-900/50 px-3 py-1 rounded-full text-[10px] font-bold">IN</span>
+                    <span class="bg-slate-100 dark:bg-slate-900/50 px-3 py-1 rounded-full text-[10px] font-bold">NEBEN</span>
+                    <span class="bg-slate-100 dark:bg-slate-900/50 px-3 py-1 rounded-full text-[10px] font-bold">ÜBER</span>
+                    <span class="bg-slate-100 dark:bg-slate-900/50 px-3 py-1 rounded-full text-[10px] font-bold">UNTER</span>
+                    <span class="bg-slate-100 dark:bg-slate-900/50 px-3 py-1 rounded-full text-[10px] font-bold">VOR</span>
+                    <span class="bg-slate-100 dark:bg-slate-900/50 px-3 py-1 rounded-full text-[10px] font-bold">ZWISCHEN</span>
+                </div>
+            </div>
+
+            <!-- Genitiv (Ejeform) -->
+            <div class="tile bg-white/80 dark:bg-slate-800/40 border border-slate-200 dark:border-white/5 shadow-sm">
+                <h4 class="text-xl font-black mb-4 uppercase italic text-purple-500">Genitiv</h4>
+                <p class="text-sm leading-relaxed text-slate-600 dark:text-slate-300 mb-4">
+                    Bruges til at vise ejerskab eller efter visse præpositioner.
+                </p>
+                <div class="space-y-2">
+                    <div class="p-2 bg-purple-500/5 rounded border border-purple-500/10 text-xs">
+                        <strong>Trotz</strong> (på trods af)
+                    </div>
+                    <div class="p-2 bg-purple-500/5 rounded border border-purple-500/10 text-xs">
+                        <strong>Während</strong> (i løbet af)
+                    </div>
+                    <div class="p-2 bg-purple-500/5 rounded border border-purple-500/10 text-xs">
+                        <strong>Wegen</strong> (på grund af)
+                    </div>
+                    <div class="p-2 bg-purple-500/5 rounded border border-purple-500/10 text-xs">
+                        <strong>Statt</strong> (i stedet for)
+                    </div>
+                </div>
+            </div>
+
+            <!-- Eksamens-sætninger -->
+            <div class="tile bg-slate-900 text-white dark:bg-slate-800/60 border border-slate-700 dark:border-white/10 shadow-xl md:col-span-2">
+                <h4 class="text-xl font-black mb-6 uppercase italic text-emerald-400">Oral Exam: Kasus-Tricks</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+                    <div class="space-y-4">
+                        <div class="p-4 bg-emerald-500/10 rounded-xl border border-emerald-500/20">
+                            <p class="font-bold text-slate-100 italic">"Mit meiner Meinung..."</p>
+                            <p class="text-emerald-400/80 text-xs mt-1">Dativ efter 'Mit'. Vis læreren du ved det er hunkøn: "Mit meiner Meinung..."</p>
+                        </div>
+                        <div class="p-4 bg-emerald-500/10 rounded-xl border border-emerald-500/20">
+                            <p class="font-bold text-slate-100 italic">"Für den Film..."</p>
+                            <p class="text-emerald-400/80 text-xs mt-1">Akkusativ efter 'Für'. Husk at det er hankøn: "Für den Film."</p>
+                        </div>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="p-4 bg-emerald-500/10 rounded-xl border border-emerald-500/20">
+                            <p class="font-bold text-slate-100 italic">"Ich gehe ins Kino."</p>
+                            <p class="text-emerald-400/80 text-xs mt-1">Sammentrækning: In + das = ins. Vis overskud med disse småord.</p>
+                        </div>
+                        <div class="p-4 bg-emerald-500/10 rounded-xl border border-emerald-500/20 text-center flex flex-col justify-center">
+                            <p class="font-black text-2xl uppercase italic tracking-widest text-white">Kasus-fejl?</p>
+                            <p class="text-slate-400 text-xs mt-2 uppercase font-bold">Det vigtigste er forståelsen. Ret dig selv hvis du kan, men fortsæt talestrømmen!</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <script>
+        const themeToggle = document.getElementById('theme-toggle');
+        const sunIcon = document.getElementById('sun-icon');
+        const moonIcon = document.getElementById('moon-icon');
+        const html = document.documentElement;
+
+        function updateIcons() {
+            if (html.classList.contains('dark')) {
+                sunIcon.classList.remove('hidden');
+                moonIcon.classList.add('hidden');
+            } else {
+                sunIcon.classList.add('hidden');
+                moonIcon.classList.remove('hidden');
+            }
+        }
+
+        if (localStorage.theme === 'light') {
+            html.classList.remove('dark');
+        } else {
+            html.classList.add('dark');
+        }
+        updateIcons();
+
+        themeToggle.addEventListener('click', () => {
+            html.classList.toggle('dark');
+            localStorage.theme = html.classList.contains('dark') ? 'dark' : 'light';
+            updateIcons();
+        });
+    </script>
+</body>
+</html>

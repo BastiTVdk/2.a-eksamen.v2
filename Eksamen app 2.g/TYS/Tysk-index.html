@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="da" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tysk Mundtlig 2.a | Sankt Annæ</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        darkBg: '#0b0f1a',
+                        darkCard: 'rgba(30, 41, 59, 0.4)',
+                        lightBg: '#f8fafc',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+            transition: background-color 0.3s ease, color 0.3s ease;
+            margin: 0;
+            overflow-x: hidden;
+        }
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+        .tile {
+            backdrop-filter: blur(10px);
+            border-radius: 1.25rem;
+            padding: 2rem;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        .tile:hover {
+            transform: translateY(-8px);
+        }
+        .tile::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: transparent;
+            transition: background 0.3s;
+        }
+        .tile.blue:hover::before { background: #3b82f6; }
+        .tile.red:hover::before { background: #ef4444; }
+        .tile.green:hover::before { background: #10b981; }
+        .tile.purple:hover::before { background: #a855f7; }
+        .tile.amber:hover::before { background: #f59e0b; }
+
+        .icon-box {
+            width: 56px;
+            height: 56px;
+            border-radius: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+            font-size: 1.5rem;
+        }
+        .glass-nav {
+            backdrop-filter: blur(16px);
+        }
+        .badge {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            padding: 0.3rem 0.8rem;
+            border-radius: 2rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            display: inline-block;
+        }
+        .status-dot {
+            height: 8px;
+            width: 8px;
+            background-color: #10b981;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 6px;
+            box-shadow: 0 0 8px #10b981;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-lightBg text-slate-900 dark:bg-darkBg dark:text-slate-100">
+
+    <!-- Navigation -->
+    <nav class="glass-nav sticky top-0 z-50 px-8 py-4 bg-white/80 dark:bg-darkBg/80 border-b border-slate-200 dark:border-white/5 text-slate-900 dark:text-white">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-4">
+                <div class="bg-blue-600 p-2.5 rounded-xl shadow-lg shadow-blue-900/20">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                </div>
+                <div>
+                    <h1 class="text-xl font-black tracking-tighter uppercase">TYSK <span class="text-blue-600">MUN-2.A</span></h1>
+                    <div class="flex items-center text-[10px] text-slate-500 dark:text-slate-400 font-bold uppercase tracking-widest">
+                        <span class="status-dot"></span> System klar
+                    </div>
+                </div>
+            </div>
+            <div class="flex items-center gap-6">
+                <div class="hidden md:flex items-center gap-10 text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
+                    <a href="#emner" class="hover:text-blue-600 dark:hover:text-white transition">Emner</a>
+                    <a href="#grammatik" class="hover:text-blue-600 dark:hover:text-white transition">Grammatik</a>
+                    <a href="#eksamen" class="hover:text-blue-500 dark:hover:text-blue-400 transition flex items-center gap-2">Guide</a>
+                </div>
+                <!-- Theme Switcher -->
+                <button id="theme-toggle" class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-white/10 shadow-sm transition-all hover:scale-105" aria-label="Skift tema">
+                    <svg id="sun-icon" class="hidden w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707m12.728 12.728L12 12l.01.01H12z"></path></svg>
+                    <svg id="moon-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-8 mt-16 pb-20">
+        
+        <!-- Header -->
+        <div class="mb-16">
+            <h2 class="text-5xl font-black mb-4 tracking-tight text-slate-900 dark:text-white uppercase">Mundtlig Eksamen <span class="text-blue-500">2026</span></h2>
+            <p class="text-slate-500 dark:text-slate-400 text-lg max-w-2xl font-medium leading-relaxed">Velkommen til din centrale eksamens-hub. Alt dit kernestof, dine analyser og dine grammatiske værktøjer er samlet her.</p>
+        </div>
+
+        <!-- SEKTION 1: EMNER (Præcis som i Untitled-4.html) -->
+        <div class="mb-20" id="emner">
+            <div class="flex items-center justify-between mb-10">
+                <div class="flex items-center gap-4">
+                    <div class="h-10 w-1.5 bg-blue-600 rounded-full"></div>
+                    <h3 class="text-3xl font-black uppercase tracking-tight text-slate-800 dark:text-slate-200">Eksamensemner</h3>
+                </div>
+            </div>
+
+            <div class="dashboard-grid">
+                <!-- 1. Die DDR -->
+                <div class="tile red bg-white/80 dark:bg-slate-800/40 border border-slate-200 dark:border-white/5 shadow-sm" onclick="window.location.href='Die-DDR.html'">
+                    <div class="badge bg-red-100 text-red-600 dark:bg-red-500/10 dark:text-red-500 border border-red-200 dark:border-red-500/20">Kernestof</div>
+                    <div class="icon-box bg-red-50 text-red-600 dark:bg-red-500/20 dark:text-red-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                    </div>
+                    <h4 class="text-2xl font-black mb-2 text-slate-900 dark:text-white uppercase tracking-tighter">Die DDR</h4>
+                    <p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed mb-6 italic flex-grow">"Das Leben der Anderen", Stasi og muren. Fokus på Wieslers forandring.</p>
+                    <div class="flex items-center text-blue-600 dark:text-blue-400 font-bold text-xs uppercase tracking-widest group">Åbn forløb <svg class="ml-2 group-hover:translate-x-1 transition-transform" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></div>
+                </div>
+
+                <!-- 2. Ein buntes Land -->
+                <div class="tile green bg-white/80 dark:bg-slate-800/40 border border-slate-200 dark:border-white/5 shadow-sm" onclick="window.location.href='Deutschland-ein-buntes-Land.html'">
+                    <div class="badge bg-green-100 text-green-600 dark:bg-green-500/10 dark:text-green-500 border border-green-200 dark:border-green-500/20">Kultur</div>
+                    <div class="icon-box bg-green-50 text-green-600 dark:bg-green-500/20 dark:text-green-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                    </div>
+                    <h4 class="text-2xl font-black mb-2 text-slate-900 dark:text-white uppercase tracking-tighter">Ein buntes Land</h4>
+                    <p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed mb-6 italic flex-grow">Migration og integration. Perspektivering mellem Cennet og Antonella.</p>
+                    <div class="flex items-center text-blue-600 dark:text-blue-400 font-bold text-xs uppercase tracking-widest group">Åbn forløb <svg class="ml-2 group-hover:translate-x-1 transition-transform" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></div>
+                </div>
+
+                <!-- 3. Nachhaltighed -->
+                <div class="tile amber bg-white/80 dark:bg-slate-800/40 border border-slate-200 dark:border-white/5 shadow-sm" onclick="window.location.href='Nachhaltighed-og-Klima.html'">
+                    <div class="badge bg-amber-100 text-amber-600 dark:bg-amber-500/10 dark:text-amber-500 border border-amber-200 dark:border-amber-500/20">Aktualitet</div>
+                    <div class="icon-box bg-amber-50 text-amber-600 dark:bg-amber-500/20 dark:text-amber-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/></svg>
+                    </div>
+                    <h4 class="text-2xl font-black mb-2 text-slate-900 dark:text-white uppercase tracking-tighter">Nachhaltighed</h4>
+                    <p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed mb-6 italic flex-grow">"Unter Ökos", klimaaktivisme og dilemmaet om bæredygtighed.</p>
+                    <div class="flex items-center text-blue-600 dark:text-blue-400 font-bold text-xs uppercase tracking-widest group">Åbn forløb <svg class="ml-2 group-hover:translate-x-1 transition-transform" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></div>
+                </div>
+
+                <!-- 4. Weimarer Republik -->
+                <div class="tile purple bg-white/80 dark:bg-slate-800/40 border border-slate-200 dark:border-white/5 shadow-sm" onclick="window.location.href='Sidste-forloeb.html'">
+                    <div class="badge bg-purple-100 text-purple-600 dark:bg-purple-500/10 dark:text-purple-500 border border-purple-200 dark:border-purple-500/20">Historie</div>
+                    <div class="icon-box bg-purple-50 text-purple-600 dark:bg-purple-500/20 dark:text-purple-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="m12 7v5l4 2"/></svg>
+                    </div>
+                    <h4 class="text-2xl font-black mb-2 text-slate-900 dark:text-white uppercase tracking-tighter">Weimarer Rep.</h4>
+                    <p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed mb-6 italic flex-grow">De gyldne 20'ere, ekspressionisme og republikkens fald.</p>
+                    <div class="flex items-center text-blue-600 dark:text-blue-400 font-bold text-xs uppercase tracking-widest group">Åbn forløb <svg class="ml-2 group-hover:translate-x-1 transition-transform" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></div>
+                </div>
+
+                <!-- 5. Märchen -->
+                <div class="tile blue bg-white/80 dark:bg-slate-800/40 border border-slate-200 dark:border-white/5 shadow-sm" onclick="window.location.href='Maerchen.html'">
+                    <div class="badge bg-blue-100 text-blue-600 dark:bg-blue-500/10 dark:text-blue-500 border border-blue-200 dark:border-blue-500/20">Litteratur</div>
+                    <div class="icon-box bg-blue-50 text-blue-600 dark:bg-blue-500/20 dark:text-blue-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+                    </div>
+                    <h4 class="text-2xl font-black mb-2 text-slate-900 dark:text-white uppercase tracking-tighter">Märchen</h4>
+                    <p class="text-slate-500 dark:text-slate-400 text-sm leading-relaxed mb-6 italic flex-grow">Brødrene Grimm, Rotkäppchen og de typiske eventyrtræk.</p>
+                    <div class="flex items-center text-blue-600 dark:text-blue-400 font-bold text-xs uppercase tracking-widest group">Åbn forløb <svg class="ml-2 group-hover:translate-x-1 transition-transform" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SEKTION 2: GRAMMATIK -->
+        <div class="mb-20" id="grammatik">
+            <div class="flex items-center gap-4 mb-10">
+                <div class="h-10 w-1.5 bg-purple-600 rounded-full"></div>
+                <h3 class="text-3xl font-black uppercase tracking-tight text-slate-800 dark:text-slate-200">Grammatik Lab</h3>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div class="tile group border-l-4 border-l-blue-500 bg-white dark:bg-slate-800/40 border-slate-200 dark:border-white/5" onclick="window.location.href='Ordstilling.html'">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h4 class="text-xl font-black mb-1 italic uppercase tracking-tighter text-slate-900 dark:text-white">Ordstilling (V2)</h4>
+                            <p class="text-slate-500 dark:text-slate-400 text-sm font-medium italic">Placer verbet rigtigt i ledsætninger (weil, dass, hvis).</p>
+                        </div>
+                        <div class="bg-blue-100 text-blue-600 dark:bg-blue-500/20 dark:text-blue-400 p-3 rounded-lg font-bold text-sm uppercase">V2</div>
+                    </div>
+                </div>
+                <div class="tile group border-l-4 border-l-pink-500 bg-white dark:bg-slate-800/40 border-slate-200 dark:border-white/5" onclick="window.location.href='Kasus.html'">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h4 class="text-xl font-black mb-1 italic uppercase tracking-tighter text-slate-900 dark:text-white">Kasus-Karrusellen</h4>
+                            <p class="text-slate-500 dark:text-slate-400 text-sm font-medium italic">Træn akkusativ, dativ og genitiv visuelt.</p>
+                        </div>
+                        <div class="bg-pink-100 text-pink-600 dark:bg-pink-500/20 dark:text-pink-400 p-3 rounded-lg font-bold text-sm uppercase">AK</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- EKSAMENS GUIDE -->
+        <div class="mb-20" id="eksamen">
+            <div class="bg-gradient-to-br from-blue-900/40 to-indigo-900/20 border border-blue-500/30 rounded-[2.5rem] p-12 relative overflow-hidden shadow-2xl">
+                <div class="relative z-10">
+                    <h3 class="text-4xl font-black mb-6 uppercase tracking-tight text-slate-100">Eksamens-Guide <span class="text-blue-500 italic">2.A</span></h3>
+                    <p class="text-slate-300 text-lg mb-10 max-w-xl font-medium leading-relaxed">Få adgang til skabeloner for præsentationen og lister med "guld-gloser".</p>
+                    <div class="flex flex-wrap gap-6">
+                        <button class="bg-blue-600 hover:bg-blue-500 text-white px-10 py-4 rounded-2xl font-black text-sm uppercase tracking-widest transition-all shadow-xl shadow-blue-900/30">Hent Kit</button>
+                    </div>
+                </div>
+                <div class="absolute -right-20 -bottom-20 w-80 h-80 bg-blue-600/10 rounded-full blur-3xl"></div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="text-center py-16 border-t border-slate-200 dark:border-white/5 text-slate-500 text-[10px] font-black uppercase tracking-[0.2em]">
+        <p>Sankt Annæ Gymnasium • 2.A Tysk B • Udviklet til Marius</p>
+    </footer>
+
+    <script>
+        const themeToggle = document.getElementById('theme-toggle');
+        const sunIcon = document.getElementById('sun-icon');
+        const moonIcon = document.getElementById('moon-icon');
+        const html = document.documentElement;
+
+        function updateIcons() {
+            if (html.classList.contains('dark')) {
+                sunIcon.classList.remove('hidden');
+                moonIcon.classList.add('hidden');
+            } else {
+                sunIcon.classList.add('hidden');
+                moonIcon.classList.remove('hidden');
+            }
+        }
+
+        if (localStorage.theme === 'light') {
+            html.classList.remove('dark');
+        } else {
+            html.classList.add('dark');
+        }
+        updateIcons();
+
+        themeToggle.addEventListener('click', () => {
+            html.classList.toggle('dark');
+            localStorage.theme = html.classList.contains('dark') ? 'dark' : 'light';
+            updateIcons();
+        });
+    </script>
+</body>
+</html>

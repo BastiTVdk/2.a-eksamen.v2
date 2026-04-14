@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="da" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Märchen | Tysk Mundtlig 2.a</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        darkBg: '#0b0f1a',
+                        darkCard: 'rgba(30, 41, 59, 0.4)',
+                        lightBg: '#f8fafc',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+            transition: background-color 0.3s ease, color 0.3s ease;
+            margin: 0;
+            overflow-x: hidden;
+        }
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+        .tile {
+            backdrop-filter: blur(10px);
+            border-radius: 1.5rem;
+            padding: 2rem;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        .tile:hover {
+            transform: translateY(-5px);
+            border-color: rgba(59, 130, 246, 0.3);
+        }
+        .glass-nav {
+            backdrop-filter: blur(16px);
+        }
+        .badge {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            padding: 0.3rem 0.8rem;
+            border-radius: 2rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            display: inline-block;
+        }
+        .quote-box {
+            border-left: 4px solid #3b82f6;
+            padding-left: 1rem;
+            font-style: italic;
+        }
+        .dichotomy-box {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(59, 130, 246, 0.05);
+            padding: 0.75rem 1rem;
+            border-radius: 0.75rem;
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-lightBg text-slate-900 dark:bg-darkBg dark:text-slate-100">
+
+    <!-- Navigation -->
+    <nav class="glass-nav sticky top-0 z-50 px-8 py-4 bg-white/80 dark:bg-darkBg/80 border-b border-slate-200 dark:border-white/5">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-4">
+                <button onclick="window.location.href='tysk_eksamen_hub.html'" class="bg-blue-600 p-2.5 rounded-xl shadow-lg hover:bg-blue-700 transition flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                </button>
+                <div>
+                    <h1 class="text-xl font-black tracking-tighter uppercase">Deutsche <span class="text-blue-500">Märchen</span></h1>
+                </div>
+            </div>
+            <button id="theme-toggle" class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-white/10 transition-transform hover:scale-110">
+                <svg id="sun-icon" class="hidden w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707m12.728 12.728L12 12l.01.01H12z"></path></svg>
+                <svg id="moon-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+            </button>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-8 mt-16 pb-20">
+        
+        <!-- Hero Section -->
+        <div class="mb-16 border-l-8 border-blue-600 pl-8 py-4">
+            <span class="badge bg-blue-100 text-blue-600 dark:bg-blue-500/10 dark:text-blue-500 border border-blue-200 dark:border-blue-500/20">Modul 3: Litteratur & Tradition</span>
+            <h2 class="text-6xl font-black mb-6 tracking-tight uppercase leading-none">Vom Zauber <br><span class="text-blue-600 italic">der Märchen</span></h2>
+            <p class="text-slate-500 dark:text-slate-400 text-xl max-w-3xl font-medium leading-relaxed italic">
+                En dybdegående rejse gennem Brødrene Grimms univers, symbolik og de faste strukturer i de tyske folkeeventyr.
+            </p>
+        </div>
+
+        <div class="dashboard-grid">
+            
+            <!-- Eventyrtræk (Merkmale) -->
+            <div class="tile bg-white/80 dark:bg-slate-800/40 border border-slate-200 dark:border-white/5 shadow-sm md:col-span-2">
+                <h4 class="text-2xl font-black mb-6 uppercase italic text-blue-500 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    Genrens Kendetegn
+                </h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+                    <div class="space-y-4">
+                        <div class="flex items-start gap-3">
+                            <div class="w-2 h-2 mt-1.5 bg-blue-500 rounded-full"></div>
+                            <p><strong>Faste vendinger:</strong> "Es war einmal..." (Begyndelse) og "Und wenn sie nicht gestorben sind..." (Slutning).</p>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <div class="w-2 h-2 mt-1.5 bg-blue-500 rounded-full"></div>
+                            <p><strong>Magiske tal:</strong> Tallene 3, 7 og 12 går ofte igen (f.eks. 3 prøvelser eller 7 dværge).</p>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <div class="w-2 h-2 mt-1.5 bg-blue-500 rounded-full"></div>
+                            <p><strong>Modsætninger:</strong> God vs. Ond, Fattig vs. Rig, Smuk vs. Grim.</p>
+                        </div>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="flex items-start gap-3">
+                            <div class="w-2 h-2 mt-1.5 bg-blue-500 rounded-full"></div>
+                            <p><strong>Overnaturlige elementer:</strong> Talende dyr, feer, hekse og magiske genstande.</p>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <div class="w-2 h-2 mt-1.5 bg-blue-500 rounded-full"></div>
+                            <p><strong>Flade karakterer:</strong> Personerne har sjældent en dyb psykologi; de er enten gode eller onde.</p>
+                        </div>
+                        <div class="flex items-start gap-3">
+                            <div class="w-2 h-2 mt-1.5 bg-blue-500 rounded-full"></div>
+                            <p><strong>Isolering:</strong> Helten er ofte alene eller udstødt i begyndelsen.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Visuel Analyse-Model: Modsætninger -->
+            <div class="tile bg-white/80 dark:bg-slate-800/40 border border-slate-200 dark:border-white/5 shadow-sm">
+                <h4 class="text-xl font-black mb-6 uppercase italic text-purple-500 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m21 21-6-6m6 6-6-6m6 6-6-6m6 6-6-6"/></svg>
+                    Dichotomien (Modsætninger)
+                </h4>
+                <div class="space-y-3">
+                    <div class="dichotomy-box text-blue-600 dark:text-blue-400">
+                        <span>Zuhause (Sikkerhed)</span>
+                        <span class="text-slate-400">vs</span>
+                        <span>Wald (Fare)</span>
+                    </div>
+                    <div class="dichotomy-box text-emerald-600 dark:text-emerald-400">
+                        <span>Arm (Fattig)</span>
+                        <span class="text-slate-400">vs</span>
+                        <span>Reich (Rig)</span>
+                    </div>
+                    <div class="dichotomy-box text-red-600 dark:text-red-400">
+                        <span>Gut (God)</span>
+                        <span class="text-slate-400">vs</span>
+                        <span>Böse (Ond)</span>
+                    </div>
+                    <div class="dichotomy-box text-amber-600 dark:text-amber-400">
+                        <span>Natur (Instinkt)</span>
+                        <span class="text-slate-400">vs</span>
+                        <span>Kultur (Orden)</span>
+                    </div>
+                </div>
+                <p class="mt-4 text-[10px] uppercase font-bold text-slate-400 text-center">Brug disse par til at strukturere din analyse</p>
+            </div>
+
+            <!-- Analyse: Rotkäppchen -->
+            <div class="tile bg-white/80 dark:bg-slate-800/40 border border-slate-200 dark:border-white/5 shadow-sm">
+                <h4 class="text-xl font-black mb-6 uppercase italic text-red-500 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                    Dybdeborende: Rotkäppchen
+                </h4>
+                <div class="space-y-4 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+                    <p>Eventyret fungerer som en <strong>advarsel</strong> (Warnung). Pigen forlader stien (den moralske vej) og lader sig friste af ulven.</p>
+                    <div class="p-4 bg-red-500/5 rounded-xl border border-red-500/10">
+                        <h6 class="font-bold text-xs uppercase mb-2">Vigtige Symboler:</h6>
+                        <ul class="text-xs space-y-2">
+                            <li class="flex gap-2">🔴 <strong>Hætten:</strong> Pubertet, seksualitet og det at blive "set".</li>
+                            <li class="flex gap-2">🐺 <strong>Ulven:</strong> Den forførende fremmede / "Der böse Mann".</li>
+                            <li class="flex gap-2">🌷 <strong>Blomsterne:</strong> Distraktioner der leder væk fra pligten.</li>
+                            <li class="flex gap-2">🪓 <strong>Jægeren:</strong> Redningsmanden / Faderfiguren.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Brødrene Grimm & Kontekst -->
+            <div class="tile bg-white/80 dark:bg-slate-800/40 border border-slate-200 dark:border-white/5 shadow-sm">
+                <h4 class="text-xl font-black mb-6 uppercase italic text-amber-500 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+                    Brødrene Grimm: Konteksten
+                </h4>
+                <div class="space-y-4 text-sm text-slate-600 dark:text-slate-300">
+                    <p>Jacob og Wilhelm Grimm var sprogforskere i <strong>Romantikken</strong>. Deres mål var at finde en fælles tysk identitet gennem sproget.</p>
+                    <div class="flex items-center gap-4 p-3 bg-slate-100 dark:bg-slate-900/50 rounded-lg">
+                        <div class="w-12 h-12 bg-amber-500/20 rounded-full flex items-center justify-center text-amber-500 font-bold">1812</div>
+                        <p class="text-[11px] leading-tight">Første udgave af <i>Kinder- und Hausmärchen</i> udkommer.</p>
+                    </div>
+                    <p class="text-xs italic">De redigerede eventyrene for at gøre dem mere "passende" for borgerskabet (f.eks. mere moral og mindre sex).</p>
+                </div>
+            </div>
+
+            <!-- Checkliste til Analyse -->
+            <div class="tile bg-white/80 dark:bg-slate-800/40 border border-slate-200 dark:border-white/5 shadow-sm">
+                <h4 class="text-xl font-black mb-6 uppercase italic text-emerald-500 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+                    Analyse-Checkliste
+                </h4>
+                <div class="space-y-3">
+                    <div class="flex items-center gap-3 text-xs font-medium">
+                        <input type="checkbox" checked disabled class="accent-emerald-500 h-4 w-4">
+                        <span>Findes de klassiske faste vendinger?</span>
+                    </div>
+                    <div class="flex items-center gap-3 text-xs font-medium">
+                        <input type="checkbox" checked disabled class="accent-emerald-500 h-4 w-4">
+                        <span>Hvilke magiske tal optræder?</span>
+                    </div>
+                    <div class="flex items-center gap-3 text-xs font-medium">
+                        <input type="checkbox" checked disabled class="accent-emerald-500 h-4 w-4">
+                        <span>Er der en klar morale eller advarsel?</span>
+                    </div>
+                    <div class="flex items-center gap-3 text-xs font-medium">
+                        <input type="checkbox" checked disabled class="accent-emerald-500 h-4 w-4">
+                        <span>Hvem er helten og hvem er modstanderen?</span>
+                    </div>
+                    <div class="flex items-center gap-3 text-xs font-medium">
+                        <input type="checkbox" checked disabled class="accent-emerald-500 h-4 w-4">
+                        <span>Er der overnaturlige hjælpere?</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Guld-gloser til Eksamen (Udvidet) -->
+            <div class="tile bg-slate-900 text-white dark:bg-slate-800/60 border border-slate-700 dark:border-white/10 shadow-xl md:col-span-2">
+                <h4 class="text-xl font-black mb-6 uppercase italic text-emerald-400 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                    Eksamens-træner: Guld-gloser
+                </h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+                    <div class="space-y-4">
+                        <div class="quote-box">
+                            <p class="font-bold">"In diesem Märchen wird der Gegensatz zwischen Gut und Böse deutlich."</p>
+                            <p class="text-emerald-400/80 text-xs mt-1">I dette eventyr bliver modsætningen mellem godt og ondt tydelig.</p>
+                        </div>
+                        <div class="quote-box">
+                            <p class="font-bold">"Der Wald symbolisiert in der deutschen Literatur oft das Unbekannte und Gefährliche."</p>
+                            <p class="text-emerald-400/80 text-xs mt-1">Skoven symboliserer i tysk litteratur ofte det ukendte og farlige.</p>
+                        </div>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="quote-box">
+                            <p class="font-bold">"Das Märchen hat eine pädagogische Funktion; es soll Kinder belehren."</p>
+                            <p class="text-emerald-400/80 text-xs mt-1">Eventyret har en pædagogisk funktion; det skal belære børn.</p>
+                        </div>
+                        <div class="quote-box">
+                            <p class="font-bold">"Am Ende gibt es eine Belohnung für die Tugend."</p>
+                            <p class="text-emerald-400/80 text-xs mt-1">Til sidst er der en belønning for dyden.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Bonus Info -->
+        <div class="mt-12 p-8 bg-blue-600/10 rounded-3xl border border-blue-500/20">
+            <h5 class="font-black text-blue-500 uppercase mb-2">Husk til perspektiveringen:</h5>
+            <p class="text-sm text-slate-500 leading-relaxed italic">
+                Eventyr er ikke kun for børn. De indeholder <strong>arketyper</strong> og universelle temaer. Du kan perspektivere til:
+            </p>
+            <ul class="mt-4 space-y-2 text-xs text-slate-500 list-disc list-inside">
+                <li>Moderne film (f.eks. Star Wars eller Harry Potter som har klare eventyrtræk).</li>
+                <li>Disney-versioner vs. de originale (Grimm-versionerne er ofte mere voldelige/barske).</li>
+                <li>Hvordan "skoven" i dag måske er internettet – et sted med mange fristelser og farer.</li>
+            </ul>
+        </div>
+    </main>
+
+    <script>
+        const themeToggle = document.getElementById('theme-toggle');
+        const sunIcon = document.getElementById('sun-icon');
+        const moonIcon = document.getElementById('moon-icon');
+        const html = document.documentElement;
+
+        function updateIcons() {
+            if (html.classList.contains('dark')) {
+                sunIcon.classList.remove('hidden');
+                moonIcon.classList.add('hidden');
+            } else {
+                sunIcon.classList.add('hidden');
+                moonIcon.classList.remove('hidden');
+            }
+        }
+
+        if (localStorage.theme === 'light') {
+            html.classList.remove('dark');
+        } else {
+            html.classList.add('dark');
+        }
+        updateIcons();
+
+        themeToggle.addEventListener('click', () => {
+            html.classList.toggle('dark');
+            localStorage.theme = html.classList.contains('dark') ? 'dark' : 'light';
+            updateIcons();
+        });
+    </script>
+</body>
+</html>

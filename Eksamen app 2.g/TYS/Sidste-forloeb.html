@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="da" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weimarer Republik | Tysk Mundtlig 2.a</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        darkBg: '#0b0f1a',
+                        darkCard: 'rgba(30, 41, 59, 0.4)',
+                        lightBg: '#f8fafc',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { 
+            font-family: 'Inter', sans-serif; 
+            transition: background-color 0.3s ease, color 0.3s ease;
+            margin: 0;
+            overflow-x: hidden;
+        }
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 1.5rem;
+        }
+        .tile {
+            backdrop-filter: blur(10px);
+            border-radius: 1.5rem;
+            padding: 2rem;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        .tile:hover {
+            transform: translateY(-5px);
+            border-color: rgba(168, 85, 247, 0.3);
+        }
+        .glass-nav {
+            backdrop-filter: blur(16px);
+        }
+        .badge {
+            font-size: 0.65rem;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            padding: 0.3rem 0.8rem;
+            border-radius: 2rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            display: inline-block;
+        }
+        .timeline-container {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            border-left: 2px solid rgba(168, 85, 247, 0.3);
+            padding-left: 1.5rem;
+            margin-left: 0.5rem;
+        }
+        .timeline-item {
+            position: relative;
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -1.9rem;
+            top: 0.5rem;
+            width: 10px;
+            height: 10px;
+            background: #a855f7;
+            border-radius: 50%;
+        }
+        .quote-box {
+            border-left: 4px solid #a855f7;
+            padding-left: 1rem;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body class="min-h-screen bg-lightBg text-slate-900 dark:bg-darkBg dark:text-slate-100">
+
+    <!-- Navigation -->
+    <nav class="glass-nav sticky top-0 z-50 px-8 py-4 bg-white/80 dark:bg-darkBg/80 border-b border-slate-200 dark:border-white/5">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-4">
+                <button onclick="window.location.href='tysk_eksamen_hub.html'" class="bg-blue-600 p-2.5 rounded-xl shadow-lg hover:bg-blue-700 transition flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                </button>
+                <div>
+                    <h1 class="text-xl font-black tracking-tighter uppercase">Weimarer <span class="text-purple-500">Republik</span></h1>
+                </div>
+            </div>
+            <button id="theme-toggle" class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-white/10 transition-transform hover:scale-110">
+                <svg id="sun-icon" class="hidden w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707m12.728 12.728L12 12l.01.01H12z"></path></svg>
+                <svg id="moon-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+            </button>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-8 mt-16 pb-20">
+        
+        <!-- Hero Section -->
+        <div class="mb-16 border-l-8 border-purple-600 pl-8 py-4">
+            <span class="badge bg-purple-100 text-purple-600 dark:bg-purple-500/10 dark:text-purple-500 border border-purple-200 dark:border-purple-500/20">Modul 7: Historisk Krise & Kultur</span>
+            <h2 class="text-6xl font-black mb-6 tracking-tight uppercase leading-none">Tanz auf dem <br><span class="text-purple-600 italic">Vulkan</span></h2>
+            <p class="text-slate-500 dark:text-slate-400 text-xl max-w-3xl font-medium leading-relaxed italic">
+                Fra kaos og sult til de gyldne tyvere og demokratiets sammenbrud (1918-1933).
+            </p>
+        </div>
+
+        <div class="dashboard-grid">
+            
+            <!-- Historisk Tidslinje -->
+            <div class="tile bg-white/80 dark:bg-slate-800/40 border border-slate-200 dark:border-white/5 shadow-sm md:col-span-2">
+                <h4 class="text-2xl font-black mb-6 uppercase italic text-purple-500 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    Historisk Overblik
+                </h4>
+                <div class="timeline-container">
+                    <div class="timeline-item">
+                        <span class="text-purple-500 font-bold">1918-1919:</span>
+                        <p class="text-sm text-slate-600 dark:text-slate-300">Tyskland taber 1. verdenskrig. Kejseren flygter, og Weimarrepublikken grundlægges (valg i 1919).</p>
+                    </div>
+                    <div class="timeline-item">
+                        <span class="text-purple-500 font-bold">1923:</span>
+                        <p class="text-sm text-slate-600 dark:text-slate-300">Hyperinflation og krise. Penge bliver værdiløse, og folk sulter.</p>
+                    </div>
+                    <div class="timeline-item">
+                        <span class="text-purple-500 font-bold">1924-1929:</span>
+                        <p class="text-sm text-slate-600 dark:text-slate-300"><strong>Die Goldenen Zwanziger.</strong> Økonomisk opsving, jazz, kabaret og kulturel blomstring i Berlin.</p>
+                    </div>
+                    <div class="timeline-item">
+                        <span class="text-purple-500 font-bold">1932-1933:</span>
+                        <p class="text-sm text-slate-600 dark:text-slate-300">Demokratiet bryder sammen. Hitler udnævnes til rigskansler d. 30. januar 1933.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Ekspressionisme & Kunst -->
+            <div class="tile bg-white/80 dark:bg-slate-800/40 border border-slate-200 dark:border-white/5 shadow-sm">
+                <h4 class="text-xl font-black mb-6 uppercase italic text-pink-500 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.94c1.88-1.55 3.75-3.1 5.63-4.65 1.57-1.3 3.37-2.6 3.37-4.29 0-3.31-2.69-6-6-6-1.51 0-2.88.56-3.95 1.48L11 7.5l-1.05-.02C8.88 6.56 7.51 6 6 6c-3.31 0-6 2.69-6 6 0 1.69 1.8 2.99 3.37 4.29 1.88 1.55 3.75 3.1 5.63 4.65Z"/></svg>
+                    Expressionismus
+                </h4>
+                <div class="space-y-4 text-sm">
+                    <p class="leading-relaxed">
+                        Kunstnerne ville væk fra den pompøse kaisertid. De fokuserede på <strong>følelser</strong> frem for virkelighed.
+                    </p>
+                    <div class="p-3 bg-pink-500/5 rounded-lg border border-pink-500/10">
+                        <p class="text-xs font-bold uppercase text-pink-500 mb-1">Kendetegn:</p>
+                        <ul class="text-xs space-y-1 text-slate-500">
+                            <li>• Skrigende farver</li>
+                            <li>• Forvridne former</li>
+                            <li>• Fokus på storbyens kaos og angst</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Babylon Berlin & Storbyen -->
+            <div class="tile bg-white/80 dark:bg-slate-800/40 border border-slate-200 dark:border-white/5 shadow-sm">
+                <h4 class="text-xl font-black mb-6 uppercase italic text-amber-500 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><line x1="9" y1="22" x2="9" y2="2"/><line x1="15" y1="22" x2="15" y2="2"/><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
+                    Babylon Berlin
+                </h4>
+                <div class="space-y-4 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+                    <p>Berlin var verdens kulturelle centrum. Folk søgte nydelse efter krigens rædsler.</p>
+                    <div class="border-l-2 border-amber-500 pl-4 py-1 italic text-xs">
+                        "Man danser på vulkanen" — man fester, selvom man ved, at katastrofen (nazismen) er på vej.
+                    </div>
+                    <p class="text-xs">Kontraster: Rigdom vs. fattigdom, luksus vs. kriminalitet.</p>
+                </div>
+            </div>
+
+            <!-- Reparationen & Krise -->
+            <div class="tile bg-white/80 dark:bg-slate-800/40 border border-slate-200 dark:border-white/5 shadow-sm">
+                <h4 class="text-xl font-black mb-6 uppercase italic text-red-500 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                    Wirtschaftskrise
+                </h4>
+                <div class="space-y-4 text-sm">
+                    <p>Tyskland skulle betale <strong>132 milliarder guldmark</strong> i erstatning (Reparationen).</p>
+                    <div class="bg-red-500/10 p-3 rounded-lg">
+                        <p class="font-bold text-red-500 text-xs uppercase">Konsekvens:</p>
+                        <p class="text-xs text-slate-500">Folk mister troen på demokratiet og vender sig mod radikale partier som NSDAP.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Guld-gloser til Eksamen -->
+            <div class="tile bg-slate-900 text-white dark:bg-slate-800/60 border border-slate-700 dark:border-white/10 shadow-xl md:col-span-2">
+                <h4 class="text-xl font-black mb-6 uppercase italic text-emerald-400">Eksamens-træner</h4>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+                    <div class="space-y-4">
+                        <div class="quote-box">
+                            <p class="font-bold">"Deutschland hat den Ersten Weltkrieg verloren."</p>
+                            <p class="text-emerald-400/80 text-xs mt-1">Tyskland har tabt 1. verdenskrig.</p>
+                        </div>
+                        <div class="quote-box">
+                            <p class="font-bold">"Die Menschen versuchen einen Neuanfang in Politik und Kultur."</p>
+                            <p class="text-emerald-400/80 text-xs mt-1">Folk forsøger en ny start i politik og kultur.</p>
+                        </div>
+                    </div>
+                    <div class="space-y-4">
+                        <div class="quote-box">
+                            <p class="font-bold">"Die Kunst geht neue Wege und will weg von der Kaiserzeit."</p>
+                            <p class="text-emerald-400/80 text-xs mt-1">Kunsten går nye veje og vil væk fra kejsertiden.</p>
+                        </div>
+                        <div class="quote-box">
+                            <p class="font-bold">"Hitler schafft die Demokratie ab."</p>
+                            <p class="text-emerald-400/80 text-xs mt-1">Hitler afskaffer demokratiet.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Bonus Info -->
+        <div class="mt-12 p-8 bg-purple-600/10 rounded-3xl border border-purple-500/20">
+            <h5 class="font-black text-purple-500 uppercase mb-2">Husk til samtalen:</h5>
+            <p class="text-sm text-slate-500 leading-relaxed italic">
+                Sammenlign Weimarrepublikkens skrøbelige demokrati med nutidens politiske landskab. Hvad sker der, når folk mister troen på de etablerede politikere på grund af økonomisk krise? Dette er en stærk perspektivering til tysk B.
+            </p>
+        </div>
+    </main>
+
+    <script>
+        const themeToggle = document.getElementById('theme-toggle');
+        const sunIcon = document.getElementById('sun-icon');
+        const moonIcon = document.getElementById('moon-icon');
+        const html = document.documentElement;
+
+        function updateIcons() {
+            if (html.classList.contains('dark')) {
+                sunIcon.classList.remove('hidden');
+                moonIcon.classList.add('hidden');
+            } else {
+                sunIcon.classList.add('hidden');
+                moonIcon.classList.remove('hidden');
+            }
+        }
+
+        if (localStorage.theme === 'light') {
+            html.classList.remove('dark');
+        } else {
+            html.classList.add('dark');
+        }
+        updateIcons();
+
+        themeToggle.addEventListener('click', () => {
+            html.classList.toggle('dark');
+            localStorage.theme = html.classList.contains('dark') ? 'dark' : 'light';
+            updateIcons();
+        });
+    </script>
+</body>
+</html>

@@ -50,10 +50,10 @@
             to { opacity: 1; transform: translateY(0); }
         }
         .step-number {
-            @apply w-10 h-10 rounded-xl bg-emerald-500 text-white flex items-center justify-center font-bold shadow-lg shadow-emerald-200 mb-4;
+            @apply w-10 h-10 rounded-xl bg-emerald-500 text-white flex items-center justify-center font-bold shadow-lg shadow-emerald-200 mb-4 flex-shrink-0;
         }
         .btn-read-more {
-            @apply flex items-center gap-3 px-6 py-3 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold uppercase tracking-wider transition-all hover:bg-emerald-100 mt-6 border border-emerald-100;
+            @apply flex items-center gap-3 px-6 py-3 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold uppercase tracking-wider transition-all hover:bg-emerald-100 mt-6 border border-emerald-100 w-max;
         }
         canvas {
             background: white;
@@ -138,16 +138,28 @@
                     </div>
                     
                     <div class="learning-card border-t-8 border-emerald-500">
-                        <h3 class="text-2xl font-black mb-6 italic text-slate-800">Andengradsligningen</h3>
-                        <p class="text-slate-600 mb-8 text-lg leading-relaxed">
-                            Et andengradspolynomium har forskriften \( f(x) = ax^2 + bx + c \). Når vi skal finde rødderne, løser vi ligningen \( f(x) = 0 \). Løsningerne findes via denne centrale formel:
+                        <h3 class="text-2xl font-black mb-6 italic text-slate-800">Sætning: Andengradsligningens løsning</h3>
+                        <p class="text-slate-600 mb-4 text-lg leading-relaxed">
+                            For en andengradsligning af typen
                         </p>
                         
-                        <div class="bg-slate-50 rounded-3xl shadow-inner text-center border border-slate-100 mb-8 math-container">
-                            <div class="text-2xl md:text-5xl font-light text-slate-800">
-                                $$x = \frac{-b \pm \sqrt{D}}{2a}$$
+                        <div class="text-center text-xl text-slate-800 font-medium mb-4">
+                            $$ax^2 + bx + c = 0$$
+                        </div>
+
+                        <p class="text-slate-600 mb-4 text-lg leading-relaxed">
+                            gælder, at rødderne kan findes ved hjælp af formlen:
+                        </p>
+
+                        <div class="bg-slate-50 rounded-3xl shadow-inner text-center border border-slate-100 mb-6 math-container">
+                            <div class="text-2xl md:text-4xl font-light text-slate-800">
+                                $$x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}$$
                             </div>
                         </div>
+
+                        <p class="text-sm text-slate-500 italic bg-emerald-50 p-4 rounded-xl border border-emerald-100">
+                            <strong>Note:</strong> Hvis diskriminanten \( b^2 - 4ac < 0 \), fremkommer ingen reelle løsninger.
+                        </p>
 
                         <button onclick="toggleDeepDive('dd-koefficienter')" class="btn-read-more">
                             <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
@@ -205,24 +217,24 @@
                 <!-- Section 3: Beviset -->
                 <section id="bevis" class="space-y-8">
                     <div class="flex items-center gap-6">
-                        <h2 class="text-xs font-black uppercase tracking-[0.4em] text-slate-400">02. Beviset</h2>
+                        <h2 class="text-xs font-black uppercase tracking-[0.4em] text-slate-400">02. Beviset trin for trin</h2>
                         <div class="h-px flex-grow bg-slate-200"></div>
                     </div>
                     
                     <div class="learning-card">
                         <p class="text-slate-600 mb-10 leading-relaxed text-lg italic">
-                            For at bevise løsningsformlen skal vi omskrive \( ax^2 + bx + c = 0 \).
+                            Her udfører vi beviset slavisk i de 9 algebraiske trin.
                         </p>
 
-                        <div class="space-y-12">
+                        <div class="space-y-8">
+                            
                             <!-- Trin 1 -->
                             <div class="flex gap-6 items-start">
                                 <div class="step-number">1</div>
-                                <div class="flex-1">
-                                    <h4 class="font-bold text-slate-800 mb-2 uppercase text-sm">Gør klar til kvadratet</h4>
-                                    <p class="text-sm text-slate-500 mb-4 italic">Vi ganger hele ligningen med \( 4a \) og flytter \( c \):</p>
-                                    <div class="p-6 bg-slate-50 rounded-xl math-container text-center text-lg border border-slate-100">
-                                        $$4a^2x^2 + 4abx = -4ac$$
+                                <div class="flex-1 pb-6 border-b border-slate-100">
+                                    <p class="text-sm text-slate-500 mb-2 font-medium">Ligningen opstilles.</p>
+                                    <div class="py-4 text-center text-lg">
+                                        $$ax^2 + bx + c = 0$$
                                     </div>
                                 </div>
                             </div>
@@ -230,12 +242,20 @@
                             <!-- Trin 2 -->
                             <div class="flex gap-6 items-start">
                                 <div class="step-number">2</div>
-                                <div class="flex-1">
-                                    <h4 class="font-bold text-slate-800 mb-2 uppercase text-sm">Saml diskriminanten</h4>
-                                    <p class="text-sm text-slate-500 mb-4 italic">Vi lægger \( b^2 \) til på begge sider for at skabe et perfekt kvadrat:</p>
-                                    <div class="p-6 bg-slate-50 rounded-xl math-container text-center text-lg border border-slate-100">
-                                        $$(2ax + b)^2 = b^2 - 4ac$$
-                                        $$(2ax + b)^2 = D$$
+                                <div class="flex-1 pb-6 border-b border-slate-100">
+                                    <p class="text-sm text-slate-500 mb-2 font-medium">Ganger med \( 4a \) på begge sider.</p>
+                                    <div class="py-4 text-center text-lg">
+                                        $$4a^2x^2 + 4abx + 4ac = 0$$
+                                    </div>
+                                    <button onclick="toggleDeepDive('dd-trick')" class="btn-read-more">
+                                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                        <span>Forklaring: Hvorfor gange med \( 4a \)?</span>
+                                    </button>
+                                    <div id="dd-trick" class="deep-dive">
+                                        <h4 class="font-bold text-emerald-900 mb-2">Det "magiske" trick</h4>
+                                        <p class="text-sm text-slate-700 leading-relaxed">
+                                            Vi ganger med \( 4a \), fordi vi forbereder ligningen til at bruge en kvadratsætning senere. Det sørger for, at det første led bliver et perfekt kvadrat (\(4a^2x^2 = (2ax)^2\)), og det forhindrer, at vi skal arbejde med trælse brøker i beviset. Det er et klassisk algebraisk trick!
+                                        </p>
                                     </div>
                                 </div>
                             </div>
@@ -243,28 +263,115 @@
                             <!-- Trin 3 -->
                             <div class="flex gap-6 items-start">
                                 <div class="step-number">3</div>
-                                <div class="flex-1">
-                                    <h4 class="font-bold text-slate-800 mb-2 uppercase text-sm">Den endelige isolering</h4>
-                                    <p class="text-sm text-slate-500 mb-4 italic">Vi tager kvadratroden og isolerer \( x \):</p>
-                                    <div class="p-10 bg-emerald-600 rounded-[2.5rem] text-white text-center shadow-2xl math-container">
-                                        <div class="text-3xl md:text-5xl font-black tracking-tighter">
-                                            $$x = \frac{-b \pm \sqrt{D}}{2a}$$
+                                <div class="flex-1 pb-6 border-b border-slate-100">
+                                    <p class="text-sm text-slate-500 mb-2 font-medium">Lægger \( b^2 \) til på begge sider.</p>
+                                    <div class="py-4 text-center text-lg">
+                                        $$4a^2x^2 + 4abx + 4ac + b^2 = b^2$$
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Trin 4 -->
+                            <div class="flex gap-6 items-start">
+                                <div class="step-number">4</div>
+                                <div class="flex-1 pb-6 border-b border-slate-100">
+                                    <p class="text-sm text-slate-500 mb-2 font-medium">Trækker \( 4ac \) fra på begge sider.</p>
+                                    <div class="py-4 text-center text-lg">
+                                        $$4a^2x^2 + 4abx + b^2 = b^2 - 4ac$$
+                                    </div>
+                                    <button onclick="toggleDeepDive('dd-diskriminant')" class="btn-read-more">
+                                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                        <span>Forklaring: Se på højre side!</span>
+                                    </button>
+                                    <div id="dd-diskriminant" class="deep-dive">
+                                        <h4 class="font-bold text-emerald-900 mb-2">Diskriminanten opstår</h4>
+                                        <p class="text-sm text-slate-700 leading-relaxed">
+                                            Læg mærke til højre side af lighedstegnet: \( b^2 - 4ac \). Dette udtryk dukker helt naturligt op i vores udledning! Vi har givet det navnet <strong>Diskriminanten</strong> (\(D\)), fordi det "diskriminerer" (afgør) hvor mange løsninger ligningen har, alt efter om det er positivt, negativt eller nul.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Trin 5 -->
+                            <div class="flex gap-6 items-start">
+                                <div class="step-number">5</div>
+                                <div class="flex-1 pb-6 border-b border-slate-100">
+                                    <p class="text-sm text-slate-500 mb-2 font-medium">Omskriver med henblik på at bruge 1. kvadratsætning.</p>
+                                    <div class="py-4 text-center text-lg">
+                                        $$(2ax)^2 + 2(2ax)b + b^2 = b^2 - 4ac$$
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Trin 6 -->
+                            <div class="flex gap-6 items-start">
+                                <div class="step-number">6</div>
+                                <div class="flex-1 pb-6 border-b border-slate-100">
+                                    <p class="text-sm text-slate-500 mb-2 font-medium">Anvender 1. kvadratsætning.</p>
+                                    <div class="py-4 text-center text-lg">
+                                        $$(2ax + b)^2 = b^2 - 4ac$$
+                                    </div>
+                                    <button onclick="toggleDeepDive('dd-kvadrat')" class="btn-read-more">
+                                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                        <span>Forklaring: Hvordan virker 1. kvadratsætning her?</span>
+                                    </button>
+                                    <div id="dd-kvadrat" class="deep-dive">
+                                        <h4 class="font-bold text-emerald-900 mb-2">Fra tre led til en parentes</h4>
+                                        <p class="text-sm text-slate-700 leading-relaxed">
+                                            1. kvadratsætning siger: \( x^2 + 2xy + y^2 = (x+y)^2 \).<br>
+                                            I vores tilfælde spiller \( 2ax \) rollen som '\( x \)', og \( b \) spiller rollen som '\( y \)'.<br>
+                                            Derfor kan det lange udtryk \( (2ax)^2 + 2(2ax)b + b^2 \) pakkes elegant sammen til én parentes i anden: \( (2ax + b)^2 \). Det er nu meget nemmere at isolere \( x \)!
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Trin 7 -->
+                            <div class="flex gap-6 items-start">
+                                <div class="step-number">7</div>
+                                <div class="flex-1 pb-6 border-b border-slate-100">
+                                    <p class="text-sm text-slate-500 mb-2 font-medium">Tager kvadratroden på begge sider.</p>
+                                    <div class="py-4 text-center text-lg">
+                                        $$2ax + b = \pm \sqrt{b^2 - 4ac}$$
+                                    </div>
+                                    <button onclick="toggleDeepDive('dd-plusminus')" class="btn-read-more">
+                                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                        <span>Forklaring: Hvorfor både plus og minus (\( \pm \))?</span>
+                                    </button>
+                                    <div id="dd-plusminus" class="deep-dive">
+                                        <h4 class="font-bold text-emerald-900 mb-2">Hvorfor to muligheder?</h4>
+                                        <p class="text-sm text-slate-700 leading-relaxed">
+                                            Når man fjerner noget i anden potens ved at tage kvadratroden, er der to tal, der kan have givet resultatet. Tænk på \( u^2 = 9 \). Her er både \( u = 3 \) og \( u = -3 \) gyldige løsninger. Derfor skal vi huske \(\pm\), og det er netop dette, der giver os <em>op til to</em> skæringspunkter (rødder) for parablen! Bemærk desuden, at vi kun kan tage kvadratroden, hvis indholdet (\(D\)) ikke er negativt.
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Trin 8 -->
+                            <div class="flex gap-6 items-start">
+                                <div class="step-number">8</div>
+                                <div class="flex-1 pb-6 border-b border-slate-100">
+                                    <p class="text-sm text-slate-500 mb-2 font-medium">Trækker \( b \) fra på begge sider.</p>
+                                    <div class="py-4 text-center text-lg">
+                                        $$2ax = -b \pm \sqrt{b^2 - 4ac}$$
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Trin 9 -->
+                            <div class="flex gap-6 items-start">
+                                <div class="step-number">9</div>
+                                <div class="flex-1 pb-6">
+                                    <p class="text-sm text-slate-500 mb-2 font-medium">Deler med 2a på begge sider.</p>
+                                    <p class="text-sm text-slate-400 mb-4 font-bold">Q.E.D.</p>
+                                    <div class="p-8 bg-emerald-600 rounded-[2rem] text-white text-center shadow-xl math-container transform hover:-translate-y-1 transition-transform">
+                                        <div class="text-2xl md:text-4xl font-black tracking-tighter">
+                                            $$x = \frac{-b \pm \sqrt{b^2 - 4ac}}{2a}$$
                                         </div>
                                     </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <button onclick="toggleDeepDive('dd-trick')" class="btn-read-more">
-                            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" /></svg>
-                            <span>Hvorfor gange med \( 4a \)?</span>
-                        </button>
-
-                        <div id="dd-trick" class="deep-dive">
-                            <h4 class="font-bold text-emerald-900 mb-4">Strategien bag tricket</h4>
-                            <p class="text-sm text-slate-700 leading-relaxed italic">
-                                Vi ganger med \( 4a \), fordi det gør \( 4a^2x^2 \) til et perfekt kvadrat, nemlig \( (2ax)^2 \). Det smarte er, at det midterste led \( 4abx \) derefter passer præcis ind i kvadratreglen \( (2ax + b)^2 \). Uden dette trick ville vi ende med svære brøker midt i beviset, hvilket gør det langt sværere at forklare på tavlen.
-                            </p>
                         </div>
                     </div>
                 </section>

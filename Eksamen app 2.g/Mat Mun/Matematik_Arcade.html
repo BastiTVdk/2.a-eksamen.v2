@@ -20,15 +20,14 @@
 
         :root {
             /* Neon Farvepalette */
-            --bg-base: #050510;
+            --bg-base: #030308;
             --neon-blue: #00f3ff;
             --neon-pink: #ff00ea;
             --neon-green: #39ff14;
             --neon-yellow: #fffb00;
             --neon-red: #ff073a;
             --neon-purple: #b026ff;
-            --neon-orange: #ff8c00;
-            --panel-bg: rgba(20, 20, 40, 0.85);
+            --panel-bg: rgba(10, 10, 25, 0.85);
             --font-game: 'Orbitron', sans-serif;
             --font-ui: 'Poppins', sans-serif;
         }
@@ -41,17 +40,30 @@
             background-color: var(--bg-base);
             /* Subtil grid-baggrund kombineret med radial gradients */
             background-image: 
-                linear-gradient(rgba(0, 243, 255, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(0, 243, 255, 0.03) 1px, transparent 1px),
-                radial-gradient(circle at 15% 50%, rgba(0, 243, 255, 0.08), transparent 25%),
-                radial-gradient(circle at 85% 30%, rgba(255, 0, 234, 0.08), transparent 25%);
-            background-size: 50px 50px, 50px 50px, 100% 100%, 100% 100%;
+                linear-gradient(rgba(0, 243, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 243, 255, 0.05) 1px, transparent 1px),
+                radial-gradient(circle at 20% 50%, rgba(0, 243, 255, 0.08), transparent 40%),
+                radial-gradient(circle at 80% 50%, rgba(255, 0, 234, 0.08), transparent 40%);
+            background-size: 60px 60px, 60px 60px, 100% 100%, 100% 100%;
+            background-attachment: fixed;
             color: white;
             min-height: 100vh;
             display: flex;
             flex-direction: column;
             overflow-x: hidden;
-            user-select: none; /* Forhindrer at man markerer tekst under spil */
+            user-select: none;
+        }
+
+        /* CRT Scanline Overlay Effekt for ægte Arcade-feel */
+        body::after {
+            content: " ";
+            display: block;
+            position: fixed;
+            top: 0; left: 0; bottom: 0; right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 2;
+            background-size: 100% 4px, 3px 100%;
+            pointer-events: none;
         }
 
         /* Skjuler scrollebar for et renere arcade look */
@@ -71,148 +83,154 @@
             position: absolute; 
             top: 0; 
             left: 0; 
+            z-index: 10;
         }
         .screen.active { 
             display: flex; 
-            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
         }
         
         @keyframes popIn { 
-            from { opacity: 0; transform: scale(0.95) translateY(20px); } 
-            to { opacity: 1; transform: scale(1) translateY(0); } 
+            from { opacity: 0; transform: scale(0.9) translateY(30px); filter: blur(5px); } 
+            to { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); } 
         }
         
         /* --- TYPOGRAFI OG UI ELEMENTER --- */
         .title-glow {
             font-family: var(--font-game); 
-            font-size: 4.5rem; 
+            font-size: 5rem; 
             font-weight: 900; 
             text-align: center; 
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
             color: #fff; 
             text-shadow: 
                 0 0 10px #fff, 
                 0 0 20px var(--neon-blue), 
                 0 0 40px var(--neon-blue), 
                 0 0 80px var(--neon-pink);
-            letter-spacing: 5px; 
+            letter-spacing: 6px; 
             text-transform: uppercase;
+            line-height: 1.1;
         }
 
         .subtitle {
-            font-size: 1.2rem;
-            color: #94a3b8;
-            max-width: 600px;
+            font-size: 1.3rem;
+            color: #cbd5e1;
+            max-width: 700px;
             text-align: center;
-            margin-bottom: 2rem;
+            margin-bottom: 3rem;
             line-height: 1.6;
+            text-shadow: 0 0 10px rgba(0,0,0,0.8);
         }
 
         /* Neon Knapper */
         .btn-neon {
-            background: rgba(0,0,0,0.5); 
+            background: rgba(0,0,0,0.7); 
             color: white; 
             font-family: var(--font-game); 
-            font-size: 1.2rem; 
+            font-size: 1.3rem; 
             font-weight: 700;
-            padding: 1rem 2.5rem; 
+            padding: 1.2rem 3rem; 
             border: 2px solid; 
             border-radius: 12px; 
             cursor: pointer; 
             transition: all 0.3s; 
             text-transform: uppercase; 
-            letter-spacing: 2px;
+            letter-spacing: 3px;
             box-shadow: 0 0 15px inset, 0 0 15px;
+            position: relative;
+            overflow: hidden;
         }
-        .btn-neon:hover {
-            transform: scale(1.05);
-            color: black;
+        .btn-neon::before {
+            content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: all 0.5s;
         }
+        .btn-neon:hover::before { left: 100%; }
+        .btn-neon:hover { transform: scale(1.05); color: black; }
         .btn-neon:active { transform: scale(0.95); }
         
-        .btn-blue { border-color: var(--neon-blue); box-shadow: 0 0 15px rgba(0, 243, 255, 0.3) inset, 0 0 15px rgba(0, 243, 255, 0.3); }
-        .btn-blue:hover { background: var(--neon-blue); box-shadow: 0 0 30px var(--neon-blue); }
+        .btn-blue { border-color: var(--neon-blue); box-shadow: 0 0 15px rgba(0, 243, 255, 0.4) inset, 0 0 15px rgba(0, 243, 255, 0.4); }
+        .btn-blue:hover { background: var(--neon-blue); box-shadow: 0 0 40px var(--neon-blue); }
         
-        .btn-pink { border-color: var(--neon-pink); box-shadow: 0 0 15px rgba(255, 0, 234, 0.3) inset, 0 0 15px rgba(255, 0, 234, 0.3); }
-        .btn-pink:hover { background: var(--neon-pink); box-shadow: 0 0 30px var(--neon-pink); }
+        .btn-pink { border-color: var(--neon-pink); box-shadow: 0 0 15px rgba(255, 0, 234, 0.4) inset, 0 0 15px rgba(255, 0, 234, 0.4); }
+        .btn-pink:hover { background: var(--neon-pink); box-shadow: 0 0 40px var(--neon-pink); }
         
-        .btn-green { border-color: var(--neon-green); box-shadow: 0 0 15px rgba(57, 255, 20, 0.3) inset, 0 0 15px rgba(57, 255, 20, 0.3); }
-        .btn-green:hover { background: var(--neon-green); box-shadow: 0 0 30px var(--neon-green); }
-        
-        .btn-orange { border-color: var(--neon-orange); box-shadow: 0 0 15px rgba(255, 140, 0, 0.3) inset, 0 0 15px rgba(255, 140, 0, 0.3); }
-        .btn-orange:hover { background: var(--neon-orange); box-shadow: 0 0 30px var(--neon-orange); }
+        .btn-green { border-color: var(--neon-green); box-shadow: 0 0 15px rgba(57, 255, 20, 0.4) inset, 0 0 15px rgba(57, 255, 20, 0.4); }
+        .btn-green:hover { background: var(--neon-green); box-shadow: 0 0 40px var(--neon-green); }
+
+        .btn-purple { border-color: var(--neon-purple); box-shadow: 0 0 15px rgba(176, 38, 255, 0.4) inset, 0 0 15px rgba(176, 38, 255, 0.4); }
+        .btn-purple:hover { background: var(--neon-purple); box-shadow: 0 0 40px var(--neon-purple); }
 
         .back-btn { 
             position: absolute; 
-            top: 20px; 
-            left: 20px; 
+            top: 25px; 
+            left: 25px; 
             background: rgba(255,255,255,0.05); 
             color: white; 
             border: 1px solid rgba(255,255,255,0.2); 
-            padding: 10px 20px; 
+            padding: 12px 24px; 
             border-radius: 8px; 
             cursor: pointer; 
             transition: 0.2s; 
             font-family: var(--font-ui); 
             font-weight: 600;
             z-index: 1000; 
-            text-decoration: none;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            backdrop-filter: blur(5px);
         }
-        .back-btn:hover { background: rgba(255,255,255,0.2); border-color: white; }
+        .back-btn:hover { background: rgba(255,255,255,0.2); border-color: white; transform: translateX(-5px); }
 
         /* Canvas indstillinger */
         canvas { 
-            background: rgba(0,0,0,0.8); 
+            background: rgba(0,0,0,0.85); 
             border: 2px solid rgba(255,255,255,0.1); 
             border-radius: 15px; 
-            box-shadow: inset 0 0 50px rgba(0,0,0,1), 0 0 20px rgba(0,0,0,0.5); 
+            box-shadow: inset 0 0 60px rgba(0,0,0,1), 0 0 30px rgba(0,0,0,0.6); 
         }
 
         /* --- MENU KORT --- */
         .mode-cards { 
             display: flex; 
-            gap: 2rem; 
+            gap: 3rem; 
             justify-content: center; 
             flex-wrap: wrap; 
             margin-top: 2rem; 
-            max-width: 1300px; 
+            max-width: 1000px; 
         }
         .card { 
             background: var(--panel-bg); 
             border: 2px solid; 
             border-radius: 20px; 
-            padding: 2.5rem; 
-            width: 320px; 
+            padding: 3rem 2.5rem; 
+            width: 400px; 
             text-align: center; 
             cursor: pointer; 
-            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
-            backdrop-filter: blur(10px); 
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+            backdrop-filter: blur(15px); 
             display: flex; 
             flex-direction: column; 
             justify-content: flex-start; 
+            position: relative;
+            overflow: hidden;
         }
-        .card:hover { transform: translateY(-15px) scale(1.02); }
-        .card-icon { font-size: 3.5rem; margin-bottom: 1rem; filter: drop-shadow(0 0 10px rgba(255,255,255,0.5)); }
+        .card::before {
+            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 60%);
+            opacity: 0; transition: opacity 0.3s; pointer-events: none;
+        }
+        .card:hover::before { opacity: 1; }
+        .card:hover { transform: translateY(-15px) scale(1.03); }
+        .card-icon { font-size: 4.5rem; margin-bottom: 1.5rem; filter: drop-shadow(0 0 15px rgba(255,255,255,0.6)); }
         
-        .card-solo { border-color: var(--neon-blue); box-shadow: 0 0 15px rgba(0, 243, 255, 0.1); }
-        .card-solo:hover { box-shadow: 0 15px 30px rgba(0, 243, 255, 0.4); }
-        .card-solo h2 { color: var(--neon-blue); font-family: var(--font-game); margin-bottom: 10px; }
+        .card-tangent { border-color: var(--neon-purple); box-shadow: 0 0 20px rgba(176, 38, 255, 0.15); }
+        .card-tangent:hover { box-shadow: 0 20px 40px rgba(176, 38, 255, 0.5); border-color: #d88bff; }
+        .card-tangent h2 { color: var(--neon-purple); font-family: var(--font-game); margin-bottom: 15px; font-size: 2rem; text-shadow: 0 0 10px var(--neon-purple); }
         
-        .card-duel { border-color: var(--neon-pink); box-shadow: 0 0 15px rgba(255, 0, 234, 0.1); }
-        .card-duel:hover { box-shadow: 0 15px 30px rgba(255, 0, 234, 0.4); }
-        .card-duel h2 { color: var(--neon-pink); font-family: var(--font-game); margin-bottom: 10px; }
-        
-        .card-laser { border-color: var(--neon-yellow); box-shadow: 0 0 15px rgba(255, 251, 0, 0.1); }
-        .card-laser:hover { box-shadow: 0 15px 30px rgba(255, 251, 0, 0.4); }
-        .card-laser h2 { color: var(--neon-yellow); font-family: var(--font-game); margin-bottom: 10px; }
-        
-        .card-tangent { border-color: var(--neon-purple); box-shadow: 0 0 15px rgba(176, 38, 255, 0.1); }
-        .card-tangent:hover { box-shadow: 0 15px 30px rgba(176, 38, 255, 0.4); }
-        .card-tangent h2 { color: var(--neon-purple); font-family: var(--font-game); margin-bottom: 10px; }
-        
-        .card-virus { border-color: var(--neon-orange); box-shadow: 0 0 15px rgba(255, 140, 0, 0.1); }
-        .card-virus:hover { box-shadow: 0 15px 30px rgba(255, 140, 0, 0.4); }
-        .card-virus h2 { color: var(--neon-orange); font-family: var(--font-game); margin-bottom: 10px; }
+        .card-sequence { border-color: var(--neon-yellow); box-shadow: 0 0 20px rgba(255, 251, 0, 0.15); }
+        .card-sequence:hover { box-shadow: 0 20px 40px rgba(255, 251, 0, 0.5); border-color: #ffff80; }
+        .card-sequence h2 { color: var(--neon-yellow); font-family: var(--font-game); margin-bottom: 15px; font-size: 2rem; text-shadow: 0 0 10px var(--neon-yellow); }
 
         /* --- GAME UI SPECIFIKT --- */
         .hud-header { 
@@ -224,129 +242,126 @@
             font-family: var(--font-game); 
             font-size: 1.5rem; 
             margin-bottom: 1.5rem;
-            background: rgba(0,0,0,0.5);
+            background: rgba(0,0,0,0.6);
             padding: 15px 30px;
             border-radius: 15px;
             border: 1px solid rgba(255,255,255,0.1);
-        }
-        
-        /* Sliders / Control Panel */
-        .control-panel { 
-            display: flex; 
-            flex-direction: column; 
-            gap: 20px; 
-            width: 100%; 
-            max-width: 400px; 
-            background: var(--panel-bg); 
-            padding: 2rem; 
-            border-radius: 20px; 
-            border: 1px solid rgba(255,255,255,0.1); 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-        }
-        .slider-group label { 
-            display: flex; 
-            justify-content: space-between; 
-            font-weight: 600; 
-            margin-bottom: 8px; 
-            color: var(--text-muted); 
-        }
-        .slider-value {
-            font-family: var(--font-math);
-            color: white;
-            background: rgba(0,0,0,0.5);
-            padding: 2px 8px;
-            border-radius: 5px;
-        }
-        input[type="range"] { 
-            width: 100%; 
-            height: 10px; 
-            border-radius: 5px; 
-            background: #1e293b; 
-            appearance: none; 
-            outline: none; 
-        }
-        input[type="range"]::-webkit-slider-thumb { 
-            appearance: none; 
-            width: 24px; 
-            height: 24px; 
-            border-radius: 50%; 
-            background: white; 
-            cursor: pointer; 
-            border: 3px solid;
-            transition: 0.1s;
-        }
-        input[type="range"]:active::-webkit-slider-thumb { transform: scale(1.2); }
-        
-        /* Specifikke farver til sliders */
-        #hack-A::-webkit-slider-thumb { border-color: var(--neon-blue); box-shadow: 0 0 10px var(--neon-blue); }
-        #hack-B::-webkit-slider-thumb { border-color: var(--neon-pink); box-shadow: 0 0 10px var(--neon-pink); }
-        #hack-C::-webkit-slider-thumb { border-color: var(--neon-green); box-shadow: 0 0 10px var(--neon-green); }
-        #virus-a::-webkit-slider-thumb { border-color: var(--neon-orange); box-shadow: 0 0 10px var(--neon-orange); }
-        #virus-b::-webkit-slider-thumb { border-color: var(--neon-yellow); box-shadow: 0 0 10px var(--neon-yellow); }
-
-        /* Matematik Displayboks */
-        .math-hero {
-            background: rgba(0,0,0,0.6); 
-            padding: 1.5rem; 
-            border-radius: 15px;
-            font-family: var(--font-math); 
-            font-size: 1.8rem; 
-            text-align: center;
-            border: 1px solid rgba(255,255,255,0.1); 
-            margin: 1rem 0; 
-            letter-spacing: 2px;
-            box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+            backdrop-filter: blur(10px);
         }
 
-        /* 1v1 Split Screen (Shape Shifter) */
-        .split-container { display: flex; width: 100%; max-width: 1200px; gap: 2rem; justify-content: center; }
-        .player-zone { 
-            flex: 1; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            background: rgba(0,0,0,0.5); 
-            padding: 2rem; 
-            border-radius: 20px; 
-            border: 2px solid; 
-        }
-        .zone-p1 { border-color: var(--neon-blue); box-shadow: inset 0 0 50px rgba(0, 243, 255, 0.05); }
-        .zone-p2 { border-color: var(--neon-pink); box-shadow: inset 0 0 50px rgba(255, 0, 234, 0.05); }
-        
         .key-hint { 
             display: inline-block; 
-            background: rgba(255,255,255,0.1); 
+            background: rgba(255,255,255,0.15); 
             color: white;
-            padding: 4px 8px; 
+            padding: 4px 10px; 
             border-radius: 6px; 
             font-family: var(--font-game); 
-            font-size: 0.9rem;
-            margin: 0 2px; 
-            border: 1px solid rgba(255,255,255,0.3); 
+            font-size: 1rem;
+            margin: 0 4px; 
+            border: 1px solid rgba(255,255,255,0.4); 
+            box-shadow: 0 2px 0 rgba(255,255,255,0.2);
         }
 
         /* Winner Overlay */
         .game-overlay { 
             position: absolute; 
             top:0; left:0; width:100%; height:100%; 
-            background:rgba(0,0,0,0.95); 
+            background:rgba(0,0,0,0.92); 
             z-index: 2000; 
             display:flex; 
             flex-direction:column; 
             align-items:center; 
             justify-content:center; 
-            backdrop-filter: blur(10px);
+            backdrop-filter: blur(15px);
         }
 
         /* Utils */
         .flex-row { display: flex; gap: 2rem; width: 100%; max-width: 1000px; justify-content: center; align-items: flex-start; }
-        .text-green { color: var(--neon-green); text-shadow: 0 0 10px var(--neon-green); }
-        .text-red { color: var(--neon-red); text-shadow: 0 0 10px var(--neon-red); }
+        .item-desc { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; text-align: left; font-size: 0.95rem; }
+        .item-icon { font-size: 1.8rem; min-width: 35px; text-align: center; }
+
+        /* SEQUENCE CRACKER SPECIFICS */
+        .seq-arena { display: flex; width: 100%; max-width: 1200px; gap: 2rem; justify-content: center; }
+        .seq-player-zone { 
+            flex: 1; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            background: var(--panel-bg); 
+            padding: 3rem 2rem; 
+            border-radius: 20px; 
+            border: 2px solid; 
+            position: relative;
+            backdrop-filter: blur(10px);
+        }
+        .seq-p1 { border-color: var(--neon-blue); box-shadow: inset 0 0 60px rgba(0, 243, 255, 0.05), 0 10px 30px rgba(0,0,0,0.5); }
+        .seq-p2 { border-color: var(--neon-pink); box-shadow: inset 0 0 60px rgba(255, 0, 234, 0.05), 0 10px 30px rgba(0,0,0,0.5); }
+        
+        .seq-display {
+            font-family: var(--font-game);
+            font-size: 2.5rem;
+            letter-spacing: 4px;
+            background: rgba(0,0,0,0.8);
+            padding: 20px;
+            border-radius: 15px;
+            border: 1px solid rgba(255,255,255,0.2);
+            width: 100%;
+            text-align: center;
+            margin: 2rem 0;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: inset 0 0 20px rgba(0,0,0,0.8);
+        }
+        .seq-missing { color: var(--neon-yellow); text-shadow: 0 0 15px var(--neon-yellow); font-weight: 900; }
+
+        .dpad-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            grid-template-rows: 1fr 1fr 1fr;
+            gap: 10px;
+            margin-top: 1rem;
+        }
+        .dpad-btn {
+            background: rgba(255,255,255,0.05);
+            border: 2px solid rgba(255,255,255,0.2);
+            border-radius: 12px;
+            padding: 15px 20px;
+            font-family: var(--font-game);
+            font-size: 1.5rem;
+            color: white;
+            text-align: center;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+        }
+        .dpad-btn small { font-size: 0.8rem; color: #94a3b8; margin-top: 5px; }
+        .dpad-top { grid-column: 2; grid-row: 1; }
+        .dpad-left { grid-column: 1; grid-row: 2; }
+        .dpad-right { grid-column: 3; grid-row: 2; }
+        .dpad-bottom { grid-column: 2; grid-row: 3; }
+
+        .flash-red { animation: flashR 0.5s; }
+        .flash-green { animation: flashG 0.5s; }
+        @keyframes flashR { 0% { background-color: rgba(255,0,0,0.5); box-shadow: 0 0 50px red; } 100% { background-color: transparent; } }
+        @keyframes flashG { 0% { background-color: rgba(0,255,0,0.5); box-shadow: 0 0 50px green; } 100% { background-color: transparent; } }
+
+        .penalty-text {
+            color: var(--neon-red);
+            font-family: var(--font-game);
+            font-size: 1.2rem;
+            position: absolute;
+            top: 20px;
+            text-shadow: 0 0 10px red;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
 
         @media (max-width: 1000px) {
-            .flex-row, .split-container { flex-direction: column; align-items: center; }
-            .title-glow { font-size: 3rem; }
+            .flex-row, .seq-arena { flex-direction: column; align-items: center; }
+            .title-glow { font-size: 3.5rem; }
             canvas { max-width: 100%; height: auto; }
+            .card { width: 100%; max-width: 400px; }
         }
     </style>
 </head>
@@ -354,259 +369,107 @@
 
     <!-- ==================== HOVEDMENU ==================== -->
     <div id="screen-menu" class="screen active">
-        <a href="MAT-MUN-Index.html" class="back-btn">⬅ Tilbage til Noter</a>
         <h1 class="title-glow">MATHEMASTER<br>ARCADE</h1>
-        <p class="subtitle">Slip matematikken fri! Vælg et spil herunder for at træne dine færdigheder til B-Niveau eksamen i en visuel og interaktiv spillehal.</p>
+        <p class="subtitle">Slip matematikken fri! Vælg et spil herunder for at dyste 1 mod 1 og træne jeres færdigheder til B-Niveau eksamen i en intens spillehal.</p>
         
         <div class="mode-cards">
-            <!-- 1. Parabel Hacker -->
-            <div class="card card-solo" onclick="showScreen('screen-hacker-setup')">
-                <div class="card-icon">🔧</div>
-                <div>
-                    <h2>PARABEL HACKER</h2>
-                    <p>Andengradspolynomier (Solo). Brug sliders til at forme funktionen, der overlapper målet. Spil mod uret!</p>
-                </div>
-            </div>
-            
-            <!-- 2. Shape Shifter -->
-            <div class="card card-duel" onclick="showScreen('screen-duel-setup')">
-                <div class="card-icon">⚔️</div>
-                <div>
-                    <h2>SHAPE SHIFTER</h2>
-                    <p>Andengradspolynomier (1v1). Bøj parabler i realtime med tastaturet. Først til at matche "Target Grafen" vinder!</p>
-                </div>
-            </div>
-
-            <!-- 3. Laser Skjoldet -->
-            <div class="card card-laser" onclick="showScreen('screen-laser-setup')">
-                <div class="card-icon">🛡️</div>
-                <div>
-                    <h2>LASER SKJOLDET</h2>
-                    <p>Analytisk Geometri. Placer dit skjold præcist ud fra afstandsformlen for at blokere de dødelige lasere!</p>
-                </div>
-            </div>
-
-            <!-- 4. Tangent Sniper -->
+            <!-- 1. Tangent Sniper -->
             <div class="card card-tangent" onclick="showScreen('screen-tangent-setup')">
                 <div class="card-icon">🎯</div>
                 <div>
                     <h2>TANGENT SNIPER</h2>
-                    <p>Differentialregning (1v1). Kør på landskabet. Kanonen peger langs tangenten ($f'(x)$). Find hældningen og skyd!</p>
+                    <p>Differentialregning (1v1). Kør på landskabet, find hældningen, saml power-ups og udskyd din modstander! Banen ændres hver runde.</p>
                 </div>
             </div>
 
-            <!-- 5. Virus Outbreak -->
-            <div class="card card-virus" onclick="showScreen('screen-virus-setup')">
-                <div class="card-icon">🦠</div>
+            <!-- 2. Tal Rækkefølgen -->
+            <div class="card card-sequence" onclick="showScreen('screen-sequence-setup')">
+                <div class="card-icon">🔢</div>
                 <div>
-                    <h2>VIRUS OUTBREAK</h2>
-                    <p>Eksponentiel Vækst. Aflæs "Intel", og juster $b$ og $a$ for at skabe en kurve, der kurerer virussen før det er for sent!</p>
+                    <h2>TAL RÆKKEFØLGEN</h2>
+                    <p>Talforståelse (1v1). Gæt det manglende tal i rækkefølgen hurtigst! Svarer du forkert, eller vinder din modstander, får du en <b>længere</b> række i næste runde.</p>
                 </div>
             </div>
         </div>
     </div>
 
 
-    <!-- ==================== SPIL 1: PARABEL HACKER ==================== -->
-    <div id="screen-hacker-setup" class="screen">
-        <button class="back-btn" onclick="showScreen('screen-menu')">⬅ Menu</button>
-        <h2 class="title-glow" style="font-size: 3rem; color: var(--neon-blue); text-shadow: 0 0 20px var(--neon-blue);">PARABEL HACKER</h2>
-        <p class="subtitle">Den hvide stiplede linje er fjendens signal. Dit mål er at justere A, B og C, indtil din blå parabel overlapper den perfekt. Hver gang du hacker systemet, får du +10 sekunder.</p>
-        <button class="btn-neon btn-blue" onclick="startHackerGame()">START HACK</button>
-    </div>
-
-    <div id="screen-hacker-game" class="screen">
-        <button class="back-btn" onclick="endHackerGame()">⬅ Afbryd Hack</button>
-        
-        <div class="hud-header" style="border-color: var(--neon-blue);">
-            <span style="color: var(--neon-blue);">SUCCESFULDE HACKS: <span id="hack-score" style="color:white; font-size:2rem;">0</span></span>
-            <span style="color: var(--neon-pink);">TID: <span id="hack-time" style="color:white; font-size:2rem;">60</span>s</span>
-        </div>
-        
-        <div class="flex-row">
-            <canvas id="hackCanvas" width="500" height="500"></canvas>
-            
-            <div class="control-panel" style="border-color: var(--neon-blue);">
-                <h3 style="text-align: center; font-family: var(--font-game); color: var(--neon-blue); margin-bottom: 20px;">TUNING SYSTEM</h3>
-                
-                <div class="math-hero" id="hack-formula" style="font-size: 1.4rem;">
-                    $f(x) = 1x^2 + 0x + 0$
-                </div>
-
-                <div class="slider-group">
-                    <label><span>Konstant A (Krumning)</span> <span class="slider-value" id="valH-A">1.0</span></label>
-                    <input type="range" id="hack-A" min="-3" max="3" step="0.1" value="1" oninput="updateHacker()">
-                </div>
-                <div class="slider-group">
-                    <label><span>Konstant B (Forskydning)</span> <span class="slider-value" id="valH-B">0.0</span></label>
-                    <input type="range" id="hack-B" min="-6" max="6" step="0.5" value="0" oninput="updateHacker()">
-                </div>
-                <div class="slider-group">
-                    <label><span>Konstant C (Skæring Y)</span> <span class="slider-value" id="valH-C">0.0</span></label>
-                    <input type="range" id="hack-C" min="-8" max="8" step="1" value="0" oninput="updateHacker()">
-                </div>
-                
-                <div id="hack-status" style="text-align: center; font-size: 1.5rem; font-family: var(--font-game); margin-top: 15px; color: var(--neon-red); text-shadow: 0 0 10px var(--neon-red);">SIGNAL UDE AF SINK</div>
-            </div>
-        </div>
-    </div>
-
-    <div id="screen-hacker-end" class="screen">
-        <h2 class="title-glow" style="color: var(--neon-red); text-shadow: 0 0 30px var(--neon-red);">SYSTEM LUKKET</h2>
-        <p style="font-size: 1.5rem; margin-bottom: 2rem;">Færdige Hacks: <span id="hack-final-score" style="color: var(--neon-blue); font-weight: bold; font-size: 3rem;">0</span></p>
-        <button class="btn-neon btn-blue" onclick="startHackerGame()">HACK IGEN</button>
-        <button class="btn-neon btn-pink" onclick="showScreen('screen-menu')">HOVEDMENU</button>
-    </div>
-
-
-    <!-- ==================== SPIL 2: SHAPE SHIFTER DUEL ==================== -->
-    <div id="screen-duel-setup" class="screen">
-        <button class="back-btn" onclick="showScreen('screen-menu')">⬅ Menu</button>
-        <h2 class="title-glow" style="font-size: 3rem; color: var(--neon-pink); text-shadow: 0 0 20px var(--neon-pink);">SHAPE SHIFTER (1v1)</h2>
-        <p class="subtitle">Byg grafen hurtigere end din modstander! Først til 5 point.</p>
-        
-        <div style="background: rgba(0,0,0,0.5); padding: 2rem; border-radius: 15px; border: 1px solid rgba(255,255,255,0.2); max-width: 600px; text-align: center; margin-bottom: 2rem;">
-            <div style="display: flex; justify-content: space-around;">
-                <div style="color: var(--neon-blue);">
-                    <h3 style="margin-bottom: 15px; font-family: var(--font-game);">SPILLER 1 (BLÅ)</h3>
-                    <p><span class="key-hint">W</span> <span class="key-hint">S</span> ændrer <b>a</b></p>
-                    <p style="margin-top: 10px;"><span class="key-hint">A</span> <span class="key-hint">D</span> ændrer <b>c</b></p>
-                </div>
-                <div style="color: var(--neon-pink);">
-                    <h3 style="margin-bottom: 15px; font-family: var(--font-game);">SPILLER 2 (PINK)</h3>
-                    <p><span class="key-hint">↑</span> <span class="key-hint">↓</span> ændrer <b>a</b></p>
-                    <p style="margin-top: 10px;"><span class="key-hint">←</span> <span class="key-hint">→</span> ændrer <b>c</b></p>
-                </div>
-            </div>
-        </div>
-        <button class="btn-neon btn-pink" onclick="startDuelGame()">START DUEL</button>
-    </div>
-
-    <div id="screen-duel-game" class="screen">
-        <button class="back-btn" onclick="endDuelGame()">⬅ Afslut Duel</button>
-        
-        <div class="hud-header" style="border-color: var(--neon-pink);">
-            <span style="color: var(--neon-blue);">P1: <span id="d-score-1" style="color:white; font-size:2rem;">0</span></span>
-            <span style="font-family: var(--font-game); font-size: 2rem;">MÅL GRAFEN</span>
-            <span style="color: var(--neon-pink);">P2: <span id="d-score-2" style="color:white; font-size:2rem;">0</span></span>
-        </div>
-
-        <div class="split-container">
-            <!-- Player 1 -->
-            <div class="player-zone zone-p1">
-                <h3 style="color: var(--neon-blue); font-family: var(--font-game); margin-bottom: 15px;">SPILLER 1</h3>
-                <canvas id="duelCanvas1" width="400" height="400"></canvas>
-                <div class="math-hero" style="width: 100%; padding: 10px; margin-top: 15px; border-color: var(--neon-blue);">
-                    $f(x) = $<span id="d1-a" style="color:var(--neon-blue)">1</span>$x^2 + $<span id="d1-c" style="color:var(--neon-blue)">0</span>
-                </div>
-            </div>
-            
-            <!-- Player 2 -->
-            <div class="player-zone zone-p2">
-                <h3 style="color: var(--neon-pink); font-family: var(--font-game); margin-bottom: 15px;">SPILLER 2</h3>
-                <canvas id="duelCanvas2" width="400" height="400"></canvas>
-                <div class="math-hero" style="width: 100%; padding: 10px; margin-top: 15px; border-color: var(--neon-pink);">
-                    $f(x) = $<span id="d2-a" style="color:var(--neon-pink)">1</span>$x^2 + $<span id="d2-c" style="color:var(--neon-pink)">0</span>
-                </div>
-            </div>
-        </div>
-
-        <!-- Vinder Overlay -->
-        <div id="duel-winner-overlay" class="game-overlay" style="display:none;">
-            <div style="font-size: 5rem; margin-bottom: 20px;">🏆</div>
-            <h1 id="duel-winner-text" class="title-glow">VINDER</h1>
-            <div style="display: flex; gap: 20px;">
-                <button class="btn-neon btn-green" onclick="startDuelGame()">OMKAMP</button>
-                <button class="btn-neon btn-blue" onclick="showScreen('screen-menu')">HOVEDMENU</button>
-            </div>
-        </div>
-    </div>
-
-
-    <!-- ==================== SPIL 3: LASER SKJOLDET ==================== -->
-    <div id="screen-laser-setup" class="screen">
-        <button class="back-btn" onclick="showScreen('screen-menu')">⬅ Menu</button>
-        <h2 class="title-glow" style="font-size: 3rem; color: var(--neon-yellow); text-shadow: 0 0 20px var(--neon-yellow);">LASER SKJOLDET</h2>
-        <p class="subtitle">Test din viden om "Afstand fra punkt til linje". En rød laserbane skærer koordinatsystemet. For at overleve, skal du placere dit skjold $P(x,y)$ i den *præcise* afstand, du får tildelt, fra laseren.</p>
-        <button class="btn-neon btn-green" style="border-color: var(--neon-yellow);" onclick="startLaserGame()">START MISSION</button>
-    </div>
-
-    <div id="screen-laser-game" class="screen">
-        <button class="back-btn" onclick="showScreen('screen-menu')">⬅ Afslut</button>
-        
-        <div class="hud-header" style="border-color: var(--neon-yellow); max-width: 800px;">
-            <span>RUNDE: <span id="laser-round" style="color:white; font-size:2rem;">1</span></span>
-            <span style="color: var(--neon-yellow);">MÅL AFSTAND: <span id="laser-target" style="color:white; font-size:2.5rem; font-weight:900;">3.0</span></span>
-        </div>
-        
-        <div class="flex-row" style="align-items: center;">
-            <div style="position: relative;">
-                <canvas id="laserCanvas" width="600" height="500" style="cursor: crosshair; border-color: var(--neon-yellow);"></canvas>
-                <div id="laser-feedback" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-family: var(--font-game); font-size: 3.5rem; font-weight: 900; display: none; text-shadow: 0 0 30px black, 0 0 10px black; pointer-events: none; white-space: nowrap;">PERFEKT!</div>
-            </div>
-
-            <div class="control-panel" style="border-color: var(--neon-red);">
-                <h3 style="text-align: center; font-family: var(--font-game); color: var(--neon-red); margin-bottom: 20px;">LASER DATA</h3>
-                <div class="math-hero" id="laser-eq" style="font-size: 1.5rem; color: var(--neon-red); border-color: rgba(255,7,58,0.3);">
-                    $y = 1x + 0$
-                </div>
-                <p style="color: var(--text-muted); font-size: 0.9rem; text-align: center;">Klik direkte på gitteret til venstre for at placere skjoldet. Det handler om ortogonal (vinkelret) afstand!</p>
-            </div>
-        </div>
-    </div>
-
-
-    <!-- ==================== SPIL 4: TANGENT SNIPER ==================== -->
+    <!-- ==================== SPIL 1: TANGENT SNIPER ==================== -->
     <div id="screen-tangent-setup" class="screen">
         <button class="back-btn" onclick="showScreen('screen-menu')">⬅ Menu</button>
-        <h2 class="title-glow" style="font-size: 3rem; color: var(--neon-purple); text-shadow: 0 0 20px var(--neon-purple);">TANGENT SNIPER</h2>
-        <p class="subtitle">1v1 Differentialregning! Kør på landskabet. Kanonens sigtekorn peger *altid* langs grafens tangent $f'(x)$. Find den rigtige hældning og skyd!</p>
+        <h2 class="title-glow" style="font-size: 4rem; color: var(--neon-purple); text-shadow: 0 0 20px var(--neon-purple);">TANGENT SNIPER <span style="color:var(--neon-green);font-size:2rem;">V2</span></h2>
+        <p class="subtitle">1v1 Differentialregning! Banen genereres tilfældigt hver runde. Skyd din modstander 3 gange for at vinde runden. Først til 5 runder vinder!</p>
         
-        <div style="background: rgba(0,0,0,0.5); padding: 2rem; border-radius: 15px; border: 1px solid rgba(255,255,255,0.2); max-width: 600px; text-align: center; margin-bottom: 2rem;">
-            <div style="display: flex; justify-content: space-around;">
-                <div style="color: var(--neon-blue);">
-                    <h3 style="margin-bottom: 15px; font-family: var(--font-game);">SPILLER 1 (BLÅ)</h3>
-                    <p><span class="key-hint">A</span> <span class="key-hint">D</span> Kør</p>
-                    <p style="margin-top: 10px;"><span class="key-hint">W</span> Skyd</p>
+        <div class="flex-row" style="max-width: 1100px; gap: 2rem;">
+            <!-- Controls -->
+            <div style="flex: 1; background: rgba(0,0,0,0.6); padding: 2rem; border-radius: 15px; border: 1px solid rgba(255,255,255,0.2); text-align: center; backdrop-filter: blur(10px);">
+                <h3 style="color: white; font-family: var(--font-game); margin-bottom: 20px; font-size: 1.5rem;">KONTROLLER</h3>
+                <div style="display: flex; justify-content: space-around;">
+                    <div style="color: var(--neon-blue);">
+                        <h4 style="margin-bottom: 15px; font-family: var(--font-game); font-size: 1.2rem;">SPILLER 1</h4>
+                        <p><span class="key-hint">A</span> <span class="key-hint">D</span> Kør</p>
+                        <p style="margin-top: 15px;"><span class="key-hint">W</span> Skyd / Oplad</p>
+                        <p style="margin-top: 15px;"><span class="key-hint">S</span> Brug Item</p>
+                    </div>
+                    <div style="color: var(--neon-pink);">
+                        <h4 style="margin-bottom: 15px; font-family: var(--font-game); font-size: 1.2rem;">SPILLER 2</h4>
+                        <p><span class="key-hint">←</span> <span class="key-hint">→</span> Kør</p>
+                        <p style="margin-top: 15px;"><span class="key-hint">↑</span> Skyd / Oplad</p>
+                        <p style="margin-top: 15px;"><span class="key-hint">↓</span> Brug Item</p>
+                    </div>
                 </div>
-                <div style="color: var(--neon-pink);">
-                    <h3 style="margin-bottom: 15px; font-family: var(--font-game);">SPILLER 2 (PINK)</h3>
-                    <p><span class="key-hint">←</span> <span class="key-hint">→</span> Kør</p>
-                    <p style="margin-top: 10px;"><span class="key-hint">↑</span> Skyd</p>
+            </div>
+            
+            <!-- Items -->
+            <div style="flex: 1.5; background: rgba(0,0,0,0.6); padding: 2rem; border-radius: 15px; border: 1px solid rgba(255,255,255,0.2); backdrop-filter: blur(10px);">
+                <h3 style="color: var(--neon-green); font-family: var(--font-game); margin-bottom: 20px; text-align: center; font-size: 1.5rem;">POWER-UPS (Kasser falder)</h3>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                    <div class="item-desc"><div class="item-icon">⚡</div><div><b>Rapid Fire:</b> Skyd lynhurtigt i en periode.</div></div>
+                    <div class="item-desc"><div class="item-icon">💖</div><div><b>Heal:</b> Få +1 HP tilbage (Max 3).</div></div>
+                    <div class="item-desc"><div class="item-icon">❄️</div><div><b>Frys:</b> Fryser fjenden fast i 2 sekunder.</div></div>
+                    <div class="item-desc"><div class="item-icon">🔴</div><div><b>Store Kugler:</b> Dine næste 3 skud er gigantiske.</div></div>
+                    <div class="item-desc"><div class="item-icon">🔋</div><div><b>Opladning:</b> Hold skyd inde for en massiv kugle (2 dmg).</div></div>
+                    <div class="item-desc"><div class="item-icon">🛡️</div><div><b>Skjold:</b> Blokerer automatisk det næste skud.</div></div>
                 </div>
             </div>
         </div>
-        <button class="btn-neon btn-purple" onclick="startTangentGame()">ENTER ARENA</button>
+        <button class="btn-neon btn-purple" style="margin-top: 3rem;" onclick="startTangentGame()">ENTER ARENA</button>
     </div>
 
     <div id="screen-tangent-game" class="screen">
         <button class="back-btn" onclick="endTangentGame()">⬅ Afslut Duel</button>
         
         <div class="hud-header" style="border-color: var(--neon-purple); max-width: 1000px;">
-            <span style="color: var(--neon-blue);">P1: <span id="t-score-1" style="color:white; font-size:2rem;">0</span></span>
+            <span style="color: var(--neon-blue);">P1 RUNDER: <span id="t-score-1" style="color:white; font-size:2rem;">0</span></span>
             <div style="text-align: center;">
                 <span style="font-family: var(--font-game); font-size: 1rem; color: var(--text-muted); display: block;">LOKATION</span>
-                <span id="t-landscape-name" style="color: var(--neon-purple); font-weight: bold;">Sinus Bølgen</span>
+                <span id="t-landscape-name" style="color: var(--neon-purple); font-weight: bold;">Genererer...</span>
             </div>
-            <span style="color: var(--neon-pink);">P2: <span id="t-score-2" style="color:white; font-size:2rem;">0</span></span>
+            <span style="color: var(--neon-pink);">P2 RUNDER: <span id="t-score-2" style="color:white; font-size:2rem;">0</span></span>
         </div>
         
         <div style="position: relative;">
             <canvas id="tangentCanvas" width="1000" height="500" style="border-color: var(--neon-purple);"></canvas>
             
             <!-- HUD overlay for ligninger -->
-            <div style="position: absolute; top: 15px; left: 15px; background: rgba(0,0,0,0.7); padding: 10px; border-radius: 8px; border: 1px solid var(--neon-blue); font-family: var(--font-math); color: var(--neon-blue); font-size: 0.9rem;">
+            <div style="position: absolute; top: 15px; left: 15px; background: rgba(0,0,0,0.8); padding: 15px; border-radius: 8px; border: 1px solid var(--neon-blue); font-family: var(--font-math); color: var(--neon-blue); font-size: 1.1rem;">
                 P1 Tangent:<br><span id="t-eq-1">y = ...</span>
+                <div style="margin-top: 10px; font-family: var(--font-ui); font-size: 0.9rem; color: white;">
+                    ITEM: <span id="t-item-1" style="font-size:1.4rem;">Tom</span>
+                </div>
             </div>
-            <div style="position: absolute; top: 15px; right: 15px; background: rgba(0,0,0,0.7); padding: 10px; border-radius: 8px; border: 1px solid var(--neon-pink); font-family: var(--font-math); color: var(--neon-pink); font-size: 0.9rem; text-align: right;">
+            <div style="position: absolute; top: 15px; right: 15px; background: rgba(0,0,0,0.8); padding: 15px; border-radius: 8px; border: 1px solid var(--neon-pink); font-family: var(--font-math); color: var(--neon-pink); font-size: 1.1rem; text-align: right;">
                 P2 Tangent:<br><span id="t-eq-2">y = ...</span>
+                <div style="margin-top: 10px; font-family: var(--font-ui); font-size: 0.9rem; color: white;">
+                    ITEM: <span id="t-item-2" style="font-size:1.4rem;">Tom</span>
+                </div>
             </div>
         </div>
 
         <div id="tangent-winner-overlay" class="game-overlay" style="display:none;">
-            <div style="font-size: 5rem; margin-bottom: 20px;">🎯</div>
+            <div style="font-size: 6rem; margin-bottom: 20px;">🎯</div>
             <h1 id="tangent-winner-text" class="title-glow">VINDER</h1>
-            <div style="display: flex; gap: 20px;">
+            <div style="display: flex; gap: 20px; margin-top: 20px;">
                 <button class="btn-neon btn-purple" onclick="startTangentGame()">OMKAMP</button>
                 <button class="btn-neon btn-blue" onclick="showScreen('screen-menu')">HOVEDMENU</button>
             </div>
@@ -614,55 +477,82 @@
     </div>
 
 
-    <!-- ==================== SPIL 5: VIRUS OUTBREAK ==================== -->
-    <div id="screen-virus-setup" class="screen">
+    <!-- ==================== SPIL 2: TAL RÆKKEFØLGEN ==================== -->
+    <div id="screen-sequence-setup" class="screen">
         <button class="back-btn" onclick="showScreen('screen-menu')">⬅ Menu</button>
-        <h2 class="title-glow" style="font-size: 3rem; color: var(--neon-orange); text-shadow: 0 0 20px var(--neon-orange);">VIRUS OUTBREAK</h2>
-        <p class="subtitle">Virussen spreder sig eksponentielt: $f(x) = b \cdot a^x$. Den røde kurve stiger ubønhørligt! Aflæs data i laboratoriet og indstil både $b$ og $a$ for at skabe en kur, der matcher perfekt og redder verden.</p>
-        <button class="btn-neon btn-orange" onclick="startVirusGame()">RED VERDEN</button>
+        <h2 class="title-glow" style="font-size: 4rem; color: var(--neon-yellow); text-shadow: 0 0 20px var(--neon-yellow);">TAL RÆKKEFØLGEN</h2>
+        <p class="subtitle">Et intenst 1v1 spil om mønstergenkendelse. Find det manglende tal i rækkefølgen!<br>Den der gætter rigtigt får 1 point. Svarer du forkert, straffes du med en <b>længere og sværere række</b> i næste runde. Først til 10 point vinder!</p>
+        
+        <div class="flex-row" style="max-width: 900px; gap: 2rem; margin-bottom: 3rem;">
+            <div style="flex: 1; background: rgba(0,0,0,0.6); padding: 2rem; border-radius: 15px; border: 1px solid var(--neon-blue); text-align: center; backdrop-filter: blur(10px);">
+                <h3 style="color: var(--neon-blue); font-family: var(--font-game); margin-bottom: 15px;">SPILLER 1 (BLÅ)</h3>
+                <p style="margin-bottom: 10px;">Brug tasterne til at vælge svar:</p>
+                <div style="font-family: var(--font-game); font-size: 1.5rem;">
+                    <span class="key-hint">W</span> Op<br>
+                    <span class="key-hint">A</span> Venstre &nbsp; <span class="key-hint">D</span> Højre<br>
+                    <span class="key-hint">S</span> Ned
+                </div>
+            </div>
+            <div style="flex: 1; background: rgba(0,0,0,0.6); padding: 2rem; border-radius: 15px; border: 1px solid var(--neon-pink); text-align: center; backdrop-filter: blur(10px);">
+                <h3 style="color: var(--neon-pink); font-family: var(--font-game); margin-bottom: 15px;">SPILLER 2 (PINK)</h3>
+                <p style="margin-bottom: 10px;">Brug piletasterne til at vælge svar:</p>
+                <div style="font-family: var(--font-game); font-size: 1.5rem;">
+                    <span class="key-hint">↑</span> Op<br>
+                    <span class="key-hint">←</span> Venstre &nbsp; <span class="key-hint">→</span> Højre<br>
+                    <span class="key-hint">↓</span> Ned
+                </div>
+            </div>
+        </div>
+        <button class="btn-neon btn-yellow" style="border-color: var(--neon-yellow); box-shadow: 0 0 15px rgba(255, 251, 0, 0.4) inset, 0 0 15px rgba(255, 251, 0, 0.4);" onmouseover="this.style.background='var(--neon-yellow)'; this.style.color='black';" onmouseout="this.style.background='rgba(0,0,0,0.7)'; this.style.color='white';" onclick="startSeqGame()">START DEKODNING</button>
     </div>
 
-    <div id="screen-virus-game" class="screen">
-        <button class="back-btn" onclick="endVirusGame()">⬅ Evakuer</button>
+    <div id="screen-sequence-game" class="screen">
+        <button class="back-btn" onclick="endSeqGame()">⬅ Afbryd</button>
         
-        <div class="hud-header" style="border-color: var(--neon-orange); max-width: 900px;">
-            <span style="color: var(--neon-green);">VERDNER REDDET: <span id="v-score" style="color:white; font-size:2rem;">0</span></span>
-            <span style="color: var(--neon-red); display: flex; align-items: center; gap: 10px;">
-                FARE NIVEAU: <span id="v-danger" style="background: rgba(255,7,58,0.2); padding: 5px 15px; border-radius: 10px; font-weight: 800;">LAV</span>
-            </span>
+        <div class="hud-header" style="border-color: var(--neon-yellow); max-width: 1200px;">
+            <span style="color: var(--neon-blue);">P1 POINT: <span id="s-score-1" style="color:white; font-size:2rem;">0</span></span>
+            <span style="font-family: var(--font-game); font-size: 2rem; color: var(--neon-yellow); text-shadow: 0 0 10px var(--neon-yellow);">DEKOD MØNSTERET</span>
+            <span style="color: var(--neon-pink);">P2 POINT: <span id="s-score-2" style="color:white; font-size:2rem;">0</span></span>
         </div>
         
-        <div class="flex-row">
-            <canvas id="virusCanvas" width="600" height="500" style="border-color: var(--neon-orange);"></canvas>
-            
-            <div class="control-panel" style="border-color: var(--neon-orange);">
-                <h3 style="text-align: center; font-family: var(--font-game); color: var(--neon-orange); margin-bottom: 10px;">LABORATORIE</h3>
+        <div class="seq-arena" id="seq-arena-container">
+            <!-- P1 Zone -->
+            <div class="seq-player-zone seq-p1" id="seq-zone-1">
+                <div class="penalty-text" id="seq-pen-1">STRAF: +1 LÆNGDE!</div>
+                <h3 style="color: var(--neon-blue); font-family: var(--font-game); font-size: 1.5rem;">SPILLER 1</h3>
                 
-                <div class="math-hero" style="border-color: rgba(255, 140, 0, 0.3); font-size: 1.4rem;">
-                    $f(x) = $<span id="v-b-display" style="color:var(--neon-green)">10</span> $\cdot$ <span id="v-a-display" style="color:var(--neon-green)">1.05</span>$^x$
-                </div>
-
-                <div class="slider-group">
-                    <label><span>Begyndelsesværdi (b)</span></label>
-                    <input type="range" id="virus-b" min="1" max="10" step="1" value="5" oninput="updateVirusControls()">
-                </div>
-
-                <div class="slider-group">
-                    <label><span>Fremskrivningsfaktor (a)</span></label>
-                    <input type="range" id="virus-a" min="1.01" max="2.00" step="0.01" value="1.05" oninput="updateVirusControls()">
-                </div>
+                <div class="seq-display" id="seq-text-1">2, 4, <span class="seq-missing">?</span>, 8</div>
                 
-                <div style="margin-top: 20px; background: rgba(255,7,58,0.1); padding: 15px; border-radius: 10px; border: 1px solid rgba(255,7,58,0.3);">
-                    <p style="color: var(--neon-red); font-weight: bold; margin-bottom: 5px; font-family: var(--font-game);">INTEL RAPPORT:</p>
-                    <p id="v-intel-1" style="font-family: var(--font-math); font-size: 0.95rem; margin-bottom: 5px;">Målt Y til tiden X=0: ?</p>
-                    <p id="v-intel-2" style="font-family: var(--font-math); font-size: 0.95rem;">Målt Y til tiden X=5: ?</p>
+                <div class="dpad-container">
+                    <div class="dpad-btn dpad-top" id="s1-btn-0"><span>10</span><small>W</small></div>
+                    <div class="dpad-btn dpad-left" id="s1-btn-1"><span>6</span><small>A</small></div>
+                    <div class="dpad-btn dpad-right" id="s1-btn-2"><span>5</span><small>D</small></div>
+                    <div class="dpad-btn dpad-bottom" id="s1-btn-3"><span>12</span><small>S</small></div>
                 </div>
+            </div>
 
-                <!-- Progress bar for "Syntetisering" -->
-                <div style="margin-top: 15px; width: 100%; height: 15px; background: #1e293b; border-radius: 8px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1);">
-                    <div id="v-cure-progress" style="height: 100%; width: 0%; background: var(--neon-green); transition: width 0.1s linear; box-shadow: 0 0 10px var(--neon-green);"></div>
+            <!-- P2 Zone -->
+            <div class="seq-player-zone seq-p2" id="seq-zone-2">
+                <div class="penalty-text" id="seq-pen-2">STRAF: +1 LÆNGDE!</div>
+                <h3 style="color: var(--neon-pink); font-family: var(--font-game); font-size: 1.5rem;">SPILLER 2</h3>
+                
+                <div class="seq-display" id="seq-text-2">2, 4, <span class="seq-missing">?</span>, 8</div>
+                
+                <div class="dpad-container">
+                    <div class="dpad-btn dpad-top" id="s2-btn-0"><span>10</span><small>↑</small></div>
+                    <div class="dpad-btn dpad-left" id="s2-btn-1"><span>6</span><small>←</small></div>
+                    <div class="dpad-btn dpad-right" id="s2-btn-2"><span>5</span><small>→</small></div>
+                    <div class="dpad-btn dpad-bottom" id="s2-btn-3"><span>12</span><small>↓</small></div>
                 </div>
-                <div style="text-align: center; font-size: 0.8rem; color: var(--text-muted); margin-top: 5px;">SYNTETISERER KUR...</div>
+            </div>
+        </div>
+
+        <div id="seq-winner-overlay" class="game-overlay" style="display:none;">
+            <div style="font-size: 6rem; margin-bottom: 20px;">🏆</div>
+            <h1 id="seq-winner-text" class="title-glow">VINDER</h1>
+            <div style="display: flex; gap: 20px; margin-top: 20px;">
+                <button class="btn-neon btn-yellow" style="border-color: var(--neon-yellow); color: white;" onmouseover="this.style.background='var(--neon-yellow)'; this.style.color='black';" onmouseout="this.style.background='rgba(0,0,0,0.7)'; this.style.color='white';" onclick="startSeqGame()">OMKAMP</button>
+                <button class="btn-neon btn-blue" onclick="showScreen('screen-menu')">HOVEDMENU</button>
             </div>
         </div>
     </div>
@@ -693,402 +583,193 @@
             ctx.stroke();
         }
 
-        function drawQuadratic(ctx, w, h, scale, a, b, c, color, isDashed=false, thickness=3) {
-            ctx.beginPath();
-            if(isDashed) ctx.setLineDash([10, 10]); else ctx.setLineDash([]);
-            ctx.strokeStyle = color;
-            ctx.lineWidth = thickness;
-            ctx.shadowBlur = isDashed ? 0 : 15;
-            ctx.shadowColor = color;
-            for(let x = -20; x <= 20; x += 0.2) {
-                let y = a*x*x + b*x + c;
-                let cx = w/2 + x * scale;
-                let cy = h/2 - y * scale;
-                if(x === -20) ctx.moveTo(cx, cy);
-                else ctx.lineTo(cx, cy);
-            }
-            ctx.stroke();
-            ctx.setLineDash([]); ctx.shadowBlur = 0;
-        }
-
-        // --- GLOBAL TASTE-STYRING (Sikrer glidende multiplayer movement) ---
+        // --- GLOBAL TASTE-STYRING ---
         const keys = {};
-        window.addEventListener('keydown', e => { keys[e.key.toLowerCase()] = true; });
-        window.addEventListener('keyup', e => { keys[e.key.toLowerCase()] = false; });
+        window.addEventListener('keydown', e => { keys[e.key] = true; keys[e.key.toLowerCase()] = true; });
+        window.addEventListener('keyup', e => { keys[e.key] = false; keys[e.key.toLowerCase()] = false; });
 
 
         // ============================================================================
-        // SPIL 1: PARABEL HACKER
-        // ============================================================================
-        let hCtx, hW = 500, hH = 500, hScale = 25;
-        let hTarget = {a: 1, b: 0, c: 0};
-        let hTime = 60, hScore = 0, hLoopInt = null, hTimerInt = null;
-
-        function startHackerGame() {
-            hTime = 60; hScore = 0;
-            document.getElementById('hack-score').innerText = hScore;
-            hCtx = document.getElementById('hackCanvas').getContext('2d');
-            
-            // Nulstil sliders
-            document.getElementById('hack-A').value = 1;
-            document.getElementById('hack-B').value = 0;
-            document.getElementById('hack-C').value = 0;
-            
-            showScreen('screen-hacker-game');
-            if(hTimerInt) clearInterval(hTimerInt);
-            if(hLoopInt) clearInterval(hLoopInt);
-
-            // Timer loop
-            hTimerInt = setInterval(() => {
-                hTime -= 1;
-                document.getElementById('hack-time').innerText = hTime;
-                if(hTime <= 0) endHackerGameFinal();
-            }, 1000);
-
-            generateHackerTarget();
-            hLoopInt = setInterval(updateHackerGraphics, 1000/60); // 60fps draw loop
-        }
-
-        function endHackerGameFinal() {
-            clearInterval(hTimerInt); clearInterval(hLoopInt);
-            document.getElementById('hack-final-score').innerText = hScore;
-            showScreen('screen-hacker-end');
-        }
-
-        function endHackerGame() {
-            clearInterval(hTimerInt); clearInterval(hLoopInt);
-            showScreen('screen-menu');
-        }
-
-        function generateHackerTarget() {
-            hTarget.a = [-2, -1, -0.5, 0.5, 1, 2][Math.floor(Math.random() * 6)];
-            hTarget.b = Math.floor(Math.random() * 9) - 4; // -4 til 4
-            hTarget.c = Math.floor(Math.random() * 13) - 6; // -6 til 6
-            
-            let statusEl = document.getElementById('hack-status');
-            statusEl.innerText = "SØGER EFTER SIGNAL...";
-            statusEl.style.color = "var(--neon-yellow)";
-            statusEl.style.textShadow = "0 0 10px var(--neon-yellow)";
-        }
-
-        function updateHacker() {
-            // Opdaterer kun text-værdier og formel når brugeren skruer
-            let pA = parseFloat(document.getElementById('hack-A').value);
-            let pB = parseFloat(document.getElementById('hack-B').value);
-            let pC = parseFloat(document.getElementById('hack-C').value);
-
-            document.getElementById('valH-A').innerText = pA.toFixed(1);
-            document.getElementById('valH-B').innerText = pB.toFixed(1);
-            document.getElementById('valH-C').innerText = pC.toFixed(1);
-            
-            let mathEl = document.getElementById('hack-formula');
-            mathEl.innerHTML = `$f(x) = ${pA}x^2 ${pB>=0?'+':''} ${pB}x ${pC>=0?'+':''} ${pC}$`;
-            MathJax.typesetPromise([mathEl]);
-        }
-
-        let hScanLine = -250; // Visuel radar effekt
-        function updateHackerGraphics() {
-            let pA = parseFloat(document.getElementById('hack-A').value);
-            let pB = parseFloat(document.getElementById('hack-B').value);
-            let pC = parseFloat(document.getElementById('hack-C').value);
-
-            drawCanvasGrid(hCtx, hW, hH, hScale);
-            
-            // Radar scan effekt
-            hScanLine += 5;
-            if(hScanLine > hH) hScanLine = 0;
-            hCtx.fillStyle = 'rgba(0, 243, 255, 0.05)';
-            hCtx.fillRect(0, hScanLine, hW, 50);
-
-            // Tegn fjende og spiller
-            drawQuadratic(hCtx, hW, hH, hScale, hTarget.a, hTarget.b, hTarget.c, 'rgba(255,255,255,0.6)', true, 3);
-            drawQuadratic(hCtx, hW, hH, hScale, pA, pB, pC, 'var(--neon-blue)', false, 4);
-
-            // Tjek match
-            if(Math.abs(pA - hTarget.a) < 0.1 && Math.abs(pB - hTarget.b) < 0.1 && Math.abs(pC - hTarget.c) < 0.1) {
-                let statusEl = document.getElementById('hack-status');
-                if(statusEl.innerText !== "HACK GENNEMFØRT!") {
-                    statusEl.innerText = "HACK GENNEMFØRT!";
-                    statusEl.style.color = "var(--neon-green)";
-                    statusEl.style.textShadow = "0 0 15px var(--neon-green)";
-                    
-                    drawQuadratic(hCtx, hW, hH, hScale, pA, pB, pC, 'var(--neon-green)', false, 8);
-                    
-                    hScore++; hTime += 10;
-                    document.getElementById('hack-score').innerText = hScore;
-                    document.getElementById('hack-time').innerText = hTime;
-                    
-                    setTimeout(generateHackerTarget, 1000);
-                }
-            }
-        }
-
-
-        // ============================================================================
-        // SPIL 2: SHAPE SHIFTER DUEL
-        // ============================================================================
-        let dCtx1, dCtx2;
-        let dTarget = {a: 1, c: 0};
-        let p1 = {a: -1, c: 5}, p2 = {a: -1, c: 5};
-        let dScore1 = 0, dScore2 = 0;
-        let dActive = false;
-
-        function startDuelGame() {
-            dScore1 = 0; dScore2 = 0;
-            updateDuelHUD();
-            dCtx1 = document.getElementById('duelCanvas1').getContext('2d');
-            dCtx2 = document.getElementById('duelCanvas2').getContext('2d');
-            document.getElementById('duel-winner-overlay').style.display = 'none';
-            showScreen('screen-duel-game');
-            dActive = true;
-            generateDuelTarget();
-            requestAnimationFrame(duelLoop);
-        }
-
-        function endDuelGame() { dActive = false; showScreen('screen-menu'); }
-
-        function generateDuelTarget() {
-            dTarget.a = [-2, -1, -0.5, 0.5, 1, 2][Math.floor(Math.random() * 6)];
-            dTarget.c = Math.floor(Math.random() * 11) - 5;
-            p1.a = 1; p1.c = 0; 
-            p2.a = 1; p2.c = 0;
-            updateDuelHUD();
-        }
-
-        function updateDuelHUD() {
-            document.getElementById('d-score-1').innerText = dScore1;
-            document.getElementById('d-score-2').innerText = dScore2;
-            document.getElementById('d1-a').innerText = p1.a.toFixed(1);
-            document.getElementById('d1-c').innerText = p1.c.toFixed(1);
-            document.getElementById('d2-a').innerText = p2.a.toFixed(1);
-            document.getElementById('d2-c').innerText = p2.c.toFixed(1);
-        }
-
-        function duelLoop() {
-            if(!dActive) return;
-
-            // Player 1 Input (W/S for 'a', A/D for 'c')
-            if(keys['w'] && p1.a < 3) p1.a += 0.05;
-            if(keys['s'] && p1.a > -3) p1.a -= 0.05;
-            if(Math.abs(p1.a) < 0.1) p1.a = 0.2; // Undgå 0
-            if(keys['a'] && p1.c > -8) p1.c -= 0.2;
-            if(keys['d'] && p1.c < 8) p1.c += 0.2;
-
-            // Player 2 Input (Arrows)
-            if(keys['arrowup'] && p2.a < 3) p2.a += 0.05;
-            if(keys['arrowdown'] && p2.a > -3) p2.a -= 0.05;
-            if(Math.abs(p2.a) < 0.1) p2.a = 0.2;
-            if(keys['arrowleft'] && p2.c > -8) p2.c -= 0.2;
-            if(keys['arrowright'] && p2.c < 8) p2.c += 0.2;
-
-            updateDuelHUD();
-
-            // Tegn Spiller 1
-            drawCanvasGrid(dCtx1, 400, 400, 20);
-            drawQuadratic(dCtx1, 400, 400, 20, dTarget.a, 0, dTarget.c, 'rgba(255,255,255,0.7)', true, 3);
-            drawQuadratic(dCtx1, 400, 400, 20, p1.a, 0, p1.c, 'var(--neon-blue)', false, 4);
-
-            // Tegn Spiller 2
-            drawCanvasGrid(dCtx2, 400, 400, 20);
-            drawQuadratic(dCtx2, 400, 400, 20, dTarget.a, 0, dTarget.c, 'rgba(255,255,255,0.7)', true, 3);
-            drawQuadratic(dCtx2, 400, 400, 20, p2.a, 0, p2.c, 'var(--neon-pink)', false, 4);
-
-            // Win Condition Tjek (Tolerancen er 0.15)
-            let p1Win = Math.abs(p1.a - dTarget.a) < 0.15 && Math.abs(p1.c - dTarget.c) < 0.5;
-            let p2Win = Math.abs(p2.a - dTarget.a) < 0.15 && Math.abs(p2.c - dTarget.c) < 0.5;
-
-            if(p1Win || p2Win) {
-                dActive = false; // Lås input
-                if(p1Win) {
-                    dScore1++; drawQuadratic(dCtx1, 400, 400, 20, p1.a, 0, p1.c, 'var(--neon-green)', false, 8);
-                } else {
-                    dScore2++; drawQuadratic(dCtx2, 400, 400, 20, p2.a, 0, p2.c, 'var(--neon-green)', false, 8);
-                }
-                
-                updateDuelHUD();
-
-                if(dScore1 >= 5 || dScore2 >= 5) {
-                    setTimeout(() => {
-                        document.getElementById('duel-winner-overlay').style.display = 'flex';
-                        let wText = document.getElementById('duel-winner-text');
-                        wText.innerText = dScore1 >= 5 ? "BLÅ VINDER!" : "PINK VINDER!";
-                        wText.style.color = dScore1 >= 5 ? "var(--neon-blue)" : "var(--neon-pink)";
-                        wText.style.textShadow = dScore1 >= 5 ? "0 0 30px var(--neon-blue)" : "0 0 30px var(--neon-pink)";
-                    }, 1000);
-                } else {
-                    setTimeout(() => { dActive = true; generateDuelTarget(); }, 1500);
-                }
-            }
-
-            if(dActive) requestAnimationFrame(duelLoop);
-        }
-
-
-        // ============================================================================
-        // SPIL 3: LASER SKJOLDET
-        // ============================================================================
-        let lCtx, lCanvas;
-        let lLine = {a: 1, b: 0}, lTargetDist = 0, lRound = 1;
-
-        function startLaserGame() { 
-            lRound = 1;
-            lCanvas = document.getElementById('laserCanvas'); 
-            lCtx = lCanvas.getContext('2d'); 
-            showScreen('screen-laser-game'); 
-            generateLaserRound(); 
-        }
-
-        function generateLaserRound() {
-            document.getElementById('laser-round').innerText = lRound;
-            document.getElementById('laser-feedback').style.display = 'none';
-            
-            lLine.a = [-2, -1, -0.5, 0.5, 1, 2][Math.floor(Math.random() * 6)];
-            lLine.b = Math.floor(Math.random() * 9) - 4;
-            lTargetDist = (Math.floor(Math.random() * 4) + 2); // 2 til 5
-            
-            let mathEq = document.getElementById('laser-eq');
-            mathEq.innerHTML = `$y = ${lLine.a}x ${lLine.b>=0?'+':''} ${lLine.b}$`;
-            MathJax.typesetPromise([mathEq]);
-
-            document.getElementById('laser-target').innerText = lTargetDist.toFixed(1);
-            
-            drawLaserField();
-        }
-
-        function drawLaserField(shieldP = null, hit = false) {
-            drawCanvasGrid(lCtx, 600, 500, 25);
-            
-            // Tegn Laseren
-            lCtx.beginPath();
-            lCtx.strokeStyle = 'var(--neon-red)';
-            lCtx.lineWidth = 4;
-            lCtx.shadowBlur = 15; lCtx.shadowColor = 'var(--neon-red)';
-            let x1 = -15, y1 = lLine.a*x1 + lLine.b;
-            let x2 = 15, y2 = lLine.a*x2 + lLine.b;
-            lCtx.moveTo(300 + x1*25, 250 - y1*25);
-            lCtx.lineTo(300 + x2*25, 250 - y2*25);
-            lCtx.stroke();
-            lCtx.shadowBlur = 0;
-
-            if(shieldP) {
-                // Tegn Shield
-                lCtx.beginPath();
-                lCtx.arc(300 + shieldP.x*25, 250 - shieldP.y*25, 8, 0, Math.PI*2);
-                lCtx.fillStyle = hit ? 'var(--neon-green)' : 'white';
-                lCtx.fill();
-                lCtx.shadowBlur = 20; lCtx.shadowColor = hit ? 'var(--neon-green)' : 'white';
-                lCtx.stroke();
-                lCtx.shadowBlur = 0;
-
-                // Tegn afstandslinje
-                let a_perp = lLine.a === 0 ? 1000 : -1 / lLine.a;
-                let b_perp = shieldP.y - a_perp * shieldP.x;
-                let projX = (b_perp - lLine.b) / (lLine.a - a_perp);
-                let projY = lLine.a * projX + lLine.b;
-
-                lCtx.beginPath();
-                lCtx.setLineDash([5, 5]);
-                lCtx.strokeStyle = hit ? 'var(--neon-green)' : 'rgba(255,255,255,0.7)';
-                lCtx.lineWidth = 2;
-                lCtx.moveTo(300 + shieldP.x*25, 250 - shieldP.y*25);
-                lCtx.lineTo(300 + projX*25, 250 - projY*25);
-                lCtx.stroke();
-                lCtx.setLineDash([]);
-            }
-        }
-
-        // Klik for at placere skjold
-        document.getElementById('laserCanvas').addEventListener('mousedown', function(e) {
-            if(document.getElementById('laser-feedback').style.display === 'block') return;
-
-            const rect = lCanvas.getBoundingClientRect();
-            let mathX = (e.clientX - rect.left - 300) / 25; 
-            let mathY = (250 - (e.clientY - rect.top)) / 25;
-            
-            // Dist = |ax - y + b| / sqrt(a^2 + 1)
-            let d = Math.abs(lLine.a * mathX - mathY + lLine.b) / Math.sqrt(lLine.a*lLine.a + 1);
-            let isHit = Math.abs(d - lTargetDist) < 0.4;
-            
-            drawLaserField({x: mathX, y: mathY}, isHit);
-            
-            let fb = document.getElementById('laser-feedback');
-            if(isHit) {
-                fb.innerText = `KORREKT! Afstand = ${d.toFixed(1)}`;
-                fb.style.color = "var(--neon-green)";
-                fb.style.textShadow = "0 0 20px black, 0 0 10px var(--neon-green)";
-                fb.style.display = "block";
-                setTimeout(() => { lRound++; generateLaserRound(); }, 2000);
-            } else {
-                fb.innerText = `FEJL! Din afstand = ${d.toFixed(1)}`;
-                fb.style.color = "var(--neon-red)";
-                fb.style.textShadow = "0 0 20px black, 0 0 10px var(--neon-red)";
-                fb.style.display = "block";
-                setTimeout(() => { fb.style.display = "none"; drawLaserField(); }, 1500);
-            }
-        });
-
-
-        // ============================================================================
-        // SPIL 4: TANGENT SNIPER (Differentialregning)
+        // SPIL 1: TANGENT SNIPER (V2)
         // ============================================================================
         let tCanvas, tCtx;
         let tScore1 = 0, tScore2 = 0;
-        let tank1 = { x: -8, y: 0, color: 'var(--neon-blue)' };
-        let tank2 = { x: 8, y: 0, color: 'var(--neon-pink)' };
-        let projectiles = []; // Array of {x, y, dx, dy, color, shooterNum}
+        let tank1 = { color: 'var(--neon-blue)' };
+        let tank2 = { color: 'var(--neon-pink)' };
+        let projectiles = []; 
+        let activeItems = [];
         let tActive = false;
         let tScale = 30;
+        let shootTimer1 = 0, shootTimer2 = 0;
+        let itemCooldown1 = 0, itemCooldown2 = 0;
+        let itemSpawnTimer = 0;
+        let currentLandscape = null;
+        let tLoopId = null;
         
-        // Landskabs typer
-        const landscapes = [
-            { name: "Sinus Bølgen", f: (x) => 4 * Math.sin(x/2.5), df: (x) => (4/2.5) * Math.cos(x/2.5) },
-            { name: "Parabel Dalen", f: (x) => 0.1*x*x - 3, df: (x) => 0.2*x },
-            { name: "Det Skæve Bjerg", f: (x) => Math.sin(x) + Math.cos(x/2)*2, df: (x) => Math.cos(x) - Math.sin(x/2) }
-        ];
-        let currentLevel = 0;
+        const ITEM_TYPES = ['RAPID', 'HEAL', 'FREEZE', 'BIG', 'CHARGE', 'SHIELD'];
+        const ICONS = { 'RAPID': '⚡', 'HEAL': '💖', 'FREEZE': '❄️', 'BIG': '🔴', 'CHARGE': '🔋', 'SHIELD': '🛡️' };
+        const COLORS = { 'RAPID': '#fffb00', 'HEAL': '#ff00ea', 'FREEZE': '#00f3ff', 'BIG': '#ff073a', 'CHARGE': '#39ff14', 'SHIELD': '#b026ff' };
+
+        function generateRandomLandscape() {
+            let type = Math.floor(Math.random() * 3);
+            if(type === 0) {
+                let A = Math.random() * 2 + 2; 
+                let B = Math.random() * 0.4 + 0.2;
+                return { name: "Kvantebølgen", f: x => A*Math.sin(B*x), df: x => A*B*Math.cos(B*x) };
+            } else if (type === 1) {
+                let A = Math.random() * 1.5 + 1;
+                let B = Math.random() * 0.5 + 0.3;
+                return { name: "Interferensdalen", f: x => A*Math.sin(B*x) + Math.cos(x/2), df: x => A*B*Math.cos(B*x) - 0.5*Math.sin(x/2) };
+            } else {
+                let A = (Math.random() * 0.05 + 0.02) * (Math.random()>0.5?1:-1);
+                return { name: "Det Buet Land", f: x => A*x*x + 2*Math.sin(x*0.5), df: x => 2*A*x + Math.cos(x*0.5) };
+            }
+        }
 
         function startTangentGame() {
             tScore1 = 0; tScore2 = 0;
-            currentLevel = 0;
-            projectiles = [];
             document.getElementById('t-score-1').innerText = tScore1;
             document.getElementById('t-score-2').innerText = tScore2;
             document.getElementById('tangent-winner-overlay').style.display = 'none';
             tCanvas = document.getElementById('tangentCanvas');
             tCtx = tCanvas.getContext('2d');
             showScreen('screen-tangent-game');
-            spawnTanks();
+            spawnRound();
             tActive = true;
-            requestAnimationFrame(tangentLoop);
+            if(tLoopId) cancelAnimationFrame(tLoopId);
+            tLoopId = requestAnimationFrame(tangentLoop);
         }
 
-        function endTangentGame() { tActive = false; showScreen('screen-menu'); }
+        function spawnRound() {
+            currentLandscape = generateRandomLandscape();
+            document.getElementById('t-landscape-name').innerText = currentLandscape.name;
+            
+            tank1.x = -12 - Math.random()*2; tank1.hp = 3; tank1.item = null; tank1.frozen = 0; tank1.rapid = 0; tank1.bigs = 0; tank1.shield = false; tank1.charge = 0; tank1.charging = false;
+            tank2.x = 12 + Math.random()*2;  tank2.hp = 3; tank2.item = null; tank2.frozen = 0; tank2.rapid = 0; tank2.bigs = 0; tank2.shield = false; tank2.charge = 0; tank2.charging = false;
+            
+            projectiles = [];
+            activeItems = [];
+            itemSpawnTimer = 300; 
+            updateHUDItems();
+        }
 
-        function spawnTanks() {
-            document.getElementById('t-landscape-name').innerText = landscapes[currentLevel].name;
-            tank1.x = -8 - Math.random()*2;
-            tank2.x = 8 + Math.random()*2;
+        function endTangentGame() { 
+            tActive = false; 
+            if(tLoopId) cancelAnimationFrame(tLoopId);
+            showScreen('screen-menu'); 
+        }
+
+        function updateHUDItems() {
+            document.getElementById('t-item-1').innerText = tank1.item ? ICONS[tank1.item] : "Tom";
+            document.getElementById('t-item-2').innerText = tank2.item ? ICONS[tank2.item] : "Tom";
+        }
+
+        function useItem(tank, enemy) {
+            if(!tank.item || tank.item === 'CHARGE') return; 
+            
+            switch(tank.item) {
+                case 'HEAL': tank.hp = Math.min(3, tank.hp + 1); break;
+                case 'FREEZE': enemy.frozen = 120; break; 
+                case 'RAPID': tank.rapid = 300; break; 
+                case 'BIG': tank.bigs = 3; break; 
+                case 'SHIELD': tank.shield = true; break;
+            }
+            tank.item = null;
+            updateHUDItems();
+        }
+
+        function shootProjectile(tank, num, isChargeRelease = false) {
+            let slope = currentLandscape.df(tank.x);
+            let length = Math.sqrt(1 + slope*slope);
+            let dir = num === 1 ? 1 : -1; 
+            
+            let isBig = tank.bigs > 0;
+            if(isBig && !isChargeRelease) tank.bigs--;
+
+            let speed = isChargeRelease ? 0.8 : (isBig ? 0.4 : 0.5);
+            let rad = isChargeRelease ? 15 : (isBig ? 12 : 6);
+            let dmg = isChargeRelease ? 2 : 1;
+
+            projectiles.push({
+                x: tank.x, y: tank.y,
+                dx: (dir / length) * speed, dy: (dir * slope / length) * speed,
+                color: isChargeRelease ? 'var(--neon-green)' : tank.color,
+                shooterNum: num,
+                radius: rad, damage: dmg
+            });
         }
 
         function tangentLoop() {
             if(!tActive) return;
             const w = tCanvas.width, h = tCanvas.height;
-            let level = landscapes[currentLevel];
+            let level = currentLandscape;
             
-            // Input
-            if(keys['a'] && tank1.x > -15) tank1.x -= 0.1;
-            if(keys['d'] && tank1.x < -1) tank1.x += 0.1;
-            if(keys['arrowleft'] && tank2.x > 1) tank2.x -= 0.1;
-            if(keys['arrowright'] && tank2.x < 15) tank2.x += 0.1;
-            
-            // Update y positions
-            tank1.y = level.f(tank1.x);
-            tank2.y = level.f(tank2.x);
+            if(shootTimer1 > 0) shootTimer1--;
+            if(shootTimer2 > 0) shootTimer2--;
+            if(itemCooldown1 > 0) itemCooldown1--;
+            if(itemCooldown2 > 0) itemCooldown2--;
+            if(tank1.frozen > 0) tank1.frozen--;
+            if(tank2.frozen > 0) tank2.frozen--;
+            if(tank1.rapid > 0) tank1.rapid--;
+            if(tank2.rapid > 0) tank2.rapid--;
+            itemSpawnTimer--;
 
-            // Draw Background
+            // TANK 1
+            if(tank1.frozen <= 0) {
+                if(keys['a'] && tank1.x > -16) tank1.x -= 0.12;
+                if(keys['d'] && tank1.x < -1) tank1.x += 0.12;
+                if(keys['s'] && itemCooldown1 <= 0) { useItem(tank1, tank2); itemCooldown1 = 30; }
+
+                if(keys['w']) {
+                    if(tank1.item === 'CHARGE') {
+                        tank1.charging = true;
+                        tank1.charge = Math.min(60, tank1.charge + 1.5);
+                    } else if(shootTimer1 <= 0) {
+                        shootProjectile(tank1, 1);
+                        shootTimer1 = tank1.rapid > 0 ? 10 : 40;
+                    }
+                } else {
+                    if(tank1.charging && tank1.charge > 20) {
+                        shootProjectile(tank1, 1, true);
+                        tank1.item = null; tank1.charging = false; tank1.charge = 0;
+                        shootTimer1 = 40; updateHUDItems();
+                    } else if (tank1.charging) { tank1.charging = false; tank1.charge = 0; }
+                }
+            }
+
+            // TANK 2
+            if(tank2.frozen <= 0) {
+                if(keys['arrowleft'] && tank2.x > 1) tank2.x -= 0.12;
+                if(keys['arrowright'] && tank2.x < 16) tank2.x += 0.12;
+                if(keys['arrowdown'] && itemCooldown2 <= 0) { useItem(tank2, tank1); itemCooldown2 = 30; }
+
+                if(keys['arrowup']) {
+                    if(tank2.item === 'CHARGE') {
+                        tank2.charging = true;
+                        tank2.charge = Math.min(60, tank2.charge + 1.5);
+                    } else if(shootTimer2 <= 0) {
+                        shootProjectile(tank2, 2);
+                        shootTimer2 = tank2.rapid > 0 ? 10 : 40;
+                    }
+                } else {
+                    if(tank2.charging && tank2.charge > 20) {
+                        shootProjectile(tank2, 2, true);
+                        tank2.item = null; tank2.charging = false; tank2.charge = 0;
+                        shootTimer2 = 40; updateHUDItems();
+                    } else if (tank2.charging) { tank2.charging = false; tank2.charge = 0; }
+                }
+            }
+
+            tank1.y = level.f(tank1.x); tank2.y = level.f(tank2.x);
+
+            if(itemSpawnTimer <= 0 && activeItems.length === 0) {
+                let rType = ITEM_TYPES[Math.floor(Math.random() * ITEM_TYPES.length)];
+                activeItems.push({ type: rType, x1: -10 + Math.random()*6, x2: 10 - Math.random()*6, floatOff: 0 });
+                itemSpawnTimer = 600; 
+            }
+
             drawCanvasGrid(tCtx, w, h, tScale);
             
-            // Draw Landscape f(x)
             tCtx.beginPath();
             tCtx.strokeStyle = 'rgba(255,255,255,0.8)';
             tCtx.lineWidth = 4;
@@ -1099,242 +780,314 @@
             }
             tCtx.stroke();
 
-            // Draw Tanks and their Tangent Lines
-            drawTankWithTangent(tank1, w, h, level, 1);
-            drawTankWithTangent(tank2, w, h, level, 2);
+            for(let i=activeItems.length-1; i>=0; i--) {
+                let itm = activeItems[i];
+                itm.floatOff += 0.05;
+                let yOff = Math.sin(itm.floatOff) * 10;
+                let px1 = w/2 + itm.x1*tScale, py1 = h/2 - level.f(itm.x1)*tScale - 20 + yOff;
+                let px2 = w/2 + itm.x2*tScale, py2 = h/2 - level.f(itm.x2)*tScale - 20 + yOff;
+                
+                tCtx.font = "20px sans-serif"; tCtx.textAlign = "center";
+                tCtx.shadowBlur = 15; tCtx.shadowColor = COLORS[itm.type];
+                tCtx.fillText(ICONS[itm.type], px1, py1);
+                tCtx.fillText(ICONS[itm.type], px2, py2);
+                tCtx.shadowBlur = 0;
 
-            // Opdater Projectiles
+                if(!tank1.item && Math.abs(tank1.x - itm.x1) < 0.8) {
+                    tank1.item = itm.type; activeItems.splice(i, 1); updateHUDItems(); continue;
+                }
+                if(!tank2.item && Math.abs(tank2.x - itm.x2) < 0.8) {
+                    tank2.item = itm.type; activeItems.splice(i, 1); updateHUDItems(); continue;
+                }
+            }
+
+            drawTankWithProperties(tank1, w, h, level, 1);
+            drawTankWithProperties(tank2, w, h, level, 2);
+
             for(let i = projectiles.length - 1; i >= 0; i--) {
                 let p = projectiles[i];
                 p.x += p.dx; p.y += p.dy;
                 
-                // Draw Projectile
                 let px = w/2 + p.x*tScale; let py = h/2 - p.y*tScale;
-                tCtx.beginPath(); tCtx.arc(px, py, 6, 0, Math.PI*2);
+                tCtx.beginPath(); tCtx.arc(px, py, p.radius, 0, Math.PI*2);
                 tCtx.fillStyle = 'white'; tCtx.fill();
-                tCtx.shadowBlur = 15; tCtx.shadowColor = p.color;
-                tCtx.stroke(); tCtx.shadowBlur = 0;
+                tCtx.shadowBlur = 15; tCtx.shadowColor = p.color; tCtx.stroke(); tCtx.shadowBlur = 0;
 
-                // Hit Detection
                 let target = p.shooterNum === 1 ? tank2 : tank1;
                 let dist = Math.sqrt(Math.pow(p.x - target.x, 2) + Math.pow(p.y - target.y, 2));
-                if(dist < 0.6) { // Hit!
-                    if(p.shooterNum === 1) tScore1++; else tScore2++;
-                    document.getElementById('t-score-1').innerText = tScore1;
-                    document.getElementById('t-score-2').innerText = tScore2;
-                    projectiles.splice(i, 1); // Fjern skud
-                    
-                    // Næste level
-                    currentLevel = (currentLevel + 1) % landscapes.length;
-                    spawnTanks();
+                let hitRadius = (p.radius / tScale) + 0.5;
 
-                    if(tScore1 >= 5 || tScore2 >= 5) {
-                        tActive = false;
-                        document.getElementById('tangent-winner-overlay').style.display = 'flex';
-                        let wTxt = document.getElementById('tangent-winner-text');
-                        wTxt.innerText = tScore1 >= 5 ? "BLÅ VINDER!" : "PINK VINDER!";
-                        wTxt.style.color = tScore1 >= 5 ? "var(--neon-blue)" : "var(--neon-pink)";
+                if(dist < hitRadius) {
+                    projectiles.splice(i, 1);
+                    if(target.shield) {
+                        target.shield = false; 
+                    } else {
+                        target.hp -= p.damage;
+                        if(target.hp <= 0) {
+                            if(p.shooterNum === 1) tScore1++; else tScore2++;
+                            document.getElementById('t-score-1').innerText = tScore1;
+                            document.getElementById('t-score-2').innerText = tScore2;
+                            
+                            if(tScore1 >= 5 || tScore2 >= 5) {
+                                tActive = false;
+                                document.getElementById('tangent-winner-overlay').style.display = 'flex';
+                                let wTxt = document.getElementById('tangent-winner-text');
+                                wTxt.innerText = tScore1 >= 5 ? "BLÅ VINDER!" : "PINK VINDER!";
+                                wTxt.style.color = tScore1 >= 5 ? "var(--neon-blue)" : "var(--neon-pink)";
+                                wTxt.style.textShadow = `0 0 30px ${tScore1 >= 5 ? 'var(--neon-blue)' : 'var(--neon-pink)'}`;
+                            } else {
+                                setTimeout(spawnRound, 500); 
+                            }
+                            break; 
+                        }
                     }
                     continue;
                 }
 
-                // Fjern hvis ude af skærm
-                if(p.x < -20 || p.x > 20 || p.y < -20 || p.y > 20) {
-                    projectiles.splice(i, 1);
-                }
+                if(p.x < -20 || p.x > 20 || p.y < -20 || p.y > 20) projectiles.splice(i, 1);
             }
 
-            requestAnimationFrame(tangentLoop);
+            if(tActive) tLoopId = requestAnimationFrame(tangentLoop);
         }
 
-        function drawTankWithTangent(tank, w, h, level, playerNum) {
+        function drawTankWithProperties(tank, w, h, level, num) {
             let px = w/2 + tank.x * tScale;
             let py = h/2 - tank.y * tScale;
             let slope = level.df(tank.x);
             
-            // HUD Opdatering
             let b_val = tank.y - slope * tank.x;
-            let eqStr = `y = ${slope.toFixed(2)}x ${b_val>=0?'+':''} ${b_val.toFixed(2)}`;
-            document.getElementById(`t-eq-${playerNum}`).innerText = eqStr;
+            document.getElementById(`t-eq-${num}`).innerText = `y = ${slope.toFixed(2)}x ${b_val>=0?'+':''} ${b_val.toFixed(2)}`;
 
-            // Tegn Tangent Linje (Sigtekorn)
-            tCtx.beginPath(); 
-            tCtx.strokeStyle = tank.color; 
-            tCtx.setLineDash([5, 10]); 
-            tCtx.lineWidth = 2;
+            tCtx.beginPath(); tCtx.strokeStyle = tank.color; tCtx.setLineDash([5, 10]); tCtx.lineWidth = 2;
             let x1 = -20, y1 = slope * (x1 - tank.x) + tank.y;
             let x2 = 20, y2 = slope * (x2 - tank.x) + tank.y;
-            tCtx.moveTo(w/2 + x1*tScale, h/2 - y1*tScale); 
-            tCtx.lineTo(w/2 + x2*tScale, h/2 - y2*tScale);
-            tCtx.stroke(); 
-            tCtx.setLineDash([]);
+            tCtx.moveTo(w/2 + x1*tScale, h/2 - y1*tScale); tCtx.lineTo(w/2 + x2*tScale, h/2 - y2*tScale);
+            tCtx.stroke(); tCtx.setLineDash([]);
 
-            // Tegn Tank (firkant for at se sejere ud)
-            tCtx.fillStyle = tank.color;
-            tCtx.shadowBlur = 20; tCtx.shadowColor = tank.color;
-            // Beregn rotation ud fra tangent hældning
-            let angle = Math.atan(-slope); // -slope fordi canvas y er omvendt
             tCtx.save();
             tCtx.translate(px, py);
-            tCtx.rotate(angle);
-            tCtx.fillRect(-15, -10, 30, 20); // Tank krop
-            tCtx.fillRect(10, -3, 15, 6); // Kanonrør
+            
+            if(tank.shield) {
+                tCtx.beginPath(); tCtx.arc(0, -10, 25, 0, Math.PI*2);
+                tCtx.strokeStyle = 'var(--neon-purple)'; tCtx.lineWidth = 3;
+                tCtx.shadowBlur = 10; tCtx.shadowColor = 'var(--neon-purple)'; tCtx.stroke(); tCtx.shadowBlur=0;
+            }
+
+            tCtx.fillStyle = 'rgba(255,0,0,0.7)'; tCtx.fillRect(-15, -35, 30, 6);
+            tCtx.fillStyle = 'var(--neon-green)'; tCtx.fillRect(-15, -35, 30 * (Math.max(0, tank.hp)/3), 6);
+
+            tCtx.rotate(Math.atan(-slope));
+            
+            if(tank.frozen > 0) {
+                tCtx.fillStyle = 'rgba(0, 243, 255, 0.4)'; tCtx.fillRect(-20, -15, 40, 25);
+            }
+
+            if(tank.charging) {
+                tCtx.beginPath(); tCtx.arc((num===1?25:-25), -3, tank.charge/4, 0, Math.PI*2);
+                tCtx.fillStyle = 'var(--neon-green)'; tCtx.fill();
+            }
+            
+            tCtx.fillStyle = tank.color;
+            tCtx.shadowBlur = 20; tCtx.shadowColor = tank.color;
+            tCtx.fillRect(-15, -10, 30, 20); 
+            tCtx.fillRect((num===1?10:-25), -3, 15, 6);
             tCtx.restore();
             tCtx.shadowBlur = 0;
         }
 
-        // Skyde Logik med cooldowns
-        let canShoot1 = true, canShoot2 = true;
-        window.addEventListener('keydown', (e) => {
-            if(!tActive) return;
-            const key = e.key.toLowerCase();
-            if(key === 'w' && canShoot1) {
-                shootProjectile(tank1, 1);
-                canShoot1 = false; setTimeout(() => canShoot1=true, 1000);
-            }
-            if(key === 'arrowup' && canShoot2) {
-                shootProjectile(tank2, 2);
-                canShoot2 = false; setTimeout(() => canShoot2=true, 1000);
-            }
-        });
-
-        function shootProjectile(shooter, num) {
-            let slope = landscapes[currentLevel].df(shooter.x);
-            // Normaliser retningsvektoren (dx, dy)
-            let length = Math.sqrt(1 + slope*slope);
-            let dir = num === 1 ? 1 : -1; // P1 skyder mod højre, P2 mod venstre
-            let speed = 0.5; // Fart på projektilet
-
-            projectiles.push({
-                x: shooter.x,
-                y: shooter.y,
-                dx: (dir / length) * speed,
-                dy: (dir * slope / length) * speed,
-                color: shooter.color,
-                shooterNum: num
-            });
-        }
-
 
         // ============================================================================
-        // SPIL 5: VIRUS OUTBREAK (Eksponentiel Vækst)
+        // SPIL 2: TAL RÆKKEFØLGEN (SEQUENCE CRACKER)
         // ============================================================================
-        let vCanvas, vCtx;
-        let vActive = false;
-        let vData = { b: 5, a: 1.15 }; // Fjendens parametre
-        let vTime = 0, vScore = 0;
-        let vCureProgress = 0;
+        let sActive = false;
+        let sScore1 = 0, sScore2 = 0;
+        
+        let p1State = { len: 3, seq: [], missingVal: 0, options: [], lockedTimer: 0 };
+        let p2State = { len: 3, seq: [], missingVal: 0, options: [], lockedTimer: 0 };
+        
+        // Key mapping: index 0: Top, 1: Left, 2: Right, 3: Bottom
+        const p1Keys = ['w', 'a', 'd', 's'];
+        const p2Keys = ['ArrowUp', 'ArrowLeft', 'ArrowRight', 'ArrowDown'];
 
-        function startVirusGame() {
-            vCanvas = document.getElementById('virusCanvas');
-            vCtx = vCanvas.getContext('2d');
-            vScore = 0; document.getElementById('v-score').innerText = vScore;
+        function startSeqGame() {
+            sScore1 = 0; sScore2 = 0;
+            p1State.len = 3; p2State.len = 3;
+            document.getElementById('s-score-1').innerText = sScore1;
+            document.getElementById('s-score-2').innerText = sScore2;
+            document.getElementById('seq-winner-overlay').style.display = 'none';
             
-            // Reset Sliders
-            document.getElementById('virus-b').value = 1;
-            document.getElementById('virus-a').value = 1.01;
-            
-            showScreen('screen-virus-game');
-            spawnVirus();
-            vActive = true;
-            requestAnimationFrame(virusLoop);
+            showScreen('screen-sequence-game');
+            sActive = true;
+            generateSeqRound();
+            seqLoop();
         }
 
-        function endVirusGame() { vActive = false; showScreen('screen-menu'); }
-
-        function spawnVirus() {
-            vTime = 0;
-            vCureProgress = 0;
-            // Generer Virus Math
-            vData.b = Math.floor(Math.random() * 8) + 2; // 2 til 9
-            vData.a = [1.10, 1.15, 1.20, 1.25, 1.30, 1.35][Math.floor(Math.random() * 6)];
-            
-            // INTEL REPORT
-            let y0 = vData.b;
-            let y5 = vData.b * Math.pow(vData.a, 5);
-            document.getElementById('v-intel-1').innerText = `Målt Y til tiden X=0: ${y0}`;
-            document.getElementById('v-intel-2').innerText = `Målt Y til tiden X=5: ${y5.toFixed(1)}`;
-            
-            updateVirusControls(); // Reset display
+        function endSeqGame() {
+            sActive = false;
+            showScreen('screen-menu');
         }
 
-        function updateVirusControls() {
-            let pB = document.getElementById('virus-b').value;
-            let pA = document.getElementById('virus-a').value;
-            document.getElementById('v-b-display').innerText = pB;
-            document.getElementById('v-a-display').innerText = pA;
-        }
-
-        function virusLoop() {
-            if(!vActive) return;
-            vTime += 0.015; // Virussen vokser konstant
+        // Genererer en talrækkefølge logik
+        function createSequenceData(length) {
+            let type = Math.floor(Math.random() * 3);
+            let seq = [];
+            let start, step;
             
-            const w = vCanvas.width, h = vCanvas.height;
-            const scaleX = w / 15; // Tid = 15 dage
-            const scaleY = h / 100; // Max smittede = 100
-
-            vCtx.clearRect(0, 0, w, h);
-            
-            // Grid
-            vCtx.strokeStyle = 'rgba(255,255,255,0.05)'; vCtx.lineWidth = 1;
-            for(let i=0; i<w; i+=scaleX) { vCtx.moveTo(i, 0); vCtx.lineTo(i, h); }
-            for(let i=0; i<h; i+=scaleY*10) { vCtx.moveTo(0, i); vCtx.lineTo(w, i); }
-            vCtx.stroke();
-
-            // Tegn VIRUS (Rød) kun op til vTime
-            vCtx.beginPath();
-            vCtx.strokeStyle = 'var(--neon-red)';
-            vCtx.lineWidth = 4;
-            vCtx.shadowBlur = 15; vCtx.shadowColor = 'var(--neon-red)';
-            for(let x=0; x<=vTime; x+=0.1) {
-                let y = vData.b * Math.pow(vData.a, x);
-                if(x===0) vCtx.moveTo(x*scaleX, h - y*scaleY); else vCtx.lineTo(x*scaleX, h - y*scaleY);
-            }
-            vCtx.stroke(); vCtx.shadowBlur = 0;
-
-            // Tegn SPILLERENS KUR (Grøn)
-            let pB = parseFloat(document.getElementById('virus-b').value);
-            let pA = parseFloat(document.getElementById('virus-a').value);
-            
-            vCtx.beginPath();
-            vCtx.strokeStyle = 'var(--neon-green)';
-            vCtx.setLineDash([5, 10]);
-            vCtx.lineWidth = 2;
-            for(let x=0; x<=15; x+=0.2) {
-                let y = pB * Math.pow(pA, x);
-                if(x===0) vCtx.moveTo(x*scaleX, h - y*scaleY); else vCtx.lineTo(x*scaleX, h - y*scaleY);
-            }
-            vCtx.stroke(); vCtx.setLineDash([]);
-
-            // FARE NIVEAU
-            let currentVirusVal = vData.b * Math.pow(vData.a, vTime);
-            let dangerEl = document.getElementById('v-danger');
-            if(currentVirusVal > 80) { dangerEl.innerText = "KRITISK"; dangerEl.style.background = "rgba(255,7,58,0.8)"; }
-            else if(currentVirusVal > 50) { dangerEl.innerText = "HØJ"; dangerEl.style.background = "rgba(255,140,0,0.5)"; }
-            else { dangerEl.innerText = "LAV"; dangerEl.style.background = "rgba(255,7,58,0.2)"; }
-
-            // GAME OVER?
-            if(currentVirusVal >= 100) {
-                alert(`INFEKTION TOTAL! Du fejlede. Virussens formel var f(x) = ${vData.b} * ${vData.a}^x`);
-                spawnVirus();
-            }
-
-            // SYNTETISERING (Match Logic)
-            if(pB === vData.b && Math.abs(pA - vData.a) < 0.01) {
-                vCureProgress += 1; // Fylder baren
-                document.getElementById('v-cure-progress').style.width = vCureProgress + '%';
-                
-                if(vCureProgress >= 100) {
-                    vScore++; document.getElementById('v-score').innerText = vScore;
-                    vCtx.fillStyle = 'rgba(57, 255, 20, 0.4)'; vCtx.fillRect(0,0,w,h); // Grønt flash
-                    setTimeout(spawnVirus, 1000);
-                }
+            if(type === 0) {
+                // Aritmetisk (+ / -)
+                start = Math.floor(Math.random() * 20) - 5;
+                step = Math.floor(Math.random() * 10) + 2;
+                if(Math.random() > 0.5) step *= -1;
+                for(let i=0; i<length; i++) seq.push(start + i*step);
+            } else if (type === 1) {
+                // Geometrisk (* /)
+                start = Math.floor(Math.random() * 5) + 1;
+                step = Math.floor(Math.random() * 3) + 2; // 2, 3 eller 4
+                for(let i=0; i<length; i++) seq.push(start * Math.pow(step, i));
             } else {
-                vCureProgress = 0; // Taber progress hvis man justerer forkert
-                document.getElementById('v-cure-progress').style.width = '0%';
+                // Kvadrattal / Kubiktal
+                start = Math.floor(Math.random() * 5) + 1;
+                let pow = Math.random() > 0.7 ? 3 : 2;
+                for(let i=0; i<length; i++) seq.push(Math.pow(start + i, pow));
             }
 
-            requestAnimationFrame(virusLoop);
+            // Vælg hvilket tal der mangler (ikke det første, for at gøre det lidt nemmere at læse startmønster)
+            let missingIdx = Math.floor(Math.random() * (length - 1)) + 1;
+            let missingVal = seq[missingIdx];
+            
+            // Generer falske muligheder tæt på det rigtige svar
+            let options = [missingVal];
+            while(options.length < 4) {
+                let offset = Math.floor(Math.random() * 10) - 5;
+                if(offset === 0) offset = 1;
+                let fake = missingVal + offset;
+                // For geometrisk, gør falske muligheder mere relaterbare
+                if(type === 1) fake = missingVal + (offset * (start || 1)); 
+                if(!options.includes(fake)) options.push(fake);
+            }
+
+            // Shuffle options
+            options.sort(() => Math.random() - 0.5);
+
+            // Sæt ? ind
+            let displaySeq = [...seq];
+            displaySeq[missingIdx] = '<span class="seq-missing">?</span>';
+
+            return { html: displaySeq.join(', '), ans: missingVal, opts: options };
+        }
+
+        function generateSeqRound() {
+            // P1 Setup
+            let data1 = createSequenceData(p1State.len);
+            p1State.missingVal = data1.ans;
+            p1State.options = data1.opts;
+            document.getElementById('seq-text-1').innerHTML = data1.html;
+            for(let i=0; i<4; i++) {
+                document.getElementById(`s1-btn-${i}`).querySelector('span').innerText = data1.opts[i];
+            }
+
+            // P2 Setup
+            let data2 = createSequenceData(p2State.len);
+            p2State.missingVal = data2.ans;
+            p2State.options = data2.opts;
+            document.getElementById('seq-text-2').innerHTML = data2.html;
+            for(let i=0; i<4; i++) {
+                document.getElementById(`s2-btn-${i}`).querySelector('span').innerText = data2.opts[i];
+            }
+        }
+
+        function triggerFlash(zoneId, type) {
+            let el = document.getElementById(zoneId);
+            el.classList.remove('flash-red', 'flash-green');
+            void el.offsetWidth; // trigger reflow
+            el.classList.add(type === 'good' ? 'flash-green' : 'flash-red');
+        }
+
+        function showPenalty(playerId) {
+            let el = document.getElementById(`seq-pen-${playerId}`);
+            el.style.opacity = 1;
+            setTimeout(() => { el.style.opacity = 0; }, 1500);
+        }
+
+        // Vigtig var til at forhindre at begge svarer præcis samme frame
+        let roundResolving = false; 
+
+        function seqLoop() {
+            if(!sActive) return;
+
+            if(!roundResolving) {
+                // P1 Input
+                if(p1State.lockedTimer <= 0) {
+                    for(let i=0; i<4; i++) {
+                        if(keys[p1Keys[i]]) {
+                            keys[p1Keys[i]] = false; // Forhindrer auto-fire
+                            if(p1State.options[i] === p1State.missingVal) {
+                                resolveSeqRound(1);
+                            } else {
+                                p1State.lockedTimer = 60; // 1 sek penalty
+                                triggerFlash('seq-zone-1', 'bad');
+                            }
+                            break;
+                        }
+                    }
+                } else {
+                    p1State.lockedTimer--;
+                }
+
+                // P2 Input
+                if(p2State.lockedTimer <= 0) {
+                    for(let i=0; i<4; i++) {
+                        if(keys[p2Keys[i]]) {
+                            keys[p2Keys[i]] = false;
+                            if(p2State.options[i] === p2State.missingVal) {
+                                resolveSeqRound(2);
+                            } else {
+                                p2State.lockedTimer = 60;
+                                triggerFlash('seq-zone-2', 'bad');
+                            }
+                            break;
+                        }
+                    }
+                } else {
+                    p2State.lockedTimer--;
+                }
+            }
+
+            requestAnimationFrame(seqLoop);
+        }
+
+        function resolveSeqRound(winner) {
+            roundResolving = true;
+            
+            if(winner === 1) {
+                sScore1++;
+                document.getElementById('s-score-1').innerText = sScore1;
+                triggerFlash('seq-zone-1', 'good');
+                p2State.len++; // STRAF TIL P2!
+                showPenalty(2);
+            } else {
+                sScore2++;
+                document.getElementById('s-score-2').innerText = sScore2;
+                triggerFlash('seq-zone-2', 'good');
+                p1State.len++; // STRAF TIL P1!
+                showPenalty(1);
+            }
+
+            if(sScore1 >= 10 || sScore2 >= 10) {
+                setTimeout(() => {
+                    sActive = false;
+                    document.getElementById('seq-winner-overlay').style.display = 'flex';
+                    let wTxt = document.getElementById('seq-winner-text');
+                    wTxt.innerText = sScore1 >= 10 ? "BLÅ VINDER!" : "PINK VINDER!";
+                    wTxt.style.color = sScore1 >= 10 ? "var(--neon-blue)" : "var(--neon-pink)";
+                    wTxt.style.textShadow = `0 0 30px ${sScore1 >= 10 ? 'var(--neon-blue)' : 'var(--neon-pink)'}`;
+                }, 500);
+            } else {
+                setTimeout(() => {
+                    generateSeqRound();
+                    roundResolving = false;
+                }, 1000); // 1 sek pause mellem runder
+            }
         }
 
     </script>

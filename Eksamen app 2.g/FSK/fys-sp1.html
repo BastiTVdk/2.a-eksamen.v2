@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>01. Verdensbilleder | FysikQuest</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #d946ef;
+            --primary-glow: rgba(217, 70, 239, 0.15);
+            --slate-bg: #fdfaff;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--slate-bg);
+            color: #1e293b;
+        }
+
+        .info-tooltip {
+            display: none;
+            position: absolute;
+            z-index: 50;
+            background: white;
+            border: 1px solid #f0e6f5;
+            box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
+            padding: 1rem;
+            border-radius: 1rem;
+            width: 250px;
+            margin-top: 0.5rem;
+        }
+
+        .info-trigger:hover + .info-tooltip,
+        .info-tooltip:hover {
+            display: block;
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(217, 70, 239, 0.1);
+        }
+
+        .orbit-animate {
+            animation: rotate var(--duration) linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="min-h-screen pb-20">
+
+    <!-- Nav Bar -->
+    <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-fuchsia-100 shadow-sm">
+        <div class="max-w-5xl mx-auto px-6 h-16 flex items-center justify-between">
+            <a href="fysik_landing.html" class="flex items-center gap-2 text-fuchsia-600 font-bold hover:opacity-80 transition">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"/></svg>
+                Tilbage til Oversigt
+            </a>
+            <span class="text-xs font-black uppercase tracking-widest text-slate-400">Spørgsmål 01</span>
+        </div>
+    </nav>
+
+    <main class="max-w-4xl mx-auto px-6 pt-12">
+        <!-- Header -->
+        <header class="mb-16">
+            <h1 class="text-4xl md:text-5xl font-black tracking-tighter text-slate-900 mb-6 uppercase italic">
+                Verdensbilledets <span class="text-fuchsia-500">Udvikling</span>
+            </h1>
+            <p class="text-slate-500 text-lg font-medium leading-relaxed">
+                Fra antikkens urokkelige jord til Keplers matematiske ellipser. Her gennemgår vi, hvordan mennesket har forstået sin plads i universet.
+            </p>
+        </header>
+
+        <!-- Sektion 1: Det Geocentriske Verdensbillede -->
+        <section class="mb-20">
+            <div class="flex items-center gap-3 mb-6">
+                <h2 class="text-2xl font-bold tracking-tight">1. Det Geocentriske Verdensbillede</h2>
+                <div class="relative inline-block">
+                    <button class="info-trigger w-6 h-6 rounded-full bg-fuchsia-100 text-fuchsia-600 flex items-center justify-center text-xs font-bold hover:bg-fuchsia-200 transition">i</button>
+                    <div class="info-tooltip text-xs leading-relaxed text-slate-600">
+                        <strong class="block mb-1 text-fuchsia-600 uppercase">Hvad betyder det?</strong>
+                        "Geo" betyder jord. I dette verdensbillede er Jorden universets ubevægelige centrum, og alle himmellegemer bevæger sig i perfekte cirkler omkring den.
+                    </div>
+                </div>
+            </div>
+
+            <div class="prose prose-slate max-w-none text-slate-600 mb-8 font-medium">
+                <p>
+                    I over 1500 år dominerede Aristoteles' og Ptolemæus' tanker. Man mente, at himlen var guddommelig og derfor måtte bestå af perfekte former (cirkler). Men planeterne opførte sig mærkeligt – nogle gange så de ud til at bevæge sig baglæns (retrograd bevægelse). 
+                </p>
+            </div>
+
+            <!-- Simulation: Geocentrisk vs Retrograd -->
+            <div class="glass-panel rounded-[2rem] p-8 mb-8">
+                <div class="flex flex-col md:flex-row gap-8 items-center">
+                    <div class="relative w-64 h-64 bg-slate-900 rounded-full flex items-center justify-center overflow-hidden shadow-inner">
+                        <!-- Jorden -->
+                        <div class="w-8 h-8 bg-blue-500 rounded-full z-10 shadow-lg border-2 border-white/20"></div>
+                        <!-- Solens bane -->
+                        <div class="absolute border border-white/10 w-32 h-32 rounded-full"></div>
+                        <div class="absolute w-32 h-32 orbit-animate" style="--duration: 4s;">
+                            <div class="w-4 h-4 bg-yellow-400 rounded-full absolute -top-2 left-14 shadow-[0_0_15px_rgba(250,204,21,0.5)]"></div>
+                        </div>
+                        <!-- Epicykel for Mars -->
+                        <div class="absolute w-48 h-48 orbit-animate" style="--duration: 8s;">
+                            <div class="absolute -top-2 left-22 w-12 h-12 border border-fuchsia-500/30 rounded-full orbit-animate" style="--duration: 2s;">
+                                <div class="w-3 h-3 bg-red-500 rounded-full absolute -top-1.5 left-4.5"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex-1">
+                        <h4 class="font-bold text-slate-800 mb-2">Simulation: Epicykler</h4>
+                        <p class="text-sm text-slate-500 mb-4">
+                            For at forklare hvorfor Mars nogle gange ser ud til at bakke, opfandt man <strong>epicykler</strong>: Små cirkler på større cirkler. Klik for at se effekten.
+                        </p>
+                        <div class="relative inline-block">
+                             <button class="info-trigger w-5 h-5 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center text-[10px] font-bold">i</button>
+                             <div class="info-tooltip text-xs">
+                                <strong>Epicykel:</strong> En matematisk "lappeløsning" brugt af Ptolemæus for at bevare cirklen som den perfekte form.
+                             </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sektion 2: Det Heliocentriske Verdensbillede -->
+        <section class="mb-20">
+            <div class="flex items-center gap-3 mb-6">
+                <h2 class="text-2xl font-bold tracking-tight">2. Det Heliocentriske Verdensbillede</h2>
+                <button class="info-trigger w-6 h-6 rounded-full bg-fuchsia-100 text-fuchsia-600 flex items-center justify-center text-xs font-bold">i</button>
+                <div class="info-tooltip text-xs">
+                    "Helios" betyder sol. Kopernikus foreslog i 1543, at Solen er centrum, og at Jorden blot er en planet som de andre.
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                <div class="bg-white border border-slate-100 p-8 rounded-[2rem] shadow-sm">
+                    <h3 class="font-bold text-fuchsia-600 mb-4">Kopernikus & Galilei</h3>
+                    <p class="text-sm text-slate-600 leading-relaxed font-medium">
+                        Kopernikus flyttede Solen ind i midten. Galilei beviste det senere med sit teleskop ved at observere Venus' faser (ligesom Månens) og Jupiters måner, der ikke kredsede om Jorden.
+                    </p>
+                </div>
+                <div class="bg-slate-900 p-8 rounded-[2rem] flex flex-col items-center justify-center text-center">
+                    <div class="w-12 h-12 bg-yellow-400 rounded-full shadow-[0_0_30px_rgba(250,204,21,0.6)] mb-4"></div>
+                    <p class="text-xs text-slate-400 font-bold uppercase tracking-widest">Solen som Centrum</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sektion 3: Keplers Love -->
+        <section class="mb-32">
+            <div class="flex items-center gap-3 mb-6">
+                <h2 class="text-2xl font-bold tracking-tight italic">3. Johannes Keplers Love</h2>
+                <button class="info-trigger w-6 h-6 rounded-full bg-fuchsia-100 text-fuchsia-600 flex items-center justify-center text-xs font-bold">i</button>
+                <div class="info-tooltip text-xs">
+                    Kepler arbejdede med Tycho Brahes data. Han opdagede, at cirkler ikke passede – ellipser gjorde!
+                </div>
+            </div>
+
+            <div class="space-y-6">
+                <!-- Lov 1 -->
+                <div class="quest-item bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm hover:border-fuchsia-200 transition">
+                    <div class="flex gap-6">
+                        <div class="text-3xl font-black text-fuchsia-200">01</div>
+                        <div>
+                            <h4 class="font-bold text-slate-800 mb-2 uppercase tracking-tight">Ellipseloven</h4>
+                            <p class="text-sm text-slate-500 mb-6">Planeterne bevæger sig i ellipser med Solen i det ene brændpunkt.</p>
+                            
+                            <!-- Interaktiv Ellipse -->
+                            <div class="bg-slate-50 p-6 rounded-2xl border border-slate-100">
+                                <label class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-4 block">Juster Excentricitet (e)</label>
+                                <input type="range" id="ecc-slider" min="0" max="0.8" step="0.01" value="0.2" class="w-full h-1 bg-fuchsia-200 rounded-lg appearance-none cursor-pointer accent-fuchsia-500 mb-6">
+                                <div class="flex justify-center">
+                                    <svg id="ellipse-sim" width="200" height="120" viewBox="0 0 200 120">
+                                        <!-- Bane -->
+                                        <ellipse id="orbit-path" cx="100" cy="60" rx="80" ry="60" fill="none" stroke="#d946ef" stroke-width="2" stroke-dasharray="4"/>
+                                        <!-- Sol -->
+                                        <circle id="sun-focus" cx="120" cy="60" r="6" fill="#f59e0b" />
+                                        <!-- Planet -->
+                                        <circle cx="20" cy="60" r="4" fill="#1e293b" />
+                                    </svg>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lov 2 -->
+                <div class="quest-item bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm">
+                    <div class="flex gap-6">
+                        <div class="text-3xl font-black text-fuchsia-200">02</div>
+                        <div>
+                            <h4 class="font-bold text-slate-800 mb-2 uppercase tracking-tight">Areal-loven</h4>
+                            <p class="text-sm text-slate-500">
+                                En linje fra Solen til en planet overstryger lige store arealer i lige store tidsrum.
+                            </p>
+                            <div class="relative inline-block mt-2">
+                                <button class="info-trigger w-5 h-5 rounded-full bg-fuchsia-50 text-fuchsia-400 flex items-center justify-center text-[10px] font-bold">i</button>
+                                <div class="info-tooltip text-xs">
+                                    Det betyder, at planeten bevæger sig <strong>hurtigst</strong> når den er tættest på Solen (perhelium) og <strong>langsomst</strong> længst væk (aphelium).
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Lov 3 -->
+                <div class="quest-item bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm">
+                    <div class="flex gap-6">
+                        <div class="text-3xl font-black text-fuchsia-200">03</div>
+                        <div>
+                            <h4 class="font-bold text-slate-800 mb-2 uppercase tracking-tight">Harmoniloven</h4>
+                            <div class="bg-fuchsia-50 p-4 rounded-xl border border-fuchsia-100 my-4 flex items-center justify-center">
+                                <span class="text-lg font-black text-fuchsia-600 italic">T² / a³ = k</span>
+                            </div>
+                            <p class="text-sm text-slate-500">
+                                Forholdet mellem omløbstiden (T) i anden og middelafstanden (a) i tredje er konstant for alle planeter i samme system.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Opsamling til Eksamen -->
+        <footer class="bg-slate-900 rounded-[3rem] p-12 text-center text-white overflow-hidden relative">
+            <div class="relative z-10">
+                <h3 class="text-2xl font-black uppercase italic mb-4">Eksamens-Checklist</h3>
+                <ul class="text-slate-400 text-sm space-y-3 mb-8">
+                    <li>✓ Kan du forklare forskellen på Geo og Helio?</li>
+                    <li>✓ Kan du tegne en ellipse og placere Solen?</li>
+                    <li>✓ Ved du hvorfor epicykler blev brugt?</li>
+                    <li>✓ Kan du forklare Keplers 2. lov med egne ord?</li>
+                </ul>
+                <button onclick="window.print()" class="px-8 py-3 bg-fuchsia-600 rounded-full font-bold text-xs hover:bg-fuchsia-500 transition shadow-xl">PRINT DISPOSITION</button>
+            </div>
+            <!-- Subtil baggrunds-cirkel -->
+            <div class="absolute -bottom-20 -right-20 w-64 h-64 bg-fuchsia-500/10 rounded-full blur-3xl"></div>
+        </footer>
+    </main>
+
+    <script>
+        // Interaktiv Ellipse Logik
+        const slider = document.getElementById('ecc-slider');
+        const path = document.getElementById('orbit-path');
+        const sun = document.getElementById('sun-focus');
+
+        slider.addEventListener('input', (e) => {
+            const ecc = parseFloat(e.target.value);
+            const a = 80; // Storakse
+            const b = a * Math.sqrt(1 - ecc * ecc); // Lilleakse
+            const c = a * ecc; // Afstand fra centrum til brændpunkt
+
+            path.setAttribute('rx', a);
+            path.setAttribute('ry', b);
+            sun.setAttribute('cx', 100 + c);
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,875 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>03. Universet | FysikQuest C</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #8b5cf6;
+            --primary-glow: rgba(139, 92, 246, 0.4);
+            --cyan: #0ea5e9;
+            --cyan-glow: rgba(14, 165, 233, 0.4);
+            --slate-bg: #020108;
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--slate-bg);
+            color: #f8fafc;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        #particle-canvas {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -2; pointer-events: none; opacity: 0.6;
+        }
+
+        .glass-card {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 2.5rem;
+            transition: all 0.5s var(--ease-out-expo);
+            box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.8);
+        }
+
+        .glass-card:hover {
+            box-shadow: 0 25px 60px -10px var(--primary-glow);
+            border-color: rgba(139, 92, 246, 0.3);
+        }
+
+        /* Modal / Info Drawer */
+        #info-drawer {
+            transform: translateX(100%);
+            transition: transform 0.6s var(--ease-out-expo);
+        }
+        #info-drawer.open { transform: translateX(0); }
+
+        .text-gradient {
+            @apply text-transparent bg-clip-text bg-gradient-to-r from-violet-400 via-fuchsia-400 to-cyan-400 italic drop-shadow-[0_0_20px_rgba(139,92,246,0.5)];
+        }
+
+        #reading-progress {
+            position: fixed; top: 0; left: 0; height: 5px;
+            background: linear-gradient(to right, #8b5cf6, #d946ef, #0ea5e9);
+            z-index: 100; width: 0%;
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.8);
+        }
+
+        .math-font { font-family: 'Space Grotesk', sans-serif; }
+
+        .sim-container {
+            background: #010105;
+            border-radius: 2rem;
+            position: relative;
+            overflow: hidden;
+            box-shadow: inset 0 0 60px rgba(0,0,0,0.9);
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .sim-canvas { width: 100%; height: 100%; display: block; }
+
+        .i-btn {
+            @apply w-8 h-8 rounded-full bg-white/10 text-violet-400 flex items-center justify-center text-xs font-black hover:bg-violet-500 hover:text-white transition-all shadow-[0_0_15px_rgba(139,92,246,0.5)] border border-violet-500/30 cursor-pointer flex-shrink-0 z-10;
+        }
+        
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
+        ::-webkit-scrollbar-thumb { background: rgba(139, 92, 246, 0.5); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(139, 92, 246, 0.8); }
+
+        /* Custom range slider styling */
+        input[type=range] {
+            -webkit-appearance: none; background: transparent; 
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none; height: 20px; width: 20px; border-radius: 50%;
+            background: #d946ef; cursor: pointer; margin-top: -8px;
+            box-shadow: 0 0 15px rgba(217, 70, 239, 0.8);
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%; height: 4px; cursor: pointer; background: #334155; border-radius: 2px;
+        }
+    </style>
+</head>
+<body class="min-h-screen pb-40">
+
+    <div id="reading-progress"></div>
+    <canvas id="particle-canvas"></canvas>
+
+    <!-- Info Drawer -->
+    <div id="info-drawer" class="fixed top-0 right-0 h-full w-full max-w-md bg-[#02010a]/95 backdrop-blur-3xl shadow-[-40px_0_80px_rgba(0,0,0,0.9)] z-[200] p-10 border-l border-violet-500/40 flex flex-col">
+        <button onclick="closeDrawer()" class="self-end p-3 bg-white/5 hover:bg-violet-500/20 rounded-full transition mb-6 text-slate-400 hover:text-violet-400">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-width="2.5" stroke-linecap="round"/></svg>
+        </button>
+        <div class="flex items-center gap-4 mb-8">
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-violet-500 to-cyan-500 flex items-center justify-center text-white font-black italic text-xl shadow-[0_0_30px_rgba(139,92,246,0.5)]">i</div>
+            <h3 id="drawer-title" class="text-2xl font-black text-white uppercase tracking-tighter">Videnscenter</h3>
+        </div>
+        <div id="drawer-content" class="text-slate-300 leading-relaxed space-y-6 font-medium text-sm overflow-y-auto pr-4">
+            <!-- Dynamisk indhold -->
+        </div>
+        <div class="mt-auto pt-6">
+            <div class="p-6 bg-gradient-to-br from-violet-900/30 to-cyan-900/30 rounded-3xl border border-white/10 shadow-inner">
+                <p class="text-[10px] font-black uppercase text-violet-400 tracking-widest mb-2 flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"/><path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"/></svg>
+                    Eksamens Perspektivering
+                </p>
+                <p class="text-xs text-slate-400">Vis dybde til eksamen! Når du taler om stjerner og universet, så husk at perspektivere til at fysikkens love er de samme overalt (Det Kosmologiske Princip).</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-50 bg-[#010108]/80 backdrop-blur-2xl border-b border-white/5">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <a href="fysik_landing.html" class="group flex items-center gap-4 text-slate-300 font-bold uppercase text-xs tracking-widest hover:text-violet-400 transition">
+                <div class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center border border-white/10 group-hover:border-violet-500/50 group-hover:bg-violet-500/20 transition shadow-sm">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M10 19l-7-7m0 0l7-7m-7 7h18" stroke-width="2.5" stroke-linecap="round"/></svg>
+                </div>
+                Tilbage til Oversigt
+            </a>
+            <div class="flex items-center gap-4">
+                <span class="px-5 py-2 rounded-full bg-gradient-to-r from-violet-600/20 to-cyan-600/20 text-white font-black text-[10px] uppercase tracking-[0.2em] border border-white/10 shadow-[0_0_15px_rgba(139,92,246,0.2)]">Spørgsmål 03</span>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-6xl mx-auto px-6 pt-20">
+        
+        <!-- Header -->
+        <header class="mb-32 text-center relative">
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[900px] h-[400px] bg-violet-600/15 blur-[150px] rounded-full pointer-events-none -z-10"></div>
+            
+            <div class="inline-block mb-6 px-6 py-2 rounded-full bg-cyan-500/10 border border-cyan-500/30 text-cyan-400 font-bold text-[10px] tracking-[0.25em] uppercase shadow-lg shadow-cyan-500/20">
+                Fysik C • Kosmologi & Astrofysik
+            </div>
+            <h1 class="text-6xl md:text-8xl font-black tracking-tighter text-white mb-8 uppercase leading-[0.9]">
+                Det Moderne <br><span class="text-gradient">Univers</span>
+            </h1>
+            <p class="text-slate-400 text-lg md:text-xl max-w-3xl mx-auto font-medium leading-relaxed">
+                Et univers uden centrum, bestående af døende stjerner, gigantiske supernovaer og milliarder af galakser, der flygter fra os i et ekspanderende mørke.
+            </p>
+        </header>
+
+        <!-- AFSNIT 1: Det Kosmologiske Princip (INTET CENTRUM) -->
+        <section class="mb-40 relative">
+            <div class="flex items-center gap-5 mb-12">
+                <div class="w-16 h-1 bg-gradient-to-r from-violet-600 to-fuchsia-500 rounded-full"></div>
+                <h2 class="text-sm font-black uppercase tracking-[0.4em] text-slate-300">I. Det Kosmologiske Princip</h2>
+            </div>
+
+            <div class="glass-card p-10 md:p-16">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                    <div class="space-y-8">
+                        <div class="border-b border-white/10 pb-6">
+                            <h3 class="text-3xl font-bold text-white tracking-tight mb-6 flex items-center gap-4">
+                                Universet har intet centrum
+                                <button onclick="openInfo('kosmologisk_princip')" class="i-btn">i</button>
+                            </h3>
+                            <div class="prose prose-invert prose-lg text-slate-400 font-medium leading-relaxed">
+                                <p>
+                                    I antikken troede Aristoteles, at Jorden var i centrum. I renæssancen opdagede Kopernikus, at Solen var midtpunktet for vores solsystem. Men i dag ved vi, at <strong>universet slet ikke har noget centrum</strong>.
+                                </p>
+                                <p>
+                                    Dette er kernen i <em>Det Kosmologiske Princip</em>. Det bygger på to utroligt vigtige antagelser om universet: At det er <strong>homogent</strong> og <strong>isotropt</strong>.
+                                </p>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <div class="bg-violet-900/20 border border-violet-500/30 p-6 rounded-3xl">
+                                <h4 class="text-lg font-bold text-violet-300 mb-2">Homogent</h4>
+                                <p class="text-sm text-slate-400 leading-relaxed">
+                                    Betyder "ensartet". Uanset hvor i universet du rejser hen, vil det store billede se ud på samme måde. Galakserne er fordelt jævnt overalt på stor skala.
+                                </p>
+                            </div>
+                            <div class="bg-cyan-900/20 border border-cyan-500/30 p-6 rounded-3xl">
+                                <h4 class="text-lg font-bold text-cyan-300 mb-2">Isotropt</h4>
+                                <p class="text-sm text-slate-400 leading-relaxed">
+                                    Betyder "ens i alle retninger". Uanset hvilken retning vi kigger ud i rummet fra Jorden, ser vi den samme struktur og fordeling af galakser.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Det Kosmiske Zoom Simulator -->
+                    <div class="w-full flex flex-col gap-6">
+                        <div class="sim-container h-[450px] relative">
+                            <div class="absolute top-4 left-4 z-10">
+                                <span class="text-[10px] font-black uppercase text-fuchsia-400 tracking-[0.2em] bg-black/50 px-3 py-1 rounded-full border border-fuchsia-500/30">Det Kosmiske Zoom</span>
+                            </div>
+                            <canvas id="zoom-canvas" class="sim-canvas"></canvas>
+                        </div>
+                        
+                        <div class="bg-[#050814] border border-white/5 p-6 rounded-3xl shadow-inner">
+                            <div class="flex justify-between items-center mb-4">
+                                <span class="text-[10px] font-black uppercase text-slate-500 tracking-widest">Træk for at zoome</span>
+                                <span id="zoom-level-text" class="text-xs font-black text-white bg-white/10 px-3 py-1 rounded-full">Solsystemet</span>
+                            </div>
+                            <input type="range" id="zoom-slider" min="0" max="300" value="0" class="w-full">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- AFSNIT 2: Stjernernes Livscyklus & Supernovaer -->
+        <section class="mb-40">
+            <div class="flex items-center gap-5 mb-12">
+                <div class="w-16 h-1 bg-gradient-to-r from-yellow-400 to-orange-600 rounded-full"></div>
+                <h2 class="text-sm font-black uppercase tracking-[0.4em] text-orange-400">II. Stjernernes Liv & Død</h2>
+            </div>
+
+            <div class="glass-card p-10 md:p-16 border-t-4 border-yellow-500">
+                <div class="flex flex-col lg:flex-row gap-16 items-start">
+                    
+                    <!-- Tekst paneler -->
+                    <div class="flex-1 space-y-10">
+                        <div>
+                            <h3 class="text-3xl font-bold text-white tracking-tight mb-6">Fra Kæmpestjerne til Supernova</h3>
+                            <p class="text-slate-400 font-medium leading-relaxed mb-4">
+                                Alle stjerner fødes i skyer af gas og støv og lever det meste af deres liv på "hovedserien" ved at fusionere brint til helium. Men brændstoffet slipper op. <strong>Stjernens oprindelige masse er fuldstændig afgørende for, hvordan den dør.</strong>
+                            </p>
+                        </div>
+
+                        <!-- Solens skæbne -->
+                        <div class="relative pl-8 border-l-2 border-yellow-500/50">
+                            <div class="absolute -left-[9px] top-0 w-4 h-4 bg-yellow-500 rounded-full shadow-[0_0_10px_yellow]"></div>
+                            <h4 class="text-xl font-bold text-white mb-3 flex items-center gap-3">Solens Død <button onclick="openInfo('solens_doed')" class="i-btn w-6 h-6 text-[10px]">i</button></h4>
+                            <p class="text-sm text-slate-400 leading-relaxed">
+                                Om ca. 5 milliarder år løber Solens kerne tør for brint. Mens kernen skrumper, svulmer dens ydre lag voldsomt op og gør den til en <strong>Rød Kæmpe</strong>, der vil opsluge Jorden. Til sidst kastes gassen ud i en <em>planetarisk tåge</em>.
+                            </p>
+                            <p class="text-sm text-slate-400 leading-relaxed mt-2">
+                                Tilbage står kun den brændende kerne: En <strong>Hvid Dværg</strong>. Den er utroligt tæt – på størrelse med Jorden, men med en masse som Solen. Den lyser svagt og vil bruge resten af universets tid på at køle ned.
+                            </p>
+                        </div>
+                        
+                        <!-- Massive stjerner -->
+                        <div class="relative pl-8 border-l-2 border-cyan-500/50">
+                            <div class="absolute -left-[9px] top-0 w-4 h-4 bg-cyan-500 rounded-full shadow-[0_0_10px_cyan]"></div>
+                            <h4 class="text-xl font-bold text-white mb-3 flex items-center gap-3">Supernova & Neutronstjerner <button onclick="openInfo('supernova')" class="i-btn w-6 h-6 text-[10px]">i</button></h4>
+                            <p class="text-sm text-slate-400 leading-relaxed">
+                                Massive stjerner (mere end 8 solmasser) fortsætter med at fusionere stoffer helt op til jern. Jern koster energi at fusionere, så reaktionerne stopper brat. Kernen kollapser under sin egen enorme vægt!
+                            </p>
+                            <p class="text-sm text-slate-400 leading-relaxed mt-2">
+                                De ydre lag blæses ud i universets vildeste eksplosion: En <strong>Supernova</strong>. I kernen presses elektroner og protoner sammen og danner en <strong>Neutronstjerne</strong> – et objekt på kun 20 km, hvor en teskefuld vejer milliarder af tons! (De allerstørste stjerner bliver til Sorte Huller).
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Stjerne Laboratorium Simulator -->
+                    <div class="w-full lg:w-[450px]">
+                        <div class="sim-container h-[550px] flex flex-col relative bg-[#020106] border border-yellow-500/20">
+                            <div class="absolute top-6 w-full text-center z-10">
+                                <span class="text-[10px] font-black uppercase text-yellow-500 tracking-widest drop-shadow-md bg-black/50 px-4 py-2 rounded-full">Stjerne Laboratorium</span>
+                            </div>
+                            
+                            <canvas id="star-canvas" class="sim-canvas absolute inset-0 z-0"></canvas>
+                            
+                            <div class="absolute bottom-6 w-full px-6 z-10">
+                                <div class="bg-[#050814]/90 backdrop-blur-xl border border-white/10 rounded-2xl p-5 shadow-2xl">
+                                    <div class="flex justify-between items-center mb-4">
+                                        <span class="text-[10px] font-black uppercase text-slate-400">Stjernens Masse:</span>
+                                        <span id="star-mass-val" class="text-xs font-black text-yellow-400 bg-yellow-500/10 px-3 py-1 rounded-full border border-yellow-500/30">1 Solmasse</span>
+                                    </div>
+                                    <input type="range" id="star-mass-slider" min="0.5" max="25" step="0.5" value="1" class="w-full">
+                                    <p class="text-[10px] text-slate-500 italic mt-4 text-center">Indstil massen og se stjernens skæbne – Supernova udløses over 8 solmasser!</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- AFSNIT 3: Rødforskydning & Hubbles Lov -->
+        <section class="mb-40">
+            <div class="flex items-center gap-5 mb-12">
+                <div class="w-16 h-1 bg-gradient-to-r from-red-500 to-cyan-500 rounded-full"></div>
+                <h2 class="text-sm font-black uppercase tracking-[0.4em] text-cyan-400">III. Ekspansion & Rødforskydning</h2>
+            </div>
+
+            <div class="glass-card p-10 md:p-16 overflow-hidden relative">
+                <div class="absolute -right-32 -top-32 w-[600px] h-[600px] bg-cyan-600/10 rounded-full blur-[120px] pointer-events-none"></div>
+
+                <div class="flex flex-col lg:flex-row gap-16 relative z-10">
+                    <div class="flex-1 space-y-10">
+                        <div>
+                            <h3 class="text-3xl font-bold text-white tracking-tight mb-6 flex items-center gap-4">
+                                Rødforskydning & Hubbles Lov
+                                <button onclick="openInfo('hubble')" class="i-btn">i</button>
+                            </h3>
+                            <div class="prose prose-invert prose-lg text-slate-400 font-medium leading-relaxed">
+                                <p>
+                                    I 1920'erne studerede astronomen Edwin Hubble lyset fra fjerne galakser. Han bemærkede, at spektret fra disse galakser var forskudt mod den røde del. 
+                                </p>
+                                <p>
+                                    På grund af <strong>Dopplereffekten</strong> for lys, betyder rødforskydning, at lysbølgerne "strækkes ud", hvilket kun kan ske, hvis galakserne <em>bevæger sig væk fra os</em>! Og endnu vildere: Jo længere væk de er, desto hurtigere flygter de. Universet udvider sig.
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <!-- Ligningen -->
+                        <div class="p-10 bg-[#050814] rounded-[2.5rem] border border-cyan-500/20 shadow-[0_0_40px_rgba(14,165,233,0.1)]">
+                            <span class="text-6xl font-black italic tracking-widest text-white math-font drop-shadow-lg flex justify-center items-center">
+                                <span class="text-red-400">v</span> <span class="text-slate-600 font-light mx-4">=</span> <span class="text-cyan-400">H₀</span> <span class="text-slate-600 font-light mx-4">·</span> <span class="text-violet-400">d</span>
+                            </span>
+                            <div class="grid grid-cols-3 gap-4 text-center mt-8 pt-6 border-t border-white/5">
+                                <div><strong class="text-red-400 block text-lg mb-1">v</strong><span class="text-[10px] text-slate-500 uppercase tracking-widest">Flugthastighed</span></div>
+                                <div><strong class="text-cyan-400 block text-lg mb-1">H₀</strong><span class="text-[10px] text-slate-500 uppercase tracking-widest">Hubble konstant</span></div>
+                                <div><strong class="text-violet-400 block text-lg mb-1">d</strong><span class="text-[10px] text-slate-500 uppercase tracking-widest">Afstand til os</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Expansion Visualizer -->
+                    <div class="w-full lg:w-[450px]">
+                        <div class="sim-container h-[550px] relative border-cyan-500/20">
+                            <div class="absolute top-4 w-full text-center z-10">
+                                <span class="text-[10px] font-black uppercase text-cyan-400 tracking-widest bg-black/50 px-4 py-2 rounded-full">Lysbølge & Ekspansions Motor</span>
+                            </div>
+                            <canvas id="expansion-canvas" class="sim-canvas"></canvas>
+                            
+                            <!-- Controls -->
+                            <div class="absolute bottom-6 left-0 w-full px-6">
+                                <div class="bg-[#050814]/90 backdrop-blur-xl p-5 rounded-2xl border border-white/10 shadow-2xl">
+                                    <div class="flex justify-between items-center mb-4">
+                                        <span class="text-[10px] font-black uppercase text-slate-400 tracking-widest">Spol Ekspansionen:</span>
+                                        <span id="exp-time-label" class="text-[10px] font-black uppercase text-cyan-400 bg-cyan-500/20 border border-cyan-500/30 px-3 py-1 rounded-full">Nutid</span>
+                                    </div>
+                                    <input type="range" id="expansion-slider" min="0" max="200" value="100" class="w-full mb-6">
+                                    
+                                    <!-- Spektrum bar viser rødforskydning live -->
+                                    <div class="flex items-center gap-4">
+                                        <span class="text-[10px] text-slate-500 uppercase font-bold">Blå</span>
+                                        <div class="relative flex-1 h-3 rounded-full overflow-hidden">
+                                            <div class="absolute inset-0 bg-gradient-to-r from-blue-500 via-green-400 to-red-500"></div>
+                                            <div id="spec-bar" class="absolute top-0 w-1 h-full bg-black left-[50%] transition-transform duration-75"></div>
+                                        </div>
+                                        <span class="text-[10px] text-red-500 uppercase font-bold">Rød</span>
+                                    </div>
+                                    <p class="text-[9px] text-center text-slate-500 mt-2">Bemærk: Lyset fra galakserne trækkes mod rød, når udvidelsen (hastigheden) øges!</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- AFSNIT 4: Big Bang -->
+        <section class="mb-40">
+            <div class="flex items-center gap-5 mb-12">
+                <div class="w-16 h-1 bg-gradient-to-r from-yellow-400 to-red-500 rounded-full"></div>
+                <h2 class="text-sm font-black uppercase tracking-[0.4em] text-yellow-500">IV. Universets Alder & Big Bang</h2>
+            </div>
+
+            <div class="glass-card p-12 md:p-20 border-t-4 border-yellow-500 text-center relative overflow-hidden">
+                <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-yellow-500/10 blur-[150px] pointer-events-none"></div>
+                
+                <h3 class="text-4xl md:text-5xl font-black text-white mb-8 tracking-tight relative z-10 flex items-center justify-center gap-4">
+                    Begyndelsen af tid og rum
+                    <button onclick="openInfo('alder')" class="i-btn">i</button>
+                </h3>
+                <p class="text-slate-400 text-lg font-medium leading-relaxed max-w-3xl mx-auto mb-12 relative z-10">
+                    Hvis universet beviseligt udvider sig i dag, må det rent logisk have været mindre i går. Hvis vi spoler Hubbles lov baglæns matematiske (Tid = Afstand/Fart), finder vi punktet, hvor alt var samlet i ét uendeligt lille, tæt og varmt punkt. Det var <strong>The Big Bang</strong>.
+                </p>
+
+                <div class="inline-flex flex-col md:flex-row items-center gap-10 p-10 bg-[#020108]/80 border border-yellow-500/30 rounded-[3rem] shadow-2xl relative z-10">
+                    <div class="text-left md:border-r border-white/10 md:pr-10">
+                        <span class="text-xs font-black uppercase tracking-[0.2em] text-slate-500 block mb-2">Formlen for alderen (t = 1/H₀)</span>
+                        <span class="text-7xl font-black text-yellow-400 tracking-tighter drop-shadow-[0_0_20px_rgba(234,179,8,0.4)]">13.8</span>
+                    </div>
+                    <div class="text-left">
+                        <span class="text-3xl font-bold text-white block uppercase tracking-widest mb-2">Milliarder</span>
+                        <span class="text-3xl font-light text-slate-500 block uppercase tracking-widest">År gammelt</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Eksamens Tjekliste (På anmodning) -->
+        <footer class="bg-gradient-to-b from-[#0a0f1c] to-[#010105] rounded-[3rem] p-12 md:p-16 text-center text-white relative overflow-hidden shadow-[0_20px_60px_-15px_rgba(0,0,0,1)] border border-white/5 mb-10">
+            <div class="relative z-10">
+                <span class="text-[10px] font-black uppercase tracking-[0.4em] text-violet-400 mb-6 block drop-shadow-[0_0_10px_rgba(139,92,246,0.8)]">Oversigt til Eksamen</span>
+                <h3 class="text-4xl font-black mb-12 italic text-white">Tjekliste til Tavlen</h3>
+                <div class="text-left max-w-3xl mx-auto space-y-6 mb-14 bg-white/5 p-8 md:p-12 rounded-[2.5rem] border border-white/10 backdrop-blur-md">
+                    <div class="flex gap-6">
+                        <div class="w-8 h-8 rounded-full bg-slate-800 text-slate-300 flex items-center justify-center flex-shrink-0 border border-slate-600 font-black text-sm shadow-inner">1</div>
+                        <div>
+                            <h5 class="font-bold text-white mb-2 text-lg">Det Kosmologiske Princip</h5>
+                            <p class="text-slate-400 text-sm leading-relaxed">Universet er homogent og isotropt på stor skala. Der findes intet centrum! Vi er blot på en stenplanet (Jorden) ved en almindelig stjerne (Solen) i én ud af milliarder af galakser.</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-6">
+                        <div class="w-8 h-8 rounded-full bg-orange-900/50 text-orange-400 flex items-center justify-center flex-shrink-0 border border-orange-500/50 font-black text-sm shadow-inner">2</div>
+                        <div>
+                            <h5 class="font-bold text-white mb-2 text-lg">Stjerners Liv & Død</h5>
+                            <p class="text-slate-400 text-sm leading-relaxed">Solens død: Opsvulmer til <em>Rød Kæmpe</em> ➔ dør roligt som <em>Hvid Dværg</em>. Tunge stjerner (> 8 Solmasser): Eksploderer som <em>Supernova</em> ➔ efterlader den ultra-tætte <em>Neutronstjerne</em> eller et Sort Hul.</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-6">
+                        <div class="w-8 h-8 rounded-full bg-cyan-900/50 text-cyan-400 flex items-center justify-center flex-shrink-0 border border-cyan-500/50 font-black text-sm shadow-inner">3</div>
+                        <div>
+                            <h5 class="font-bold text-white mb-2 text-lg">Rødforskydning & Hubbles Lov</h5>
+                            <p class="text-slate-400 text-sm leading-relaxed">Lyset fra galakser er rødforskudt (Dopplereffekten) = de flygter fra os. Skriv Hubbles lov op: <span class="math-font text-white bg-white/10 px-1.5 py-0.5 rounded mx-1 shadow-inner">v = H₀ · d</span>. Dette beviser matematisk universets ekspansion.</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-6">
+                        <div class="w-8 h-8 rounded-full bg-yellow-900/50 text-yellow-500 flex items-center justify-center flex-shrink-0 border border-yellow-500/50 font-black text-sm shadow-inner">4</div>
+                        <div>
+                            <h5 class="font-bold text-white mb-2 text-lg">Universets Alder (Big Bang)</h5>
+                            <p class="text-slate-400 text-sm leading-relaxed">Vend Hubbles lov om for at finde tiden. <span class="math-font text-white bg-white/10 px-1.5 py-0.5 rounded mx-1 shadow-inner">t = 1 / H₀</span>. Det beviser at universet startede i ét punkt for 13.8 milliarder år siden.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="absolute -top-32 -left-32 w-[50rem] h-[50rem] bg-violet-600/10 rounded-full blur-[200px] pointer-events-none"></div>
+            <div class="absolute -bottom-32 -right-32 w-[50rem] h-[50rem] bg-sky-600/10 rounded-full blur-[200px] pointer-events-none"></div>
+        </footer>
+
+    </main>
+
+    <script>
+        // --- DATA TIL VIDENS-SKUFFE ---
+        const infoData = {
+            'kosmologisk_princip': {
+                title: 'Det Kosmologiske Princip',
+                text: 'Et af de mest fundamentale principper i moderne kosmologi. Det slår fast, at universet ser ens ud overalt (det er <strong>homogent</strong>), og det ser ens ud i alle retninger (det er <strong>isotropt</strong>), når man betragter det på en meget stor skala.<br><br>Den absolut vigtigste konsekvens er: <em>Der er intet centrum i universet!</em> Dette understreger, at Jorden ikke har nogen særstatus i universet. Vi er ikke universets midtpunkt.'
+            },
+            'solens_doed': {
+                title: 'Solens Død & Hvide Dværg',
+                text: 'En gennemsnitlig stjerne som Solen producerer energi ved at fusionere brint til helium. Om cirka 5 milliarder år løber brinten tør i kernen. Solens kerne trækker sig sammen, mens de ydre lag svulmer voldsomt op, og den bliver til en <strong>Rød Kæmpe</strong>.<br><br>Til sidst afstødes de ydre gaslag og danner en smuk <em>planetarisk tåge</em>. Tilbage står kun kernen: En <strong>Hvid Dværg</strong>. Den er ekstremt tæt (på størrelse med Jorden, men med en masse som Solen) og vil blot gløde og køle ned for altid.'
+            },
+            'supernova': {
+                title: 'Supernova',
+                text: 'Hvis en stjerne er massiv (over 8 gange Solens masse), dør den ekstremt dramatisk. Tyngdekraften er så stærk, at stjernen i slutningen af sit liv kan fusionere tungere stoffer, helt op til jern.<br><br>Når kernen består af jern, koster det pludselig energi at fusionere, og reaktionerne stopper. Stjernen kollapser under sin egen enorme tyngde. De ydre lag smadres ned mod kernen og slynges ud i rummet i en af universets vildeste eksplosioner: En <strong>Supernova</strong>.'
+            },
+            'hubble': {
+                title: 'Rødforskydning & Hubbles Lov',
+                text: 'Edwin Hubble beviste vha. rødforskydning (lysets udgave af Dopplereffekten), at galakser bevæger sig væk fra os. Jo længere væk en galakse er (d), desto hurtigere flygter den (v). Det beskrives matematisk i Hubbles lov: <strong>v = H₀ · d</strong>.<br><br>Det er dog ikke galakserne der suser gennem rummet – <em>selve rummet udvider sig</em> imellem dem!'
+            },
+            'alder': {
+                title: 'Universets Alder & Big Bang',
+                text: 'Når vi ved, at universet udvider sig, kan vi "spole filmen baglæns". Ved at omskrive formlen for fart (Fart = Afstand/Tid ➔ Tid = Afstand/Fart ➔ t = d/v) og indsætte Hubbles lov (v = H₀*d), får vi <strong>t = 1/H₀</strong>.<br><br>Dette giver en tid på ca. 13,8 milliarder år. Det betyder, at for 13.8 mia. år siden var alt stof og hele rummet samlet i et uendeligt lille, tæt punkt: <strong>The Big Bang</strong>.'
+            }
+        };
+
+        function openInfo(key) {
+            const data = infoData[key];
+            document.getElementById('drawer-title').innerText = data.title;
+            document.getElementById('drawer-content').innerHTML = `<p>${data.text}</p>`;
+            document.getElementById('info-drawer').classList.add('open');
+        }
+
+        function closeDrawer() {
+            document.getElementById('info-drawer').classList.remove('open');
+        }
+
+        // --- THE COSMIC ZOOM SIMULATOR ---
+        const zoomCanvas = document.getElementById('zoom-canvas');
+        const zoomCtx = zoomCanvas.getContext('2d');
+        const zoomSlider = document.getElementById('zoom-slider');
+        const zoomLabel = document.getElementById('zoom-level-text');
+        
+        let zW, zH;
+        let zoomParticles = [];
+
+        function initZoomCanvas() {
+            const dp = 2;
+            zW = zoomCanvas.parentElement.clientWidth;
+            zH = zoomCanvas.parentElement.clientHeight;
+            zoomCanvas.width = zW * dp;
+            zoomCanvas.height = zH * dp;
+            zoomCtx.scale(dp, dp);
+            
+            Math.seedrandom = 10;
+            zoomParticles = [];
+            for(let i=0; i<300; i++) {
+                zoomParticles.push({
+                    x: (Math.random()-0.5) * 4000, 
+                    y: (Math.random()-0.5) * 4000,
+                    size: Math.random() * 2 + 1,
+                    color: Math.random() > 0.8 ? '#fcd34d' : (Math.random() > 0.5 ? '#8b5cf6' : '#0ea5e9')
+                });
+            }
+        }
+
+        let zTime = 0;
+        function drawZoom() {
+            zoomCtx.clearRect(0, 0, zW, zH);
+            zTime += 0.02;
+            const cx = zW/2; const cy = zH/2;
+            const val = parseFloat(zoomSlider.value); // 0 to 300
+            
+            if (val < 50) zoomLabel.innerText = "Jorden & Månen";
+            else if (val < 150) zoomLabel.innerText = "Solsystemet";
+            else if (val < 250) zoomLabel.innerText = "Mælkevejen";
+            else zoomLabel.innerText = "Kosmisk Væv (Universet)";
+
+            const scale = Math.pow(0.97, val); 
+
+            zoomCtx.save();
+            zoomCtx.translate(cx, cy);
+            zoomCtx.scale(scale, scale);
+
+            // 1. Universet (Galakser)
+            if (val > 100) {
+                let opacity = Math.min(1, (val - 100) / 100);
+                zoomCtx.globalAlpha = opacity;
+                zoomParticles.forEach(p => {
+                    zoomCtx.fillStyle = p.color;
+                    zoomCtx.beginPath(); zoomCtx.arc(p.x, p.y, p.size / scale * 1.5, 0, Math.PI*2); zoomCtx.fill();
+                });
+                zoomCtx.globalAlpha = 1.0;
+            }
+
+            // 2. Mælkevejen
+            if (val > 20 && val < 280) {
+                let opacity = 1;
+                if (val < 80) opacity = (val - 20) / 60;
+                if (val > 220) opacity = 1 - (val - 220) / 60;
+                zoomCtx.globalAlpha = opacity;
+                
+                for(let i=0; i<300; i++) {
+                    let angle = i * 0.1 + zTime*0.1;
+                    let r = i * 3;
+                    let x = Math.cos(angle) * r;
+                    let y = Math.sin(angle) * r;
+                    zoomCtx.fillStyle = 'rgba(139, 92, 246, 0.5)';
+                    zoomCtx.beginPath(); zoomCtx.arc(x, y, 5, 0, Math.PI*2); zoomCtx.fill();
+                }
+                const grad = zoomCtx.createRadialGradient(0,0,0, 0,0,200);
+                grad.addColorStop(0, 'rgba(255,255,255,0.8)');
+                grad.addColorStop(1, 'rgba(139,92,246,0)');
+                zoomCtx.fillStyle = grad;
+                zoomCtx.beginPath(); zoomCtx.arc(0,0, 200, 0, Math.PI*2); zoomCtx.fill();
+                
+                zoomCtx.globalAlpha = 1.0;
+            }
+
+            // 3. Solsystemet
+            if (val < 180) {
+                let opacity = 1;
+                if (val > 100) opacity = 1 - (val - 100) / 80;
+                zoomCtx.globalAlpha = opacity;
+
+                zoomCtx.fillStyle = '#f59e0b';
+                zoomCtx.beginPath(); zoomCtx.arc(0, 0, 40, 0, Math.PI*2); zoomCtx.fill();
+                
+                for(let i=1; i<=4; i++) {
+                    let dist = 80 * i;
+                    zoomCtx.strokeStyle = 'rgba(255,255,255,0.2)';
+                    zoomCtx.beginPath(); zoomCtx.arc(0, 0, dist, 0, Math.PI*2); zoomCtx.stroke();
+                    
+                    if (i !== 2) { 
+                        let pa = zTime * (5-i)*0.5;
+                        zoomCtx.fillStyle = '#94a3b8';
+                        zoomCtx.beginPath(); zoomCtx.arc(Math.cos(pa)*dist, Math.sin(pa)*dist, 10, 0, Math.PI*2); zoomCtx.fill();
+                    }
+                }
+                zoomCtx.globalAlpha = 1.0;
+            }
+
+            // 4. Jorden & Månen
+            if (val < 120) {
+                let eDist = 160;
+                let eAngle = zTime;
+                let ex = Math.cos(eAngle) * eDist;
+                let ey = Math.sin(eAngle) * eDist;
+                
+                zoomCtx.fillStyle = '#3b82f6';
+                zoomCtx.beginPath(); zoomCtx.arc(ex, ey, 20, 0, Math.PI*2); zoomCtx.fill();
+                
+                let mx = ex + Math.cos(zTime*4) * 40;
+                let my = ey + Math.sin(zTime*4) * 40;
+                zoomCtx.fillStyle = '#e2e8f0';
+                zoomCtx.beginPath(); zoomCtx.arc(mx, my, 5, 0, Math.PI*2); zoomCtx.fill();
+                
+                if (val < 20) {
+                    let moveScale = 1 - (val/20);
+                    zoomCtx.translate(-ex * moveScale, -ey * moveScale);
+                }
+            }
+
+            zoomCtx.restore();
+            requestAnimationFrame(drawZoom);
+        }
+
+        // --- STJERNE LIVSCYKLUS SIMULATOR ---
+        const starCanvas = document.getElementById('star-canvas');
+        const starCtx = starCanvas.getContext('2d');
+        const starSlider = document.getElementById('star-mass-slider');
+        const starValText = document.getElementById('star-mass-val');
+        
+        let sWidth, sHeight;
+        let starTime = 0;
+
+        function initStarCanvas() {
+            const dp = 2;
+            sWidth = starCanvas.parentElement.clientWidth;
+            sHeight = starCanvas.parentElement.clientHeight;
+            starCanvas.width = sWidth * dp;
+            starCanvas.height = sHeight * dp;
+            starCtx.scale(dp, dp);
+        }
+
+        function drawStarLifecycle() {
+            starCtx.clearRect(0, 0, sWidth, sHeight);
+            const mass = parseFloat(starSlider.value);
+            starValText.innerText = mass + (mass === 1 ? " Solmasse" : " Solmasser");
+
+            const y = sHeight / 2 + 20;
+            const x1 = sWidth * 0.15; 
+            const x2 = sWidth * 0.5;  
+            const x3 = sWidth * 0.85; 
+            
+            starTime += 0.05; 
+            
+            // Connectors
+            starCtx.strokeStyle = 'rgba(255,255,255,0.1)';
+            starCtx.setLineDash([4, 4]);
+            starCtx.beginPath(); starCtx.moveTo(x1+30, y); starCtx.lineTo(x2-40, y); starCtx.stroke();
+            starCtx.beginPath(); starCtx.moveTo(x2+40, y); starCtx.lineTo(x3-30, y); starCtx.stroke();
+            starCtx.setLineDash([]);
+
+            starCtx.fillStyle = '#475569'; starCtx.font = '11px Space Grotesk'; starCtx.textAlign = 'center';
+            starCtx.fillText("1. HOVEDSERIE", x1, y - 80);
+            starCtx.fillText("2. RØD KÆMPE (DØR)", x2, y - 100);
+            starCtx.fillText("3. ENDESTADIE", x3, y - 80);
+
+            // 1. START FASE
+            let startColor, startRadius;
+            if (mass < 2) { startColor = '#fef08a'; startRadius = 15 + mass*5; } 
+            else if (mass < 8) { startColor = '#f8fafc'; startRadius = 20 + mass*2; } 
+            else { startColor = '#7dd3fc'; startRadius = 25 + mass; } 
+
+            starCtx.beginPath(); starCtx.arc(x1, y, startRadius, 0, Math.PI*2);
+            starCtx.fillStyle = startColor; starCtx.shadowBlur = 30; starCtx.shadowColor = startColor; starCtx.fill();
+            starCtx.shadowBlur = 0;
+
+            // 2. MIDTER FASE
+            let giantRadius = startRadius * (2 + Math.min(mass, 5)*0.4);
+            let giantColor = mass >= 8 ? '#ef4444' : '#f97316'; 
+            
+            let pulse = Math.sin(starTime) * 3;
+            starCtx.beginPath(); starCtx.arc(x2, y, giantRadius + pulse, 0, Math.PI*2);
+            starCtx.fillStyle = giantColor; starCtx.globalAlpha = 0.8;
+            starCtx.shadowBlur = 50; starCtx.shadowColor = giantColor; starCtx.fill();
+            starCtx.globalAlpha = 1.0; starCtx.shadowBlur = 0;
+            
+            starCtx.fillStyle = 'rgba(255,255,255,0.7)'; starCtx.font = 'bold 12px Plus Jakarta Sans';
+            starCtx.fillText(mass >= 8 ? "Rød Superkæmpe" : "Rød Kæmpe", x2, y + giantRadius + 25);
+
+            // 3. DØDS FASE
+            if (mass < 8) {
+                // Hvid dværg
+                let ringR = 30 + (starTime*10 % 50);
+                starCtx.beginPath(); starCtx.arc(x3, y, ringR, 0, Math.PI*2);
+                starCtx.strokeStyle = `rgba(14, 165, 233, ${1 - (ringR-30)/50})`;
+                starCtx.lineWidth = 4; starCtx.stroke();
+                
+                starCtx.beginPath(); starCtx.arc(x3, y, 4, 0, Math.PI*2);
+                starCtx.fillStyle = '#ffffff'; starCtx.shadowBlur = 15; starCtx.shadowColor = '#ffffff'; starCtx.fill();
+                starCtx.shadowBlur = 0;
+                
+                starCtx.fillStyle = 'rgba(255,255,255,0.7)';
+                starCtx.fillText("Hvid Dværg", x3, y + 50);
+            } else {
+                // Supernova + Neutronstjerne / Sort Hul
+                let snCycle = (starTime % 6); 
+                
+                if (snCycle < 5) {
+                    let flash = Math.max(0, 1 - snCycle*1.2);
+                    starCtx.beginPath(); starCtx.arc(x3, y, 120 * (1-flash), 0, Math.PI*2);
+                    starCtx.fillStyle = `rgba(255, 255, 255, ${flash})`;
+                    starCtx.fill();
+                    
+                    let shockR = snCycle * 50;
+                    starCtx.beginPath(); starCtx.arc(x3, y, shockR, 0, Math.PI*2);
+                    starCtx.strokeStyle = `rgba(239, 68, 68, ${1 - shockR/300})`;
+                    starCtx.lineWidth = 10; starCtx.stroke();
+                }
+                
+                if (mass < 20) {
+                    starCtx.beginPath(); starCtx.arc(x3, y, 3, 0, Math.PI*2);
+                    starCtx.fillStyle = '#22d3ee'; starCtx.shadowBlur = 20; starCtx.shadowColor = '#22d3ee'; starCtx.fill();
+                    starCtx.shadowBlur = 0;
+                    starCtx.fillStyle = 'rgba(255,255,255,0.7)';
+                    starCtx.fillText("Neutronstjerne", x3, y + 50);
+                } else {
+                    starCtx.beginPath(); starCtx.ellipse(x3, y, 25, 6, 0, 0, Math.PI*2);
+                    starCtx.strokeStyle = 'rgba(245, 158, 11, 0.5)'; starCtx.lineWidth = 2; starCtx.stroke();
+                    starCtx.beginPath(); starCtx.arc(x3, y, 10, 0, Math.PI*2);
+                    starCtx.fillStyle = '#000000'; starCtx.shadowBlur = 10; starCtx.shadowColor = '#ffffff'; starCtx.fill();
+                    starCtx.shadowBlur = 0;
+                    starCtx.fillStyle = 'rgba(255,255,255,0.7)';
+                    starCtx.fillText("Sort Hul", x3, y + 50);
+                }
+                
+                starCtx.fillStyle = '#ef4444'; starCtx.font = 'bold 12px Space Grotesk';
+                starCtx.fillText("SUPERNOVA", x3, y - 50);
+            }
+
+            requestAnimationFrame(drawStarLifecycle);
+        }
+
+        // --- HUBBLE EXPANSION SIMULATOR ---
+        const expCanvas = document.getElementById('expansion-canvas');
+        const expCtx = expCanvas.getContext('2d');
+        const expSlider = document.getElementById('expansion-slider');
+        const expLabel = document.getElementById('exp-time-label');
+        const specBar1 = document.getElementById('spec-bar');
+        let expWidth, expHeight;
+        
+        let galaxies = [];
+        let expTime = 0;
+        
+        function initExpCanvas() {
+            const dp = 2;
+            expWidth = expCanvas.parentElement.clientWidth;
+            expHeight = expCanvas.parentElement.clientHeight;
+            expCanvas.width = expWidth * dp;
+            expCanvas.height = expHeight * dp;
+            expCtx.scale(dp, dp);
+            
+            Math.seedrandom = 100; 
+            galaxies = [];
+            for(let i=0; i<6; i++) {
+                let a = (Math.PI*2 / 6) * i;
+                let d = 40 + Math.random() * 40;
+                galaxies.push({ a: a, baseD: d, size: 8 });
+            }
+            drawExpansion();
+        }
+
+        function speedToColor(speed) {
+            if (speed < 0.5) return '#ffffff'; 
+            if (speed < 15) return '#fca5a5';
+            if (speed < 30) return '#ef4444';
+            return '#991b1b';
+        }
+
+        function drawExpansion() {
+            expCtx.clearRect(0, 0, expWidth, expHeight);
+            const cx = expWidth / 2; const cy = expHeight / 2 - 60; 
+            expTime += 0.1;
+            
+            const sliderVal = parseFloat(expSlider.value);
+            const timeScale = sliderVal / 100; // 0 til 2
+            
+            if(sliderVal < 10) expLabel.innerText = "Big Bang";
+            else if(sliderVal < 90) expLabel.innerText = "Fortid";
+            else if(sliderVal > 110) expLabel.innerText = "Fremtid";
+            else expLabel.innerText = "Nutid";
+
+            const shiftPercent = 50 + (timeScale * 20); 
+            specBar1.style.left = shiftPercent + "%";
+
+            // Observation Earth
+            expCtx.beginPath(); expCtx.arc(cx, cy, 10, 0, Math.PI*2);
+            expCtx.fillStyle = '#0ea5e9'; expCtx.shadowBlur = 20; expCtx.shadowColor = '#0ea5e9'; expCtx.fill(); expCtx.shadowBlur = 0;
+            
+            // Galaxies and light waves
+            galaxies.forEach(g => {
+                let currentD = g.baseD * timeScale;
+                let gx = cx + Math.cos(g.a) * currentD;
+                let gy = cy + Math.sin(g.a) * currentD;
+                
+                let speedV = currentD * 0.15; 
+                let gColor = speedToColor(speedV);
+
+                if(timeScale > 0.1) {
+                    expCtx.beginPath();
+                    let distToEarth = Math.hypot(gx - cx, gy - cy);
+                    let steps = 50;
+                    
+                    let frequency = Math.max(2, 20 - speedV*0.5); 
+                    
+                    for(let i=0; i<=steps; i++) {
+                        let t = i/steps;
+                        let px = gx + (cx - gx)*t;
+                        let py = gy + (cy - gy)*t;
+                        
+                        let dx = (cx - gx) / distToEarth;
+                        let dy = (cy - gy) / distToEarth;
+                        let perpX = -dy; let perpY = dx;
+                        
+                        let waveOffset = Math.sin(t * frequency * Math.PI - expTime) * 15;
+                        
+                        px += perpX * waveOffset;
+                        py += perpY * waveOffset;
+                        
+                        if(i===0) expCtx.moveTo(px, py);
+                        else expCtx.lineTo(px, py);
+                    }
+                    expCtx.strokeStyle = gColor; 
+                    expCtx.lineWidth = 2;
+                    expCtx.stroke();
+                }
+
+                expCtx.beginPath(); expCtx.arc(gx, gy, g.size, 0, Math.PI*2);
+                expCtx.fillStyle = '#ffffff'; expCtx.shadowBlur = 15; expCtx.shadowColor = '#ffffff'; expCtx.fill(); expCtx.shadowBlur = 0;
+            });
+            
+            requestAnimationFrame(drawExpansion);
+        }
+
+        expSlider.addEventListener('input', () => {});
+
+        // --- BACKGROUND PARTICLES ---
+        const bgCanvas = document.getElementById('particle-canvas');
+        const bgCtx = bgCanvas.getContext('2d');
+        let bgParticles = [];
+        
+        function initBgCanvas() {
+            bgCanvas.width = window.innerWidth; bgCanvas.height = window.innerHeight;
+            bgParticles = [];
+            for (let i = 0; i < 50; i++) {
+                bgParticles.push({
+                    x: Math.random() * bgCanvas.width, y: Math.random() * bgCanvas.height,
+                    size: Math.random() * 1.5 + 0.5,
+                    vx: (Math.random() - 0.5) * 0.1, vy: (Math.random() - 0.5) * 0.1,
+                    color: Math.random() > 0.5 ? '#8b5cf6' : '#0ea5e9'
+                });
+            }
+        }
+        function animateBg() {
+            bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
+            bgParticles.forEach(p => {
+                p.x += p.vx; p.y += p.vy;
+                if (p.x > bgCanvas.width || p.x < 0) p.vx *= -1;
+                if (p.y > bgCanvas.height || p.y < 0) p.vy *= -1;
+                bgCtx.fillStyle = p.color; bgCtx.beginPath(); bgCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2); bgCtx.fill();
+            });
+            requestAnimationFrame(animateBg);
+        }
+
+        Math.seedrandom = function(seed) {
+            let m_w = seed; let m_z = 987654321; let mask = 0xffffffff;
+            Math.random = function() {
+                m_z = (36969 * (m_z & 65535) + (m_z >> 16)) & mask;
+                m_w = (18000 * (m_w & 65535) + (m_w >> 16)) & mask;
+                let result = ((m_z << 16) + m_w) & mask;
+                result /= 4294967296; return result + 0.5;
+            }
+        }
+
+        window.addEventListener('resize', () => {
+            initZoomCanvas(); initExpCanvas(); initBgCanvas(); initStarCanvas();
+        });
+        
+        window.onload = () => {
+            initZoomCanvas(); initExpCanvas(); initBgCanvas(); initStarCanvas();
+            animateBg(); drawZoom(); drawStarLifecycle(); drawExpansion();
+        };
+    </script>
+</body>
+</html>

@@ -1,0 +1,643 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>02. Vores Solsystem | FysikQuest C</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #eab308; /* Sol-gul som primær farve for dette emne */
+            --primary-glow: rgba(234, 179, 8, 0.4);
+            --cyan: #06b6d4;
+            --cyan-glow: rgba(6, 182, 212, 0.4);
+            --magenta: #d946ef;
+            --slate-bg: #040814;
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--slate-bg);
+            color: #f8fafc;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        #particle-canvas {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -2; pointer-events: none; opacity: 0.6;
+        }
+
+        .glass-card {
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 2rem;
+            transition: all 0.5s var(--ease-out-expo);
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.7);
+        }
+
+        .glass-card:hover {
+            box-shadow: 0 25px 50px -10px var(--primary-glow);
+            border-color: rgba(234, 179, 8, 0.3);
+        }
+
+        #info-drawer {
+            transform: translateX(100%);
+            transition: transform 0.6s var(--ease-out-expo);
+        }
+        #info-drawer.open { transform: translateX(0); }
+
+        .text-gradient {
+            @apply text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 via-orange-400 to-red-400;
+        }
+
+        #reading-progress {
+            position: fixed; top: 0; left: 0; height: 5px;
+            background: linear-gradient(to right, #eab308, #f97316, #ef4444);
+            z-index: 100; width: 0%;
+            box-shadow: 0 0 20px rgba(234, 179, 8, 0.8);
+        }
+
+        .math-font { font-family: 'Space Grotesk', sans-serif; }
+
+        .sim-container {
+            background: #02040a;
+            border-radius: 1.5rem;
+            position: relative;
+            overflow: hidden;
+            box-shadow: inset 0 0 60px rgba(0,0,0,0.9);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .sim-canvas { width: 100%; height: 100%; display: block; }
+        
+        .i-btn {
+            @apply w-8 h-8 rounded-full bg-white/10 text-yellow-400 flex items-center justify-center text-xs font-black hover:bg-yellow-500 hover:text-white transition-all shadow-[0_0_15px_rgba(234,179,8,0.3)] border border-yellow-500/30 cursor-pointer flex-shrink-0 z-10;
+        }
+
+        .planet-btn {
+            @apply px-4 py-2 rounded-full font-bold text-xs uppercase tracking-widest transition-all border border-white/10 hover:bg-white/10 text-slate-400 text-left w-full flex justify-between items-center;
+        }
+        .planet-btn.active {
+            @apply bg-yellow-500/20 border-yellow-500/50 text-yellow-400 shadow-[0_0_15px_rgba(234,179,8,0.2)];
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
+        ::-webkit-scrollbar-thumb { background: rgba(234, 179, 8, 0.5); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(234, 179, 8, 0.8); }
+    </style>
+</head>
+<body class="min-h-screen pb-40">
+
+    <div id="reading-progress"></div>
+    <canvas id="particle-canvas"></canvas>
+
+    <!-- Info Drawer -->
+    <div id="info-drawer" class="fixed top-0 right-0 h-full w-full max-w-md bg-[#0a0f1c]/95 backdrop-blur-3xl shadow-[-40px_0_80px_rgba(0,0,0,0.8)] z-[200] p-10 border-l border-yellow-500/40 flex flex-col">
+        <button onclick="closeDrawer()" class="self-end p-3 bg-white/5 hover:bg-yellow-500/20 rounded-full transition mb-6 text-slate-400 hover:text-yellow-400">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-width="2.5" stroke-linecap="round"/></svg>
+        </button>
+        <div class="flex items-center gap-4 mb-8">
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-yellow-500 to-orange-500 flex items-center justify-center text-white font-black italic text-xl shadow-[0_0_30px_rgba(234,179,8,0.5)]">i</div>
+            <h3 id="drawer-title" class="text-2xl font-black text-white uppercase tracking-tighter">Videnscenter</h3>
+        </div>
+        <div id="drawer-content" class="text-slate-300 leading-relaxed space-y-6 font-medium text-sm overflow-y-auto pr-4">
+            <!-- Dynamisk indhold -->
+        </div>
+        <div class="mt-auto pt-6">
+            <div class="p-6 bg-gradient-to-br from-yellow-900/30 to-orange-900/30 rounded-3xl border border-white/10 shadow-inner">
+                <p class="text-[10px] font-black uppercase text-yellow-400 tracking-widest mb-2 flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"/><path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"/></svg>
+                    Eksamens Perspektivering
+                </p>
+                <p class="text-xs text-slate-400">Noter fra Fysik C læreplanen: Træk begreberne frem under den faglige samtale. Vis hvordan formørkelser og årstider er fysiske konsekvenser af himmellegemernes placering og hældning.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-50 bg-[#040814]/80 backdrop-blur-2xl border-b border-white/5">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <a href="fysik_landing.html" class="group flex items-center gap-4 text-slate-300 font-bold uppercase text-xs tracking-widest hover:text-yellow-400 transition">
+                <div class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center border border-white/10 group-hover:border-yellow-500/50 group-hover:bg-yellow-500/20 transition shadow-sm">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M10 19l-7-7m0 0l7-7m-7 7h18" stroke-width="2.5" stroke-linecap="round"/></svg>
+                </div>
+                Tilbage til Oversigt
+            </a>
+            <div class="flex items-center gap-4">
+                <span class="px-5 py-2 rounded-full bg-gradient-to-r from-yellow-600/20 to-orange-600/20 text-white font-black text-[10px] uppercase tracking-[0.2em] border border-white/10 shadow-[0_0_15px_rgba(234,179,8,0.2)]">Spørgsmål 02</span>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-6xl mx-auto px-6 pt-20">
+        
+        <!-- Header -->
+        <header class="mb-32 text-center relative">
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-yellow-600/20 blur-[150px] rounded-full pointer-events-none -z-10"></div>
+            
+            <div class="inline-block mb-6 px-6 py-2 rounded-full bg-orange-500/10 border border-orange-500/30 text-orange-400 font-bold text-[10px] tracking-[0.25em] uppercase shadow-lg shadow-orange-500/20">
+                Fysik C • Astronomi
+            </div>
+            <h1 class="text-6xl md:text-8xl font-black tracking-tighter text-white mb-8 uppercase leading-[0.9]">
+                Vores <br><span class="text-gradient drop-shadow-[0_0_30px_rgba(234,179,8,0.4)]">Solsystem</span>
+            </h1>
+            <p class="text-slate-400 text-lg md:text-xl max-w-3xl mx-auto font-medium leading-relaxed">
+                Opbygningen af vores kosmiske nabolag. Fra gasgiganter og ringe af is, til de fysiske fænomener der skaber årstider og formørkelser på Jorden.
+            </p>
+        </header>
+
+        <!-- AFSNIT 1: Planeternes Hemmeligheder (Fra dine noter!) -->
+        <section class="mb-36 relative">
+            <div class="flex items-center gap-5 mb-10">
+                <div class="w-16 h-1 bg-gradient-to-r from-yellow-600 to-orange-500 rounded-full"></div>
+                <h2 class="text-sm font-black uppercase tracking-[0.4em] text-slate-300">I. Planeternes Opbygning</h2>
+            </div>
+
+            <div class="glass-card p-10 md:p-14">
+                <div class="flex items-center justify-between border-b border-white/10 pb-6 mb-8">
+                    <div>
+                        <h3 class="text-3xl font-bold text-white tracking-tight mb-2">Interaktiv Planet-Database</h3>
+                        <p class="text-slate-400 font-medium">Udforsk solsystemets legemer baseret direkte på dine eksamensnoter.</p>
+                    </div>
+                    <button onclick="openInfo('au')" class="i-btn">i</button>
+                </div>
+                
+                <div class="flex flex-col lg:flex-row gap-10">
+                    <!-- Navigations Menu for Planeter -->
+                    <div class="w-full lg:w-1/3 flex flex-col gap-3">
+                        <button onclick="showPlanet('mars')" id="btn-mars" class="planet-btn active">🔴 Mars <span class="text-lg">›</span></button>
+                        <button onclick="showPlanet('jupiter')" id="btn-jupiter" class="planet-btn">🟠 Jupiter <span class="text-lg">›</span></button>
+                        <button onclick="showPlanet('saturn')" id="btn-saturn" class="planet-btn">🪐 Saturn <span class="text-lg">›</span></button>
+                        <button onclick="showPlanet('uranus')" id="btn-uranus" class="planet-btn">🔵 Uranus <span class="text-lg">›</span></button>
+                        <button onclick="showPlanet('neptun')" id="btn-neptun" class="planet-btn">🔵 Neptun <span class="text-lg">›</span></button>
+                        <button onclick="showPlanet('andre')" id="btn-andre" class="planet-btn">☄️ Bælter & Pluto <span class="text-lg">›</span></button>
+                    </div>
+
+                    <!-- Indhold Viser -->
+                    <div class="flex-1 bg-[#02040a] rounded-3xl p-8 border border-white/10 shadow-inner relative overflow-hidden flex items-center">
+                        <div id="planet-content" class="relative z-10 w-full">
+                            <!-- Indhold opdateres via JS -->
+                        </div>
+                        <!-- Dekorativ Planet visualisering i baggrunden -->
+                        <div id="planet-visual" class="absolute -right-10 -bottom-10 w-64 h-64 rounded-full blur-[2px] opacity-40 transition-all duration-700"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- AFSNIT 2: Dag, Nat & Årstider -->
+        <section class="mb-36">
+            <div class="flex items-center gap-5 mb-10">
+                <div class="w-16 h-1 bg-gradient-to-r from-cyan-400 to-blue-500 rounded-full"></div>
+                <h2 class="text-sm font-black uppercase tracking-[0.4em] text-cyan-400">II. Årstider & Døgn</h2>
+            </div>
+
+            <div class="glass-card p-10 md:p-14">
+                <div class="flex flex-col lg:flex-row gap-16 items-center">
+                    <div class="flex-1 space-y-8">
+                        <div>
+                            <h3 class="text-3xl font-bold text-white tracking-tight flex items-center gap-4 mb-4">
+                                Hældningen bestemmer alt
+                                <button onclick="openInfo('aarstider')" class="i-btn">i</button>
+                            </h3>
+                            <p class="text-slate-400 font-medium leading-relaxed">
+                                Jorden står ikke lige op og ned i sin bane om Solen. Den <strong>hælder 23,5 grader</strong>! Det er udelukkende denne hældning, der skaber vores årstider.
+                            </p>
+                            <p class="text-slate-400 font-medium leading-relaxed mt-4">
+                                Når den nordlige halvkugle peger <em>mod</em> Solen, har vi sommer (solens stråler rammer mere direkte). Samtidig skaber Jordens egen rotation om aksen <strong>dag og nat</strong>.
+                            </p>
+                        </div>
+                        
+                        <div class="p-6 bg-cyan-900/10 border border-cyan-500/20 rounded-2xl">
+                            <p class="text-[10px] font-black uppercase tracking-widest text-cyan-400 mb-2">Vigtig Eksamensviden</p>
+                            <p class="text-sm text-slate-300">Det er en klassisk misforståelse, at sommer opstår, fordi vi er tættere på Solen. Faktisk er Jorden tættest på Solen i januar! (Det er altså kun aksehældningen, der gælder).</p>
+                        </div>
+                    </div>
+
+                    <!-- Seasons Simulator -->
+                    <div class="w-full lg:w-[450px]">
+                        <div class="sim-container h-[350px] flex items-center justify-center">
+                            <canvas id="season-canvas" class="sim-canvas absolute inset-0"></canvas>
+                            <!-- Controls -->
+                            <div class="absolute bottom-6 w-full px-8 z-10 flex flex-col gap-2">
+                                <div class="flex justify-between">
+                                    <span class="text-[10px] font-bold text-white uppercase tracking-widest">Sommer (Nord)</span>
+                                    <span class="text-[10px] font-bold text-white uppercase tracking-widest">Vinter (Nord)</span>
+                                </div>
+                                <input type="range" id="orbit-slider" min="0" max="180" value="0" class="w-full h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-cyan-400">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- AFSNIT 3: Formørkelser -->
+        <section class="mb-40">
+            <div class="flex items-center gap-5 mb-10">
+                <div class="w-16 h-1 bg-gradient-to-r from-purple-500 to-magenta-500 rounded-full"></div>
+                <h2 class="text-sm font-black uppercase tracking-[0.4em] text-fuchsia-400">III. Kometer & Formørkelser</h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-10 mb-10">
+                <div class="glass-card p-10 border-t-4 border-fuchsia-500">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-2xl font-bold text-white italic">Hvad er en komet?</h3>
+                        <button onclick="openInfo('komet')" class="i-btn">i</button>
+                    </div>
+                    <p class="text-slate-400 font-medium leading-relaxed">
+                        Kometer er "beskidte snebolde" bestående af is, støv og sten. De har meget langstrakte (excentriske) elliptiske baner om Solen. Når de nærmer sig Solen, fordamper isen, og solvinden blæser det væk, hvilket skaber den smukke komethale (som altid peger <em>væk</em> fra Solen).
+                    </p>
+                </div>
+                <div class="glass-card p-10 border-t-4 border-slate-600">
+                    <div class="flex items-center justify-between mb-4">
+                        <h3 class="text-2xl font-bold text-white italic">Skyggespil i rummet</h3>
+                        <button onclick="openInfo('formorkelse')" class="i-btn">i</button>
+                    </div>
+                    <p class="text-slate-400 font-medium leading-relaxed">
+                        Den antikke astronom Aristarchos brugte en måneformørkelse til at måle forholdet mellem Jordens og Månens størrelse! En formørkelse opstår kun, når Solen, Jorden og Månen ligger på en fuldstændig lige linje.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Formørkelses Laboratorium -->
+            <div class="glass-card p-10 md:p-14 overflow-hidden relative">
+                <div class="flex items-center justify-between mb-8">
+                    <div>
+                        <h3 class="text-3xl font-bold text-white tracking-tight mb-2">Formørkelses Laboratoriet</h3>
+                        <p class="text-slate-400 font-medium">Træk Månen i bane om Jorden og se, hvornår skyggerne rammer rigtigt.</p>
+                    </div>
+                </div>
+
+                <div class="sim-container h-[350px] relative">
+                    <canvas id="eclipse-canvas" class="sim-canvas"></canvas>
+                    
+                    <div class="absolute bottom-6 w-full px-8 z-10 flex flex-col items-center">
+                        <div id="eclipse-status" class="mb-4 px-6 py-2 bg-white/5 border border-white/10 rounded-full text-xs font-black uppercase tracking-widest text-slate-400 backdrop-blur-md">
+                            Ingen Formørkelse
+                        </div>
+                        <input type="range" id="moon-slider" min="0" max="360" value="90" class="w-full max-w-lg h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-fuchsia-500">
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Eksamens Disposition -->
+        <footer class="bg-gradient-to-b from-[#0a0f1c] to-[#02040a] rounded-[3rem] p-12 md:p-16 text-center text-white relative overflow-hidden shadow-[0_20px_60px_-15px_rgba(0,0,0,1)] border border-white/5 mb-10">
+            <div class="relative z-10">
+                <span class="text-[10px] font-black uppercase tracking-[0.4em] text-yellow-400 mb-6 block drop-shadow-[0_0_10px_rgba(234,179,8,0.8)]">Oversigt til Eksamen</span>
+                <h3 class="text-4xl font-black mb-12 italic text-white">Tjekliste til Tavlen</h3>
+                <div class="text-left max-w-3xl mx-auto space-y-6 mb-14 bg-white/5 p-8 md:p-10 rounded-3xl border border-white/10 backdrop-blur-md">
+                    <div class="flex gap-5">
+                        <div class="w-8 h-8 rounded-full bg-slate-800 text-slate-300 flex items-center justify-center flex-shrink-0 border border-slate-600 font-black">1</div>
+                        <div>
+                            <h5 class="font-bold text-white mb-1">Planeternes Fakta</h5>
+                            <p class="text-slate-400 text-sm leading-relaxed">Nævn Mars (rust/intet magnetfelt), Jupiter (gas/95 måner), Saturn (ringe/Titan/methan), Uranus (parallel akse) – netop de detaljer du har i noterne.</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-5">
+                        <div class="w-8 h-8 rounded-full bg-cyan-900/50 text-cyan-400 flex items-center justify-center flex-shrink-0 border border-cyan-500/50 font-black">2</div>
+                        <div>
+                            <h5 class="font-bold text-white mb-1">Årstider, Dag & Nat</h5>
+                            <p class="text-slate-400 text-sm leading-relaxed">Rotation = dag/nat. Aksehældning (23,5°) = årstider. Tegn det gerne, så læreren kan se, hvordan strålerne rammer.</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-5">
+                        <div class="w-8 h-8 rounded-full bg-fuchsia-900/50 text-fuchsia-400 flex items-center justify-center flex-shrink-0 border border-fuchsia-500/50 font-black">3</div>
+                        <div>
+                            <h5 class="font-bold text-white mb-1">Formørkelser & Kometer</h5>
+                            <p class="text-slate-400 text-sm leading-relaxed">Solformørkelse: Sol-Måne-Jord. Måneformørkelse: Sol-Jord-Måne (Aristarchos). Kometer: Beskidte snebolde med hale væk fra Solen.</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-5">
+                        <div class="w-8 h-8 rounded-full bg-yellow-900/50 text-yellow-500 flex items-center justify-center flex-shrink-0 border border-yellow-500/50 font-black">4</div>
+                        <div>
+                            <h5 class="font-bold text-white mb-1">Keplers Love (Kort)</h5>
+                            <p class="text-slate-400 text-sm leading-relaxed">Nævn kort, at de bestemmer alt i solsystemet, og definer AU (Astronomisk Enhed = Afstand Jord til Sol).</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="absolute -top-32 -left-32 w-[40rem] h-[40rem] bg-yellow-600/10 rounded-full blur-[150px] pointer-events-none"></div>
+            <div class="absolute -bottom-32 -right-32 w-[40rem] h-[40rem] bg-cyan-600/10 rounded-full blur-[150px] pointer-events-none"></div>
+        </footer>
+
+    </main>
+
+    <script>
+        // --- DATA TIL PLANET DATABASE (STRENGT FRA NOTERNE!) ---
+        const planetData = {
+            'mars': {
+                title: 'Mars', subtitle: 'Den røde planet', color: '#ef4444',
+                text: `<p class="mb-3">Mars kaldes den røde planet, og den røde farve skyldes et stort indhold af <strong>jernoxid</strong>, også kaldet rust.</p>
+                       <p>Mars har ikke rigtig nogen atmosfære. Mars' kerne er størknet, og den har derfor <strong>ikke noget magnetfelt</strong>. Dette har gjort, at atmosfæren er blevet blæst væk af solvinde.</p>`
+            },
+            'jupiter': {
+                title: 'Jupiter', subtitle: 'Den største gaskæmpe', color: '#f59e0b',
+                text: `<p class="mb-3">Jupiter er Solsystemets <strong>største planet</strong>, og består primært af de samme elementer som Solen.</p>
+                       <p>Det er en gasgigant, da man ikke kan stå på overfladen. Pr. 2023 har Jupiter <strong>95 kendte måner</strong>.</p>`
+            },
+            'saturn': {
+                title: 'Saturn', subtitle: 'Ringene af is og sten', color: '#fcd34d',
+                text: `<p class="mb-3">Saturn er den næststørste planet. Det er også en gasgigant, primært kendt for sine ringe, som <strong>består af is og sten</strong>.</p>
+                       <p>Pr. bogens udgivelse har Saturn 62 kendte måner. Den største er <strong>Titan</strong>. Titans atmosfære består af nitrogen, methan og ethan, og der er faktisk <em>flydende methan-have</em> på overfladen!</p>`
+            },
+            'uranus': {
+                title: 'Uranus', subtitle: 'Den trillende isgigant', color: '#38bdf8',
+                text: `<p class="mb-3">Uranus er kedelig og kold. Der er ingen store storme, som man finder på Jupiter og Saturn.</p>
+                       <p>Det er en kold gaskæmpe, hvor temperaturen kan komme ned på <strong>-224 grader</strong>. Planetens rotationsakse ligger <strong>næsten parallelt</strong> til de andre planeter og dens bane (den "triller" nærmest afsted).</p>`
+            },
+            'neptun': {
+                title: 'Neptun', subtitle: 'Den yderste kæmpe', color: '#3b82f6',
+                text: `<p>Neptun er også en gaskæmpe, ligesom Jupiter, Saturn og Uranus.</p>`
+            },
+            'andre': {
+                title: 'De Ydre Grænser', subtitle: 'Pluto og bælterne', color: '#94a3b8',
+                text: `<p class="mb-3">Udover de store planeter findes andre vigtige strukturer i vores solsystem ifølge noterne:</p>
+                       <ul class="list-disc list-inside text-slate-400 ml-4 space-y-2">
+                           <li><strong>Asteroidebæltet:</strong> Ligger typisk mellem Mars og Jupiter.</li>
+                           <li><strong>Pluto:</strong> Den kendte dværgplanet.</li>
+                           <li><strong>Kuiperbæltet:</strong> Et bælte af is-legemer langt ude i solsystemet (efter Neptun).</li>
+                       </ul>`
+            }
+        };
+
+        function showPlanet(id) {
+            // Update buttons
+            document.querySelectorAll('.planet-btn').forEach(btn => btn.classList.remove('active'));
+            document.getElementById('btn-' + id).classList.add('active');
+
+            // Update Content
+            const data = planetData[id];
+            const content = document.getElementById('planet-content');
+            content.innerHTML = `
+                <h4 class="text-4xl font-black text-white mb-1 uppercase tracking-tight" style="text-shadow: 0 0 20px ${data.color}80">${data.title}</h4>
+                <p class="text-xs font-bold uppercase tracking-widest mb-6" style="color: ${data.color}">${data.subtitle}</p>
+                <div class="text-slate-300 font-medium leading-relaxed text-sm">${data.text}</div>
+            `;
+            
+            // Update Visual background glow
+            document.getElementById('planet-visual').style.background = `radial-gradient(circle, ${data.color} 0%, transparent 70%)`;
+        }
+
+        // Initialize first planet
+        showPlanet('mars');
+
+        // --- DATA TIL VIDENS-SKUFFE ---
+        const infoData = {
+            'au': {
+                title: 'Astronomisk Enhed (AU)',
+                text: 'En Astronomisk Enhed (Astronomical Unit) er defineret som gennemsnitsafstanden fra Jorden til Solen. Det er cirka 150 millioner kilometer. I stedet for at sige at Jupiter er 778 mio. km væk, er det lettere at sige, at den er ca. 5.2 AU væk.'
+            },
+            'aarstider': {
+                title: 'Årstider',
+                text: 'Mange tror fejlagtigt, at det er afstanden til Solen, der skaber årstider (faktisk er Jorden tættest på Solen i januar!). Årstider skyldes udelukkende, at Jordens rotationsakse hælder 23,5 grader. Når den nordlige halvkugle vipper ind mod Solen, rammer solstrålerne mere direkte, og vi har sommer.'
+            },
+            'komet': {
+                title: 'Kometer',
+                text: 'Kometer beskrives ofte som "beskidte snebolde" bestående af is, sten og støv. Når de kommer tæt på Solen i deres excentriske baner, begynder isen at fordampe. Solvinden (partikler fra Solen) blæser materialet væk og skaber den ikoniske komethale. Halen peger altid <em>væk</em> fra Solen, uanset hvilken vej kometen flyver.'
+            },
+            'formorkelse': {
+                title: 'Formørkelser',
+                text: '<strong>Solformørkelse:</strong> Månen går præcis ind mellem Solen og Jorden, og Månens skygge rammer Jorden.<br><br><strong>Måneformørkelse:</strong> Jorden står præcis mellem Solen og Månen. Jorden kaster en skygge, som Månen glider ind i. Den græske astronom Aristarchos brugte dette skyggespil til at udregne forholdet mellem Jordens og Månens størrelse.'
+            }
+        };
+
+        function openInfo(key) {
+            const data = infoData[key];
+            document.getElementById('drawer-title').innerText = data.title;
+            document.getElementById('drawer-content').innerHTML = `<p>${data.text}</p>`;
+            document.getElementById('info-drawer').classList.add('open');
+        }
+
+        function closeDrawer() {
+            document.getElementById('info-drawer').classList.remove('open');
+        }
+
+        window.addEventListener('scroll', () => {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            document.getElementById('reading-progress').style.width = scrolled + "%";
+        });
+
+        // --- ÅRSTIDS SIMULATOR ---
+        const seaCanvas = document.getElementById('season-canvas');
+        const seaCtx = seaCanvas.getContext('2d');
+        const orbSlider = document.getElementById('orbit-slider');
+        
+        function initSeasonCanvas() {
+            const dp = 2;
+            seaCanvas.width = seaCanvas.parentElement.clientWidth * dp;
+            seaCanvas.height = seaCanvas.parentElement.clientHeight * dp;
+            seaCtx.scale(dp, dp);
+        }
+
+        function drawSeasons() {
+            seaCtx.clearRect(0, 0, seaCanvas.width, seaCanvas.height);
+            const w = seaCanvas.width/2; const h = seaCanvas.height/2;
+            
+            // Slider value 0 to 180 (0 = Summer North, 180 = Winter North)
+            const orbitPos = parseFloat(orbSlider.value); 
+            // Map 0-180 to an angle for an elliptical path (just visual)
+            const angle = orbitPos * (Math.PI / 180);
+            
+            const sunX = w/2; const sunY = h/2;
+            const orbitRx = w*0.35; const orbitRy = 20; // very flat ellipse to show 3D side view
+            
+            const earthX = sunX + orbitRx * Math.cos(angle);
+            const earthY = sunY + orbitRy * Math.sin(angle);
+            
+            // Draw Orbit path
+            seaCtx.beginPath();
+            seaCtx.ellipse(sunX, sunY, orbitRx, orbitRy, 0, 0, Math.PI*2);
+            seaCtx.strokeStyle = 'rgba(255,255,255,0.1)';
+            seaCtx.lineWidth = 2;
+            seaCtx.stroke();
+            
+            // Draw Sun
+            seaCtx.beginPath(); seaCtx.arc(sunX, sunY, 30, 0, Math.PI*2);
+            seaCtx.fillStyle = '#f59e0b'; seaCtx.shadowBlur = 40; seaCtx.shadowColor = '#f59e0b'; seaCtx.fill(); seaCtx.shadowBlur = 0;
+
+            // Z-sorting: if sin(angle) < 0, earth is "behind" sun. We'll draw earth anyway but smaller maybe.
+            const scale = 1 + Math.sin(angle)*0.2; // slight perspective scale
+            const eRadius = 15 * scale;
+            
+            // Draw Earth
+            seaCtx.save();
+            seaCtx.translate(earthX, earthY);
+            // Tilt axis (23.5 deg)
+            seaCtx.rotate(23.5 * Math.PI / 180);
+            
+            // Earth Body
+            seaCtx.beginPath(); seaCtx.arc(0, 0, eRadius, 0, Math.PI*2);
+            seaCtx.fillStyle = '#3b82f6'; seaCtx.fill();
+            
+            // Equator
+            seaCtx.beginPath(); seaCtx.moveTo(-eRadius, 0); seaCtx.lineTo(eRadius, 0);
+            seaCtx.strokeStyle = 'rgba(255,255,255,0.5)'; seaCtx.lineWidth = 1; seaCtx.stroke();
+            
+            // Axis line
+            seaCtx.beginPath(); seaCtx.moveTo(0, -eRadius-10); seaCtx.lineTo(0, eRadius+10);
+            seaCtx.strokeStyle = '#ef4444'; seaCtx.lineWidth = 2; seaCtx.stroke();
+            
+            seaCtx.restore();
+
+            // Draw Sun Rays (simple visualization)
+            seaCtx.beginPath();
+            seaCtx.moveTo(sunX, sunY);
+            seaCtx.lineTo(earthX, earthY);
+            seaCtx.strokeStyle = 'rgba(250, 204, 21, 0.3)';
+            seaCtx.lineWidth = 20 * scale;
+            seaCtx.stroke();
+
+            // Lighting (Shadow on earth)
+            // The shadow should always face away from the sun.
+            const shadowAngle = Math.atan2(earthY - sunY, earthX - sunX);
+            seaCtx.save();
+            seaCtx.translate(earthX, earthY);
+            seaCtx.rotate(shadowAngle);
+            seaCtx.beginPath();
+            seaCtx.arc(0, 0, eRadius, -Math.PI/2, Math.PI/2);
+            seaCtx.fillStyle = 'rgba(0,0,0,0.7)';
+            seaCtx.fill();
+            seaCtx.restore();
+
+            requestAnimationFrame(drawSeasons);
+        }
+
+        // --- FORMØRKELSES LABORATORIUM ---
+        const eclCanvas = document.getElementById('eclipse-canvas');
+        const eclCtx = eclCanvas.getContext('2d');
+        const moonSlider = document.getElementById('moon-slider');
+        const eclStatus = document.getElementById('eclipse-status');
+        
+        function initEclipseCanvas() {
+            const dp = 2;
+            eclCanvas.width = eclCanvas.parentElement.clientWidth * dp;
+            eclCanvas.height = eclCanvas.parentElement.clientHeight * dp;
+            eclCtx.scale(dp, dp);
+        }
+
+        function drawEclipse() {
+            eclCtx.clearRect(0, 0, eclCanvas.width, eclCanvas.height);
+            const w = eclCanvas.width/2; const h = eclCanvas.height/2;
+            
+            const sunX = w * 0.15; const sunY = h/2; const sunR = 40;
+            const earthX = w * 0.75; const earthY = h/2; const earthR = 15;
+            
+            // Moon position
+            const mAngle = parseFloat(moonSlider.value) * (Math.PI / 180);
+            const orbitR = 60;
+            const moonX = earthX + orbitR * Math.cos(mAngle);
+            const moonY = earthY + orbitR * Math.sin(mAngle);
+            const moonR = 6;
+
+            // Draw Sun
+            eclCtx.beginPath(); eclCtx.arc(sunX, sunY, sunR, 0, Math.PI*2);
+            eclCtx.fillStyle = '#f59e0b'; eclCtx.shadowBlur = 30; eclCtx.shadowColor = '#f59e0b'; eclCtx.fill(); eclCtx.shadowBlur = 0;
+
+            // Earth Shadow Cone (Umbra)
+            const shadowLen = 150;
+            eclCtx.beginPath();
+            eclCtx.moveTo(earthX, earthY - earthR);
+            eclCtx.lineTo(earthX + shadowLen, earthY);
+            eclCtx.lineTo(earthX, earthY + earthR);
+            eclCtx.fillStyle = 'rgba(0,0,0,0.6)';
+            eclCtx.fill();
+
+            // Moon Shadow Cone
+            eclCtx.beginPath();
+            eclCtx.moveTo(moonX, moonY - moonR);
+            eclCtx.lineTo(moonX + shadowLen, moonY);
+            eclCtx.lineTo(moonX, moonY + moonR);
+            eclCtx.fillStyle = 'rgba(0,0,0,0.8)';
+            eclCtx.fill();
+
+            // Draw Earth
+            eclCtx.beginPath(); eclCtx.arc(earthX, earthY, earthR, 0, Math.PI*2);
+            eclCtx.fillStyle = '#3b82f6'; eclCtx.fill();
+
+            // Draw Moon Orbit
+            eclCtx.beginPath(); eclCtx.arc(earthX, earthY, orbitR, 0, Math.PI*2);
+            eclCtx.strokeStyle = 'rgba(255,255,255,0.1)'; eclCtx.lineWidth = 1; eclCtx.stroke();
+
+            // Draw Moon
+            eclCtx.beginPath(); eclCtx.arc(moonX, moonY, moonR, 0, Math.PI*2);
+            eclCtx.fillStyle = '#cbd5e1'; eclCtx.fill();
+
+            // Collision / Eclipse Detection Logic
+            let statusText = "Ingen Formørkelse";
+            let statusClass = "mb-4 px-6 py-2 bg-white/5 border border-white/10 rounded-full text-xs font-black uppercase tracking-widest text-slate-400 backdrop-blur-md";
+
+            // If Moon is directly between Earth and Sun (angle ~ 180 deg)
+            if (mAngle > Math.PI - 0.2 && mAngle < Math.PI + 0.2) {
+                statusText = "Solformørkelse!";
+                statusClass = "mb-4 px-6 py-2 bg-fuchsia-500/20 border border-fuchsia-500/50 text-fuchsia-400 rounded-full text-xs font-black uppercase tracking-widest backdrop-blur-md shadow-[0_0_15px_rgba(217,70,239,0.5)]";
+            }
+            // If Moon is in Earth's shadow (angle ~ 0 or 360)
+            else if (mAngle < 0.2 || mAngle > Math.PI*2 - 0.2) {
+                statusText = "Måneformørkelse!";
+                statusClass = "mb-4 px-6 py-2 bg-cyan-500/20 border border-cyan-500/50 text-cyan-400 rounded-full text-xs font-black uppercase tracking-widest backdrop-blur-md shadow-[0_0_15px_rgba(6,182,212,0.5)]";
+                // Darken moon to simulate eclipse
+                eclCtx.beginPath(); eclCtx.arc(moonX, moonY, moonR, 0, Math.PI*2);
+                eclCtx.fillStyle = 'rgba(220, 38, 38, 0.5)'; // Blood moon effect
+                eclCtx.fill();
+            }
+
+            if(eclStatus.innerText !== statusText) {
+                eclStatus.innerText = statusText;
+                eclStatus.className = statusClass;
+            }
+
+            requestAnimationFrame(drawEclipse);
+        }
+
+        // --- BAGGRUND PARTIKLER ---
+        const bgCanvas = document.getElementById('particle-canvas');
+        const bgCtx = bgCanvas.getContext('2d');
+        let bgParticles = [];
+        
+        function initBgCanvas() {
+            bgCanvas.width = window.innerWidth; bgCanvas.height = window.innerHeight;
+            bgParticles = [];
+            for (let i = 0; i < 40; i++) {
+                bgParticles.push({
+                    x: Math.random() * bgCanvas.width, y: Math.random() * bgCanvas.height,
+                    size: Math.random() * 1.5 + 0.5,
+                    vx: (Math.random() - 0.5) * 0.2, vy: (Math.random() - 0.5) * 0.2,
+                    color: Math.random() > 0.5 ? '#eab308' : '#06b6d4'
+                });
+            }
+        }
+        function animateBg() {
+            bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
+            bgParticles.forEach(p => {
+                p.x += p.vx; p.y += p.vy;
+                if (p.x > bgCanvas.width || p.x < 0) p.vx *= -1;
+                if (p.y > bgCanvas.height || p.y < 0) p.vy *= -1;
+                bgCtx.fillStyle = p.color; bgCtx.beginPath(); bgCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2); bgCtx.fill();
+            });
+            requestAnimationFrame(animateBg);
+        }
+
+        window.addEventListener('resize', () => {
+            initSeasonCanvas(); initEclipseCanvas(); initBgCanvas();
+        });
+        
+        window.onload = () => {
+            initSeasonCanvas(); initEclipseCanvas(); initBgCanvas();
+            
+            drawSeasons();
+            drawEclipse();
+            animateBg();
+        };
+    </script>
+</body>
+</html>

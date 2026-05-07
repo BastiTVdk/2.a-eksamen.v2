@@ -8,7 +8,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
-            /* Varmt termisk farvetema - Laboratorie stil */
+            /* Termisk/Laboratorie farvetema */
             --primary: #f97316; /* Orange */
             --primary-glow: rgba(249, 115, 22, 0.4);
             --secondary: #eab308; /* Gul */
@@ -16,7 +16,7 @@
             --accent: #ef4444; /* Rød */
             --accent-glow: rgba(239, 68, 68, 0.4);
             
-            --slate-bg: #1c1917; /* Varm mørkegrå (stone-900) i stedet for space-sort */
+            --slate-bg: #1c1917; /* Varm, mørkegrå baggrund */
             --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
         }
 
@@ -26,33 +26,33 @@
             color: #f8fafc;
             overflow-x: hidden;
             scroll-behavior: smooth;
-            /* Subtilt laboratorie-gitter for at fjerne "rum" følelsen */
+            /* Laboratorie-gitter baggrund */
             background-image: 
                 linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
-            background-size: 30px 30px;
+            background-size: 40px 40px;
         }
 
-        /* Varme gnister i baggrunden */
+        /* Varme gnister */
         #particle-canvas {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             z-index: -2; pointer-events: none; opacity: 0.8;
         }
 
-        /* Ambient varme-glød i hjørnerne */
+        /* Ambient varme-glød */
         .ambient-heat {
             position: fixed;
             border-radius: 50%;
-            filter: blur(150px);
+            filter: blur(180px);
             z-index: -1;
             pointer-events: none;
         }
 
         .glass-card {
-            background: rgba(28, 25, 23, 0.8);
+            background: rgba(28, 25, 23, 0.85);
             backdrop-filter: blur(24px);
             -webkit-backdrop-filter: blur(24px);
-            border: 1px solid rgba(249, 115, 22, 0.15);
+            border: 1px solid rgba(249, 115, 22, 0.2);
             border-radius: 2.5rem;
             transition: all 0.5s var(--ease-out-expo);
             box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.8);
@@ -89,7 +89,7 @@
             position: relative;
             overflow: hidden;
             box-shadow: inset 0 0 60px rgba(0,0,0,0.9);
-            border: 1px solid rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.08);
         }
         
         .i-btn {
@@ -111,9 +111,9 @@
     <div id="reading-progress"></div>
     <canvas id="particle-canvas"></canvas>
     
-    <!-- Varme Ambient Baggrunde -->
-    <div class="ambient-heat w-[600px] h-[600px] bg-red-600/10 top-0 left-0"></div>
-    <div class="ambient-heat w-[800px] h-[800px] bg-orange-600/10 bottom-0 right-0"></div>
+    <!-- Varme Ambient Baggrunde for laboratorie-effekt -->
+    <div class="ambient-heat w-[600px] h-[600px] bg-red-600/10 top-[-10%] left-[-10%]"></div>
+    <div class="ambient-heat w-[800px] h-[800px] bg-orange-600/10 bottom-[-10%] right-[-10%]"></div>
 
     <!-- Info Drawer (Videns-skuffen) -->
     <div id="info-drawer" class="fixed top-0 right-0 h-full w-full max-w-md bg-stone-900/95 backdrop-blur-3xl shadow-[-40px_0_80px_rgba(0,0,0,0.9)] z-[200] p-10 border-l border-orange-500/40 flex flex-col">
@@ -131,7 +131,7 @@
                     <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"/><path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"/></svg>
                     Eksamens-Tip
                 </p>
-                <p class="text-xs text-slate-400">Når du taler om energi, er det fundamentalt at nævne <strong>Energibevarelsesloven</strong>: Energi kan hverken opstå fra ingenting eller forsvinde. Den skifter kun form (f.eks. fra elektrisk energi til termisk energi i vandet og luften).</p>
+                <p class="text-xs text-slate-400">Når du fremlægger hjemmeforsøget, er det afgørende at forklare <strong>Energibevarelsesloven</strong>. Læreren vil gerne høre dig sige: <em>"Energien forsvandt ikke, den opvarmede bare omgivelserne i stedet for vandet!"</em></p>
             </div>
         </div>
     </div>
@@ -160,15 +160,15 @@
                 Energi & <br><span class="text-gradient">Effekt</span>
             </h1>
             <p class="text-slate-400 text-lg md:text-xl max-w-3xl mx-auto font-medium leading-relaxed">
-                Forstå forskellen på watt og joule, og lær hvordan vi bruger hjemmeforsøget til at afsløre, hvor meget energi der i virkeligheden går tabt, når vi koger vand.
+                Forstå forskellen på Watt og Joule. Dyk ned i hjemmeforsøget med vandvarmeren, beregn nyttevirkningen, og opdag hvorfor intet apparat i verden er 100% effektivt.
             </p>
         </header>
 
-        <!-- AFSNIT 1: Sammenhængen mellem E og P -->
+        <!-- AFSNIT 1: Energibevarelse og Grundformlen -->
         <section class="mb-40">
             <div class="flex items-center gap-5 mb-12">
                 <div class="w-16 h-1 bg-gradient-to-r from-red-600 to-orange-500 rounded-full"></div>
-                <h2 class="text-sm font-black uppercase tracking-[0.4em] text-slate-300">I. Grundformlen for Energi</h2>
+                <h2 class="text-sm font-black uppercase tracking-[0.4em] text-slate-300">I. Energibevarelse & Formler</h2>
             </div>
 
             <div class="glass-card p-10 md:p-16">
@@ -176,14 +176,14 @@
                     <div class="flex-1 space-y-8">
                         <div class="border-b border-white/10 pb-6">
                             <h3 class="text-3xl font-bold text-white tracking-tight mb-4 flex items-center gap-4">
-                                Energi er Effekt over tid
-                                <button onclick="openInfo('effekt')" class="i-btn">i</button>
+                                Energi forsvinder aldrig
+                                <button onclick="openInfo('energibevarelse')" class="i-btn">i</button>
                             </h3>
                             <p class="text-slate-400 font-medium leading-relaxed mb-4">
-                                I dagligdagen bytter vi ofte rundt på begreberne energi og effekt, men i fysik er forskellen afgørende. <strong>Effekt (<em>P</em>)</strong> måles i Watt (W) og er et udtryk for, hvor <em>hurtigt</em> energi omsættes. Det er "hastigheden" på energien. En elkedel på 2000 Watt trækker præcis 2000 Joule ud af stikkontakten hvert sekund.
+                                Fysikkens vigtigste lov er <strong>Energibevarelsesloven</strong>: Energi kan hverken skabes ud af ingenting eller destrueres. Den kan udelukkende omdannes fra én form til en anden – for eksempel fra elektrisk energi til termisk energi (varme).
                             </p>
                             <p class="text-slate-400 font-medium leading-relaxed">
-                                Den samlede mængde <strong>Energi (<em>E</em>)</strong> afhænger af effekten ganget med den <em>tid (<em>t</em>)</em> apparatet er tændt. 
+                                For at beregne hvor meget energi vi omsætter, skal vi kende <strong>Effekten (P)</strong>. Effekt måles i Watt (W) og fortæller os, hvor mange Joule der omsættes pr. sekund. Energien er dermed effekten ganget med tiden.
                             </p>
                         </div>
                         
@@ -191,7 +191,7 @@
                             <span class="text-6xl font-black italic tracking-widest text-white math-font drop-shadow-md">
                                 E = P · t
                             </span>
-                            <div class="flex gap-4 w-full max-w-sm">
+                            <div class="flex gap-4 w-full max-w-sm mt-2">
                                 <div class="flex-1 text-center bg-white/5 p-3 rounded-xl border border-white/5">
                                     <span class="block text-red-400 font-bold mb-1">E</span><span class="text-[10px] text-slate-500 uppercase">Joule (J)</span>
                                 </div>
@@ -206,7 +206,7 @@
                         
                         <div class="flex justify-start gap-4">
                              <button onclick="openInfo('kwh')" class="px-6 py-3 rounded-full border border-orange-500/50 bg-orange-500/10 text-orange-300 text-[10px] font-black uppercase tracking-widest hover:bg-orange-500 hover:text-white transition-all shadow-[0_0_15px_rgba(249,115,22,0.2)]">Hvad er kWh (Kilowatt-time)?</button>
-                             <button onclick="openInfo('joule')" class="px-6 py-3 rounded-full border border-white/10 bg-white/5 text-slate-300 text-[10px] font-black uppercase tracking-widest hover:bg-white/20 transition-all">Hvor meget er 1 Joule?</button>
+                             <button onclick="openInfo('effekt_vs_energi')" class="px-6 py-3 rounded-full border border-white/10 bg-white/5 text-slate-300 text-[10px] font-black uppercase tracking-widest hover:bg-white/20 transition-all">Effekt vs Energi</button>
                         </div>
                     </div>
 
@@ -226,7 +226,7 @@
                                     <span id="watt-label" class="text-sm font-black text-yellow-400 bg-yellow-500/20 px-3 py-1 rounded-full border border-yellow-500/30">1000 W</span>
                                 </div>
                                 <input type="range" id="watt-slider" min="0" max="3000" step="100" value="1000" class="input-range">
-                                <p class="text-[9px] text-slate-500 uppercase mt-4">Tælleren kører hurtigere, jo højere effekten er (Joule = Watt &times; sekunder).</p>
+                                <p class="text-[9px] text-slate-500 uppercase mt-4">Tælleren kører hurtigere, jo højere effekten er (Joule = Watt &times; tid).</p>
                             </div>
                         </div>
                     </div>
@@ -234,11 +234,11 @@
             </div>
         </section>
 
-        <!-- AFSNIT 2: Specifik Varmekapacitet (Vandvarmeren) -->
+        <!-- AFSNIT 2: Hjemmeforsøget med Vand -->
         <section class="mb-40">
             <div class="flex items-center gap-5 mb-12">
                 <div class="w-16 h-1 bg-gradient-to-r from-orange-500 to-yellow-500 rounded-full"></div>
-                <h2 class="text-sm font-black uppercase tracking-[0.4em] text-orange-400">II. Opvarmning af Vand & Nyttevirkning</h2>
+                <h2 class="text-sm font-black uppercase tracking-[0.4em] text-orange-400">II. Hjemmeforsøg: Elkedlen</h2>
             </div>
 
             <div class="glass-card p-10 md:p-16 border-t-4 border-orange-500">
@@ -246,40 +246,39 @@
                     <div class="flex-1 space-y-8">
                         <div class="border-b border-white/10 pb-6">
                             <h3 class="text-3xl font-bold text-white tracking-tight mb-4 flex items-center gap-4">
-                                Specifik Varmekapacitet
-                                <button onclick="openInfo('varmekapacitet')" class="i-btn">i</button>
+                                Hvor effektiv er din elkedel?
+                                <button onclick="openInfo('hjemmeforsoeg')" class="i-btn">i</button>
                             </h3>
                             <p class="text-slate-400 font-medium leading-relaxed">
-                                Hvor meget energi kræver det at varme noget op? Det afhænger af stoffet. <strong>Specifik Varmekapacitet (<em>c</em>)</strong> fortæller os, hvor mange Joule der skal til for at opvarme 1 kg af stoffet med 1 °C.
+                                Formålet med hjemmeforsøget er ikke blot at se vand koge. Målet er at finde ud af, hvor meget energi der rent faktisk går til at opvarme vandet, og sammenligne det med den energi, elkedlen trak fra stikkontakten. Forskellen vil afsløre elkedlens effektivitet (nyttevirkning).
                             </p>
                             <p class="text-slate-400 font-medium leading-relaxed mt-4">
-                                Vand er en exceptionel "energisluger" og har en værdi på hele <strong>4186 J/(kg·°C)</strong>. For at finde ud af, hvor meget termisk energi vandet optager i kedlen, bruger vi varmeligningen.
+                                For at beregne den energi vandet optager, skal vi bruge <strong>Varmeligningen</strong> og kende vands utroligt høje specifikke varmekapacitet (c = 4186 J/(kg·°C)).
                             </p>
                         </div>
                         
                         <div class="p-8 bg-[#0a0a0a] border border-orange-500/30 rounded-3xl shadow-[0_0_30px_rgba(249,115,22,0.1)]">
-                            <h5 class="text-orange-400 font-black uppercase text-[10px] tracking-[0.2em] mb-4">Varmeligningen</h5>
+                            <h5 class="text-orange-400 font-black uppercase text-[10px] tracking-[0.2em] mb-4">Varmeligningen (Termisk energi)</h5>
                             <span class="text-4xl md:text-5xl font-black italic text-white math-font block text-center mb-6">E = m · c · ΔT</span>
                             
                             <ul class="space-y-3 text-sm text-slate-400 font-medium bg-white/5 p-5 rounded-xl border border-white/5">
                                 <li><strong class="text-white">m:</strong> Vandets masse (kg).</li>
-                                <li><strong class="text-white">c:</strong> Varmekapacitet for vand (4186 J/(kg·°C)).</li>
-                                <li><strong class="text-white">ΔT:</strong> Temperaturændringen (Slut-temperatur minus Start-temperatur).</li>
+                                <li><strong class="text-white">c:</strong> Vands varmekapacitet (4186 J/(kg·°C)).</li>
+                                <li><strong class="text-white">ΔT:</strong> Temperaturstigningen (°C).</li>
                             </ul>
                         </div>
                     </div>
 
-                    <!-- Water Heater Game/Sim med Nyttevirkning -->
+                    <!-- Water Heater Game/Sim med Live-Matematik Dashboard -->
                     <div class="w-full lg:w-[500px]">
-                        <div class="sim-container p-8 flex flex-col relative border border-orange-500/20 bg-stone-900">
+                        <div class="sim-container p-6 flex flex-col relative border border-orange-500/20 bg-stone-900 shadow-2xl">
                             <div class="absolute top-4 left-4 z-10 flex gap-2">
-                                <span class="text-[10px] font-black uppercase text-slate-900 tracking-widest bg-yellow-400 px-3 py-1 rounded-full shadow-lg">Hjemmeforsøg Lab</span>
-                                <button onclick="openInfo('hjemmeforsoeg')" class="i-btn w-6 h-6 shadow-none">i</button>
+                                <span class="text-[10px] font-black uppercase text-slate-900 tracking-widest bg-yellow-400 px-3 py-1 rounded-full shadow-lg">Interaktivt Forsøg</span>
                             </div>
                             
-                            <div class="flex gap-8 mt-12 mb-6">
+                            <div class="flex gap-6 mt-12 mb-6">
                                 <!-- Kedel Visuel -->
-                                <div class="w-32 h-48 bg-[#171717] rounded-b-3xl rounded-t-lg border-4 border-slate-700 relative overflow-hidden shadow-[inset_0_-10px_20px_rgba(0,0,0,0.8)] flex-shrink-0">
+                                <div class="w-32 h-52 bg-[#171717] rounded-b-3xl rounded-t-lg border-4 border-slate-700 relative overflow-hidden shadow-[inset_0_-10px_20px_rgba(0,0,0,0.8)] flex-shrink-0">
                                     <div id="heater-coil" class="absolute bottom-2 left-1/2 -translate-x-1/2 w-20 h-4 border-4 border-slate-600 rounded-full transition-colors duration-1000 z-10"></div>
                                     <div id="water-fill" class="absolute bottom-0 left-0 w-full bg-blue-500/40 backdrop-blur-sm transition-all duration-300" style="height: 50%;">
                                         <div id="bubbles" class="absolute inset-0 overflow-hidden pointer-events-none opacity-0 transition-opacity duration-1000"></div>
@@ -287,23 +286,28 @@
                                     <div id="temp-display" class="absolute inset-0 flex items-center justify-center text-3xl font-black text-white drop-shadow-[0_0_10px_rgba(0,0,0,0.8)] z-20">20°C</div>
                                 </div>
 
-                                <!-- Live Data Dashboard -->
-                                <div class="flex-1 bg-black/60 rounded-2xl p-4 border border-white/10 font-mono text-xs flex flex-col justify-between">
-                                    <div class="text-slate-400 mb-2 border-b border-white/10 pb-2">
-                                        <span class="block text-[10px] uppercase tracking-widest text-orange-400">Live Data</span>
-                                        Tid (<em class="font-serif">t</em>): <span id="sim-time" class="text-white">0 s</span>
+                                <!-- Live Data Dashboard / Matematik -->
+                                <div class="flex-1 bg-black/80 rounded-2xl p-4 border border-white/10 font-mono text-xs flex flex-col">
+                                    <div class="text-slate-400 mb-3 border-b border-white/10 pb-2 flex justify-between items-end">
+                                        <span class="block text-[10px] uppercase tracking-widest text-orange-400">Live Udregning</span>
+                                        <span>Tid: <strong id="sim-time" class="text-white text-sm">0 s</strong></span>
                                     </div>
-                                    <div class="space-y-3">
+                                    
+                                    <!-- Formler i realtid -->
+                                    <div class="space-y-4">
                                         <div>
-                                            <span class="text-slate-500">Tilført (El):</span><br>
-                                            <span id="sim-e-til" class="text-red-400 font-bold">0 J</span>
+                                            <span class="text-slate-500 text-[10px] uppercase">Tilført (El): P · t</span><br>
+                                            <span class="text-slate-300">2000W · <span class="dyn-time">0</span>s = </span>
+                                            <span id="sim-e-til" class="text-red-400 font-bold block mt-1 text-sm">0 J</span>
                                         </div>
                                         <div>
-                                            <span class="text-slate-500">Nyttig (Varme i vand):</span><br>
-                                            <span id="sim-e-nyt" class="text-yellow-400 font-bold">0 J</span>
+                                            <span class="text-slate-500 text-[10px] uppercase">Nyttig (Vand): m · c · ΔT</span><br>
+                                            <span class="text-slate-300"><span id="dyn-mass">1.0</span>kg · 4186 · <span id="dyn-dt">0</span>°C = </span>
+                                            <span id="sim-e-nyt" class="text-yellow-400 font-bold block mt-1 text-sm">0 J</span>
                                         </div>
-                                        <div class="border-t border-white/10 pt-2 mt-2">
-                                            <span class="text-slate-500">Nyttevirkning (η):</span><br>
+                                        <div class="border-t border-white/10 pt-2 bg-white/5 -mx-4 px-4 pb-2 rounded-b-xl">
+                                            <span class="text-slate-500 text-[10px] uppercase">Nyttevirkning:</span><br>
+                                            <span class="text-slate-300">Nyttig / Tilført = </span>
                                             <span id="sim-eta" class="text-white font-bold text-lg">0 %</span>
                                         </div>
                                     </div>
@@ -315,13 +319,66 @@
                                 <div class="mb-4">
                                     <div class="flex justify-between items-center mb-2">
                                         <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Hæld vand i (Masse)</span>
-                                        <span id="mass-label" class="text-xs font-black text-yellow-400 bg-yellow-500/20 px-2 py-1 rounded">1.0 kg</span>
+                                        <span id="mass-label" class="text-xs font-black text-yellow-400 bg-yellow-500/20 px-2 py-1 rounded border border-yellow-500/30">1.0 kg</span>
                                     </div>
                                     <input type="range" id="mass-slider" min="0.2" max="2" step="0.2" value="1" class="input-range accent-yellow-500">
                                 </div>
-                                <button id="btn-heat" onclick="startHeating()" class="w-full py-3 bg-orange-600 rounded-full font-black text-xs uppercase tracking-widest text-white hover:bg-orange-500 transition shadow-[0_0_15px_rgba(249,115,22,0.4)] active:scale-95 border border-orange-500">Kog Vand (2000 W)</button>
+                                <button id="btn-heat" onclick="startHeating()" class="w-full py-3 bg-orange-600 rounded-full font-black text-xs uppercase tracking-widest text-white hover:bg-orange-500 transition shadow-[0_0_15px_rgba(249,115,22,0.4)] active:scale-95 border border-orange-500">Start Forsøg (2000 W)</button>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- AFSNIT 3: Nyttevirkning & Fejlkilder -->
+        <section class="mb-32">
+            <div class="flex items-center gap-5 mb-12">
+                <div class="w-16 h-1 bg-gradient-to-r from-red-500 to-red-400 rounded-full"></div>
+                <h2 class="text-sm font-black uppercase tracking-[0.4em] text-red-500">III. Nyttevirkning og Fejlkilder</h2>
+            </div>
+
+            <div class="glass-card p-10 md:p-16 overflow-hidden relative">
+                <div class="absolute -right-32 -top-32 w-[600px] h-[600px] bg-red-600/10 rounded-full blur-[120px] pointer-events-none"></div>
+                
+                <div class="flex flex-col lg:flex-row gap-16 items-center relative z-10">
+                    <div class="flex-1 space-y-8">
+                        <div class="border-b border-white/10 pb-6">
+                            <h3 class="text-3xl font-bold text-white tracking-tight mb-4 flex items-center gap-4">
+                                Hvor forsvandt energien hen?
+                                <button onclick="openInfo('fejlkilder')" class="i-btn text-red-400 border-red-500/30 hover:bg-red-500 shadow-[0_0_15px_rgba(239,68,68,0.3)]">i</button>
+                            </h3>
+                            <p class="text-slate-400 font-medium leading-relaxed">
+                                Hvis energien bevares, hvorfor er nyttevirkningen så ikke 100%? Fordi den energi, der trækkes fra stikkontakten (<em class="text-white">E<sub>tilført</sub></em>), ikke udelukkende går til vandet (<em class="text-white">E<sub>nytte</sub></em>).
+                            </p>
+                            <p class="text-slate-400 font-medium leading-relaxed mt-4">
+                                Forskellen kaldes "tab". Dette tab udgør vores <strong>fejlkilder</strong> i forsøget. En del af energien går til at varme elkedlens plastik op, en anden del fordamper som damp, og en tredje del varmer simpelthen bare luften op i køkkenet.
+                            </p>
+                        </div>
+                        
+                        <div class="p-8 bg-[#0a0a0a] rounded-[2.5rem] border border-red-500/30 shadow-[0_0_30px_rgba(239,68,68,0.15)] flex flex-col justify-center items-center">
+                            <span class="text-4xl md:text-5xl font-black italic tracking-widest text-white math-font mb-4">
+                                η = <span class="text-orange-400 drop-shadow-md">E<sub>nytte</sub></span> / <span class="text-red-400 drop-shadow-md">E<sub>tilført</sub></span>
+                            </span>
+                            <p class="text-sm text-slate-500 uppercase tracking-widest font-bold">Resulterer i en procentdel (%)</p>
+                        </div>
+                    </div>
+
+                    <div class="w-full lg:w-96 bg-[#050814] p-10 rounded-[3rem] border border-white/10 text-center shadow-2xl relative">
+                        <div class="absolute top-6 left-1/2 -translate-x-1/2 w-full">
+                            <span class="text-[10px] font-black uppercase text-red-500 tracking-widest">Resultat af Forsøg</span>
+                        </div>
+                        <div class="relative w-40 h-40 mx-auto mt-10 mb-8">
+                            <svg viewBox="0 0 100 100" class="w-full h-full rotate-[-90deg]">
+                                <circle cx="50" cy="50" r="45" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="10"/>
+                                <circle id="eta-circle" cx="50" cy="50" r="45" fill="none" stroke="#ef4444" stroke-width="10" stroke-dasharray="283" stroke-dashoffset="56" style="filter: drop-shadow(0 0 8px rgba(239,68,68,0.6));"/>
+                            </svg>
+                            <div class="absolute inset-0 flex flex-col items-center justify-center">
+                                <span class="text-4xl font-black text-white drop-shadow-md">82%</span>
+                                <span class="text-[10px] font-bold text-red-400 uppercase tracking-widest mt-1">Nyttig Energi</span>
+                            </div>
+                        </div>
+                        <p class="text-xs text-slate-500 font-medium leading-relaxed">De resterende 18% varmer kedlen og omgivelserne op. De forsvinder ikke, de spredes blot.</p>
                     </div>
                 </div>
             </div>
@@ -337,32 +394,32 @@
                     <div class="flex gap-6">
                         <div class="w-8 h-8 rounded-full bg-red-900/50 text-red-400 flex items-center justify-center flex-shrink-0 border border-red-500/50 font-black text-sm shadow-inner">1</div>
                         <div>
-                            <h5 class="font-bold text-white mb-2 text-lg">Effekt & Energi</h5>
-                            <p class="text-slate-400 text-sm leading-relaxed">Start med definitioner. Effekt (<em>P</em>) = omsat energi pr. sekund (måles i Watt eller J/s). Energi (<em>E</em>) måles i Joule. Skriv formlen <span class="math-font text-white bg-white/10 px-1.5 py-0.5 rounded mx-1 shadow-inner">E = P · t</span>.</p>
+                            <h5 class="font-bold text-white mb-2 text-lg">Energibevarelse & Formler</h5>
+                            <p class="text-slate-400 text-sm leading-relaxed">Start med det basale: Energi skifter kun form. Definer Effekt (<em class="text-white">P</em>) som omsat energi pr. sekund (J/s). Skriv formlen for tilført energi op: <span class="math-font text-white bg-white/10 px-1.5 py-0.5 rounded mx-1 shadow-inner">E = P · t</span>.</p>
                         </div>
                     </div>
                     
                     <div class="flex gap-6">
                         <div class="w-8 h-8 rounded-full bg-orange-900/50 text-orange-400 flex items-center justify-center flex-shrink-0 border border-orange-500/50 font-black text-sm shadow-inner">2</div>
                         <div>
-                            <h5 class="font-bold text-white mb-2 text-lg">Kilowatt-timer (kWh)</h5>
-                            <p class="text-slate-400 text-sm leading-relaxed">Forklar elregningens enhed. Vis udregningen: 1 kWh svarer til 1000 W brugt i 3600 sekunder. Det betyder at: 1000 · 3600 = 3.600.000 J.</p>
+                            <h5 class="font-bold text-white mb-2 text-lg">Varmekapacitet og Joule</h5>
+                            <p class="text-slate-400 text-sm leading-relaxed">Nævn kort kWh (1 kWh = 3.6 MJ). Skriv derefter varmeligningen: <span class="math-font text-white bg-white/10 px-1.5 py-0.5 rounded mx-1 shadow-inner">E = m · c · ΔT</span>. Gør det klart, at vands høje <em>c</em>-værdi gør, at det kræver ekstremt meget energi at opvarme vand ift. andre stoffer.</p>
                         </div>
                     </div>
                     
                     <div class="flex gap-6">
                         <div class="w-8 h-8 rounded-full bg-yellow-900/50 text-yellow-500 flex items-center justify-center flex-shrink-0 border border-yellow-500/50 font-black text-sm shadow-inner">3</div>
                         <div>
-                            <h5 class="font-bold text-white mb-2 text-lg">Specifik Varmekapacitet</h5>
-                            <p class="text-slate-400 text-sm leading-relaxed">Skriv varmeligningen op på tavlen: <span class="math-font text-white bg-white/10 px-1.5 py-0.5 rounded mx-1 shadow-inner">E = m · c · ΔT</span>. Forklar at vands specifikke varmekapacitet (<em>c</em>) er utroligt høj (4186 J/(kg·°C)), og at det derfor kræver stor energi at koge.</p>
+                            <h5 class="font-bold text-white mb-2 text-lg">Gennemgang af Hjemmeforsøget</h5>
+                            <p class="text-slate-400 text-sm leading-relaxed">Fortæl læreren, at målet var at finde elkedlens effektivitet. Vis at du kender massen af vandet, start/slut temperatur og tiden det tog. Forklar, hvordan du brugte de to formler overfor til at udregne henholdsvis E<sub>tilført</sub> og E<sub>nytte</sub>.</p>
                         </div>
                     </div>
                     
                     <div class="flex gap-6">
                         <div class="w-8 h-8 rounded-full bg-red-900/50 text-red-400 flex items-center justify-center flex-shrink-0 border border-red-500/50 font-black text-sm shadow-inner">4</div>
                         <div>
-                            <h5 class="font-bold text-white mb-2 text-lg">Hjemmeforsøgets Formål (Nyttevirkning)</h5>
-                            <p class="text-slate-400 text-sm leading-relaxed">Forklar selve forsøget! Hvad fik vi ud af det? Vi fandt ud af, at elkedlen <em>ikke</em> er 100% effektiv. Vi udregner <em>E<sub>tilført</sub></em> (fra stikket) og <em>E<sub>nytte</sub></em> (varmet vandet). Forskellen er tabet til omgivelserne (Energibevarelse). Opskriv <span class="math-font text-white bg-white/10 px-1.5 py-0.5 rounded mx-1 shadow-inner">η = E<sub>nytte</sub> / E<sub>tilført</sub></span> for at finde procentdelen.</p>
+                            <h5 class="font-bold text-white mb-2 text-lg">Nyttevirkning & Fejlkilder</h5>
+                            <p class="text-slate-400 text-sm leading-relaxed">Opskriv resultatet med <span class="math-font text-white bg-white/10 px-1.5 py-0.5 rounded mx-1 shadow-inner">η = E<sub>nytte</sub> / E<sub>tilført</sub></span>. Diskuter fejlkilderne: Hvorfor var tallet ikke 100%? Forklar tabet (opvarmning af selve elkedlen, varmetab til luften, fordampning af vand).</p>
                         </div>
                     </div>
                 </div>
@@ -377,25 +434,37 @@
     <script>
         // --- DATA TIL VIDENS-SKUFFE ---
         const infoData = {
+            'energibevarelse': {
+                title: 'Energibevarelsesloven',
+                text: 'Dette er måske den allervigtigste lov i fysikken! Den dikterer, at energi ikke kan skabes ud af ingenting, og at den aldrig forsvinder. Universets samlede mængde energi er konstant.<br><br>Når vi tænder en elkedel, opstår varmen ikke ud af den blå luft. El-værket har omdannet energi (f.eks. kemisk energi i kul eller vindens kinetiske energi) til elektrisk energi, som sendes til stikkontakten. Elkedlen omdanner derefter denne elektriske energi til termisk energi (varme) i vandet.'
+            },
             'effekt': {
                 title: 'Effekt (P)',
-                text: 'Effekt måles i <strong>Watt (W)</strong>, som fysisk set er defineret som Joule pr. sekund (J/s). Det er et udtryk for "hastigheden" hvormed energi omsættes. Hvis en pære bruger 10W, trækker den altså 10 Joule elektrisk energi ud af nettet hvert eneste sekund og omsætter det til lys og varme.'
+                text: 'Effekt er fysisk set defineret som <strong>Joule pr. sekund (J/s)</strong> og det måles i Watt (W). Det er altså et udtryk for "hastigheden" hvormed energi overføres.<br><br>Ganger vi effekt (J/s) med tid (s), går "sekunderne" ud med hinanden, og vi har den samlede mængde energi (J) tilbage.'
+            },
+            'effekt_vs_energi': {
+                title: 'Effekt vs. Energi',
+                text: 'Tænk på vand fra en vandhane. <strong>Effekten</strong> svarer til, hvor meget vand der sprøjter ud af hanen pr. sekund (liter pr. sekund). <strong>Energien</strong> svarer til, hvor mange liter vand du samlet set har nede i spanden til sidst.<br><br>Selv en hane der drypper meget langsomt (lav effekt), kan fylde en spand helt op (høj samlet energi), hvis bare den får lov at stå i lang nok tid!'
             },
             'kwh': {
                 title: 'Kilowatt-timer (kWh)',
-                text: 'Joule er en ekstremt lille enhed i hverdagen. Når energiselskaberne skal måle dit hus\' samlede energiforbrug på en måned, bruger de i stedet kWh.<br><br><strong>Beviset for enheden:</strong> "kilo" betyder 1000, så 1 kW = 1000 W (J/s). En "time" består af 60 minutter á 60 sekunder = 3600 sekunder. <br>Ganger vi det sammen får vi 1 kWh = 1000 J/s · 3600 s = <strong>3.600.000 Joule</strong>.'
+                text: 'Joule er en meget lille enhed, så energiselskaber bruger kWh.<br><br><strong>Hvad er det?</strong> 1 kWh er den samlede energi, som et apparat på 1 kW (1000 Watt) bruger, hvis det står tændt i præcis 1 time (3600 sekunder). <br><br>1000 J/s · 3600 s = <strong>3.600.000 Joule</strong>. Det koster cirka 2-3 kr. at trække al den energi ud af stikkontakten!'
             },
             'joule': {
                 title: 'Hvad er 1 Joule egentlig?',
-                text: 'En Joule (J) er den standardiserede enhed for energi. Men det er meget lidt energi!<br><br>Fysisk set er 1 Joule den energi det kræver, at løfte et æble (ca. 100 gram) 1 meter op i luften mod tyngdekraften. <br>Når en elkedel bruger 2000 W, bruger den altså energien det svarer til at kaste 2000 æbler en meter op i luften - <em>hvert eneste sekund!</em>'
+                text: '1 Joule er den officielle SI-enhed for energi. <br><br>For at sætte det i perspektiv: Det kræver præcis 1 Joule at løfte et gennemsnitligt æble (100 gram) 1 meter op i luften. Når din elkedel kører på 2000 Watt, bruger den altså energi svarende til, at der kastes 2000 æbler én meter op i luften – <em>hvert eneste sekund!</em>'
             },
             'varmekapacitet': {
                 title: 'Specifik Varmekapacitet (c)',
-                text: 'Dette tal er unikt for ethvert stof. Det fortæller præcist, hvor mange Joule det kræver at opvarme 1 kg af stoffet med 1 °C.<br><br>Vands specifikke varmekapacitet er <strong>4186 J/(kg·°C)</strong>. Sammenlignet med jern (ca. 450 J) er vand utroligt svært at varme op. Dette er grunden til at kystklimaer har milde vintre; havet har gemt på sommerens energi og afgiver det langsomt.'
+                text: 'Angiver, hvor mange Joule der kræves for at opvarme 1 kg af et materiale med 1 °C. Dette tal afslører, hvor god materialet er til at optage og holde på termisk energi.<br><br><strong>Vand: 4186 J/(kg·°C)</strong><br><strong>Jern: 450 J/(kg·°C)</strong><br><br>At vands tal er så ekstremt højt, er grunden til at vi bruger vand i vores radiatorer – det kan bære på utroligt meget energi!'
             },
             'hjemmeforsoeg': {
-                title: 'Forsøgets egentlige formål',
-                text: 'Formålet med at koge vand er ikke bare at se det koge. Formålet er at samle to grene af fysikken: <strong>Elektrisk energi</strong> og <strong>Termisk energi</strong>.<br><br>Vi stoler på at elkedlen trækker de f.eks. 2000W der står i bunden af den. Vi tager tid på kogningen for at beregne den tilførte energi fra huset. Derefter kigger vi isoleret på vandet og regner ud, hvor meget energi der <em>beviseligt</em> er landet deri, baseret på temperaturstigningen. Ved at dividere disse, finder vi ud af hvor ineffektiv maskinen er (Nyttevirkning).'
+                title: 'Formålet med forsøget',
+                text: 'Forsøget binder "el-fysik" sammen med "varme-fysik". <br><br>Ved at se på elkedlens mærkeplade (Watt) og måle tiden, finder vi ud af, hvor meget vi har "betalt" for af energi (<strong>E_tilført</strong>). Ved at måle temperaturens stigning i vandet, finder vi ud af, hvor meget energi der reelt kom i hus (<strong>E_nytte</strong>).<br><br>Dette giver os den direkte nyttevirkning.'
+            },
+            'fejlkilder': {
+                title: 'Tab og Fejlkilder',
+                text: 'Hvorfor er nyttevirkningen ikke 100%? Det skyldes tab og fejlkilder:<br><br>1. <strong>Opvarmning af materialet:</strong> Vandet er ikke det eneste der bliver varmt. Selve elkedlens kappe af plastik eller stål bliver også varm.<br>2. <strong>Opvarmning af omgivelser:</strong> Kedlen afgiver varme til luften i køkkenet undervejs.<br>3. <strong>Fordampning:</strong> Noget vand fordamper til damp, hvilket koster ekstra energi.<br>4. <strong>Mærkeeffekten:</strong> En kedel mærket "2000W" kører sjældent på præcis 2000W hele tiden.'
             }
         };
 
@@ -420,13 +489,12 @@
             const currentWatt = parseInt(wattSlider.value);
             wattLabel.innerText = currentWatt + " W";
             if(currentWatt > 0) {
-                // Vi opdaterer hver 50ms for smooth animation, så vi tilføjer (Watt * 0.05) pr frame
                 totalJoule += (currentWatt * 0.05); 
                 energyMeter.innerText = Math.floor(totalJoule).toLocaleString('da-DK');
             }
         }, 50);
 
-        // --- VANDVARMER LAB MED DASHBOARD (Hjemmeforsøg) ---
+        // --- VANDVARMER LAB MED LIVE DASHBOARD (Hjemmeforsøg) ---
         const massSlider = document.getElementById('mass-slider');
         const massLabel = document.getElementById('mass-label');
         const waterFill = document.getElementById('water-fill');
@@ -437,12 +505,16 @@
         
         // Dashboard referencer
         const simTimeLabel = document.getElementById('sim-time');
+        const dynTimeLabels = document.querySelectorAll('.dyn-time');
         const simEtilLabel = document.getElementById('sim-e-til');
+        const dynMassLabel = document.getElementById('dyn-mass');
+        const dynDtLabel = document.getElementById('dyn-dt');
         const simEnytLabel = document.getElementById('sim-e-nyt');
         const simEtaLabel = document.getElementById('sim-eta');
         
         let isHeating = false;
         let currentTemp = 20;
+        let startTemp = 20;
         let realTimeSeconds = 0;
         let heatInterval;
 
@@ -450,7 +522,8 @@
         massSlider.addEventListener('input', (e) => {
             const m = parseFloat(e.target.value).toFixed(1);
             massLabel.innerText = m + " kg";
-            // Visuel højde (mellem 10% og 90%)
+            dynMassLabel.innerText = m;
+            
             const heightPct = 10 + (m / 2) * 80; 
             waterFill.style.height = heightPct + "%";
             
@@ -461,11 +534,14 @@
 
         function resetKettle() {
             currentTemp = 20;
+            startTemp = 20;
             realTimeSeconds = 0;
             tempDisplay.innerText = "20°C";
             tempDisplay.style.color = "white";
             bubblesContainer.style.opacity = "0";
             simTimeLabel.innerText = "0 s";
+            dynTimeLabels.forEach(el => el.innerText = "0");
+            dynDtLabel.innerText = "0";
             simEtilLabel.innerText = "0 J";
             simEnytLabel.innerText = "0 J";
             simEtaLabel.innerText = "0 %";
@@ -506,7 +582,7 @@
         function startHeating() {
             if(isHeating) return;
             isHeating = true;
-            resetKettle(); // Nulstil alt inden ny start
+            resetKettle(); 
             
             btnHeat.innerText = "VARMER OP...";
             btnHeat.classList.replace('bg-orange-600', 'bg-red-600');
@@ -519,42 +595,50 @@
             const mass = parseFloat(massSlider.value);
             const power = 2000; // 2000 Watt
             const c = 4186; 
-            const efficiency = 0.82; // Vi tvinger en nyttevirkning på 82% i forsøget for realisme!
+            const efficiency = 0.82; // Vi tvinger en nyttevirkning på 82%
             
-            // Vi kører interval hver 100ms
+            // Interval kører hver 100ms
             heatInterval = setInterval(() => {
-                const dt_sim = 1.5; // Hver frame (100ms) i virkeligheden svarer til 1.5 sekunder i simulationen
+                const dt_sim = 1.5; // Tiden går hurtigere i simulatoren
                 realTimeSeconds += dt_sim;
                 
-                // Udregn Dashboard værdier
-                const eTilfort = power * realTimeSeconds; // E = P*t (Det vi betaler for)
-                const eNytte = eTilfort * efficiency; // Det der faktisk går i vandet
+                // Udregningerne
+                const eTilfort = power * realTimeSeconds; // P * t
+                const eNytte = eTilfort * efficiency; 
                 const deltaT = eNytte / (mass * c); // Hvor meget stiger vandet?
                 
-                currentTemp = 20 + deltaT;
+                currentTemp = startTemp + deltaT;
                 
-                // Opdater UI Dashboard
-                simTimeLabel.innerText = Math.floor(realTimeSeconds) + " s";
+                // --- Opdater Live Dashboard ---
+                let floorTime = Math.floor(realTimeSeconds);
+                let floorDt = Math.floor(deltaT);
+                simTimeLabel.innerText = floorTime + " s";
+                dynTimeLabels.forEach(el => el.innerText = floorTime);
+                dynDtLabel.innerText = floorDt;
+                
                 simEtilLabel.innerText = Math.floor(eTilfort).toLocaleString('da-DK') + " J";
                 simEnytLabel.innerText = Math.floor(eNytte).toLocaleString('da-DK') + " J";
-                simEtaLabel.innerText = (efficiency * 100).toFixed(0) + " %";
+                
+                // Beregn den reelle % for at vise det regner korrekt
+                let currentEta = (eNytte / eTilfort) * 100;
+                if(isNaN(currentEta)) currentEta = 0;
+                simEtaLabel.innerText = currentEta.toFixed(0) + " %";
                 
                 tempDisplay.innerText = Math.floor(currentTemp) + "°C";
                 
-                // Farve-overgang fra kold hvid til rød
+                // Farve-overgang
                 const r = Math.min(255, 200 + (currentTemp-20)*2);
                 const g = Math.max(50, 255 - (currentTemp-20)*3);
                 const b = Math.max(50, 255 - (currentTemp-20)*3);
                 tempDisplay.style.color = `rgb(${r}, ${g}, ${b})`;
 
-                // Stop når vandet koger
+                // Stop ved kogepunkt
                 if(currentTemp >= 100) {
                     clearInterval(heatInterval);
                     currentTemp = 100;
                     tempDisplay.innerText = "100°C";
                     btnHeat.innerText = "VANDET KOGER!";
                     
-                    // Reset styling efter lidt tid
                     setTimeout(() => {
                         isHeating = false;
                         heaterCoil.classList.replace('border-red-500', 'border-slate-600');
@@ -562,7 +646,7 @@
                         btnHeat.classList.replace('bg-red-600', 'bg-orange-600');
                         btnHeat.classList.replace('hover:bg-red-500', 'hover:bg-orange-500');
                         btnHeat.classList.replace('shadow-[0_0_20px_rgba(239,68,68,0.6)]', 'shadow-[0_0_15px_rgba(249,115,22,0.4)]');
-                        btnHeat.innerText = "Kog Vand (2000 W)";
+                        btnHeat.innerText = "Start Forsøg (2000 W)";
                         bubblesContainer.style.opacity = "0";
                     }, 3000);
                 }
@@ -583,7 +667,7 @@
                     y: Math.random() * bgCanvas.height,
                     size: Math.random() * 2 + 0.5,
                     vx: (Math.random() - 0.5) * 0.3, 
-                    vy: -Math.random() * 1.5 - 0.5, // Går konsekvent opad
+                    vy: -Math.random() * 1.5 - 0.5, // Går konsekvent opad som varme
                     color: Math.random() > 0.6 ? '#ef4444' : (Math.random() > 0.5 ? '#f97316' : '#eab308')
                 });
             }

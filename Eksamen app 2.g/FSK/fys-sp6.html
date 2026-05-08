@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>06. Termisk Energi I | FysikQuest C</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Termisk Tema (Rose/Rød/Rav) */
+            --primary: #f43f5e; /* Rose 500 */
+            --primary-glow: rgba(244, 63, 94, 0.4);
+            --secondary: #f59e0b; /* Amber 500 */
+            --secondary-glow: rgba(245, 158, 11, 0.4);
+            --accent: #e11d48; /* Rose 600 */
+            
+            --slate-bg: #110c11; /* Mørk varm violet/sort baggrund */
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--slate-bg);
+            color: #f8fafc;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+            background-image: 
+                linear-gradient(rgba(244, 63, 94, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(244, 63, 94, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+        }
+
+        #particle-canvas {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -2; pointer-events: none; opacity: 0.8;
+        }
+
+        .ambient-heat {
+            position: fixed; border-radius: 50%; filter: blur(180px);
+            z-index: -1; pointer-events: none; opacity: 0.6;
+        }
+
+        .glass-card {
+            background: rgba(20, 15, 20, 0.8);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(244, 63, 94, 0.2);
+            border-radius: 2.5rem;
+            transition: all 0.5s var(--ease-out-expo);
+            box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.8);
+        }
+
+        .glass-card:hover {
+            box-shadow: 0 25px 60px -10px var(--primary-glow);
+            border-color: rgba(244, 63, 94, 0.4);
+            transform: translateY(-3px);
+        }
+
+        #info-drawer {
+            transform: translateX(100%);
+            transition: transform 0.6s var(--ease-out-expo);
+        }
+        #info-drawer.open { transform: translateX(0); }
+
+        .text-gradient {
+            @apply text-transparent bg-clip-text bg-gradient-to-r from-rose-500 via-red-500 to-amber-500 drop-shadow-[0_0_20px_rgba(244,63,94,0.5)];
+        }
+
+        #reading-progress {
+            position: fixed; top: 0; left: 0; height: 5px;
+            background: linear-gradient(to right, #f43f5e, #e11d48, #f59e0b);
+            z-index: 100; width: 0%;
+            box-shadow: 0 0 20px rgba(244, 63, 94, 0.8);
+        }
+
+        .math-font { font-family: 'Space Grotesk', sans-serif; }
+
+        .sim-container {
+            background: #0a0505;
+            border-radius: 2rem;
+            position: relative;
+            overflow: hidden;
+            box-shadow: inset 0 0 60px rgba(0,0,0,0.9);
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+        .sim-canvas { width: 100%; height: 100%; display: block; }
+
+        .i-btn {
+            @apply w-8 h-8 rounded-full bg-white/10 text-rose-400 flex items-center justify-center text-xs font-black hover:bg-rose-500 hover:text-white transition-all shadow-[0_0_15px_rgba(244,63,94,0.3)] border border-rose-500/30 cursor-pointer flex-shrink-0 z-10;
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
+        ::-webkit-scrollbar-thumb { background: rgba(244, 63, 94, 0.5); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(244, 63, 94, 0.8); }
+
+        /* Rør-animation */
+        .tube-container {
+            transition: transform 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+    </style>
+</head>
+<body class="min-h-screen pb-40">
+
+    <div id="reading-progress"></div>
+    <canvas id="particle-canvas"></canvas>
+    
+    <div class="ambient-heat w-[600px] h-[600px] bg-rose-600/10 top-[-10%] left-[-10%]"></div>
+    <div class="ambient-heat w-[800px] h-[800px] bg-amber-600/10 bottom-[-10%] right-[-10%]"></div>
+
+    <!-- Info Drawer -->
+    <div id="info-drawer" class="fixed top-0 right-0 h-full w-full max-w-md bg-stone-950/95 backdrop-blur-3xl shadow-[-40px_0_80px_rgba(0,0,0,0.9)] z-[200] p-10 border-l border-rose-500/40 flex flex-col">
+        <button onclick="closeDrawer()" class="self-end p-3 bg-white/5 hover:bg-rose-500/20 rounded-full transition mb-6 text-slate-400 hover:text-rose-400">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-width="2.5" stroke-linecap="round"/></svg>
+        </button>
+        <div class="flex items-center gap-4 mb-8">
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-rose-500 to-amber-500 flex items-center justify-center text-white font-black italic text-xl shadow-[0_0_30px_rgba(244,63,94,0.5)]">i</div>
+            <h3 id="drawer-title" class="text-2xl font-black text-white uppercase tracking-tighter">Videnscenter</h3>
+        </div>
+        <div id="drawer-content" class="text-slate-300 leading-relaxed space-y-6 font-medium text-sm overflow-y-auto pr-4"></div>
+        <div class="mt-auto pt-6">
+            <div class="p-6 bg-gradient-to-br from-rose-900/30 to-amber-900/30 rounded-3xl border border-white/10 shadow-inner">
+                <p class="text-[10px] font-black uppercase text-rose-400 tracking-widest mb-2 flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"/><path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"/></svg>
+                    Eksamens-Tip
+                </p>
+                <p class="text-xs text-slate-400">Faldforsøget beviser mekanisk energibevarelse i praksis. Tyngdekraften udfører et arbejde, farten stiger, haglene rammer bunden – og den kinetiske energi forsvinder ikke, men bliver til varme!</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-50 bg-[#0a0505]/90 backdrop-blur-2xl border-b border-white/5 shadow-md">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <a href="fysik_landing.html" class="group flex items-center gap-4 text-slate-300 font-bold uppercase text-xs tracking-widest hover:text-rose-400 transition">
+                <div class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center border border-white/10 group-hover:border-rose-500/50 group-hover:bg-rose-500/20 transition shadow-sm">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M10 19l-7-7m0 0l7-7m-7 7h18" stroke-width="2.5" stroke-linecap="round"/></svg>
+                </div>
+                Tilbage til Oversigt
+            </a>
+            <span class="px-5 py-2 rounded-full bg-rose-600/20 text-rose-400 font-black text-[10px] uppercase tracking-[0.2em] border border-rose-500/30 shadow-[0_0_15px_rgba(244,63,94,0.2)]">Spørgsmål 06</span>
+        </div>
+    </nav>
+
+    <main class="max-w-6xl mx-auto px-6 pt-20">
+        
+        <!-- Header -->
+        <header class="mb-32 text-center relative">
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-rose-600/15 blur-[150px] rounded-full pointer-events-none -z-10"></div>
+            <div class="inline-block mb-6 px-6 py-2 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 font-bold text-[10px] tracking-[0.25em] uppercase shadow-lg shadow-amber-500/20">
+                Fysik C • Termodynamik I
+            </div>
+            <h1 class="text-6xl md:text-8xl font-black tracking-tighter text-white mb-8 uppercase leading-[0.9]">
+                Termisk <br><span class="text-gradient">Energi</span>
+            </h1>
+            <p class="text-slate-400 text-lg md:text-xl max-w-3xl mx-auto font-medium leading-relaxed">
+                Når fald bliver til varme. Udforsk forskellen på stor C og lille c, og lær fysikken bag det klassiske faldforsøg med blyhagl.
+            </p>
+        </header>
+
+        <!-- AFSNIT 1: Makro vs Mikro -->
+        <section class="mb-40">
+            <div class="flex items-center gap-5 mb-12">
+                <div class="w-16 h-1 bg-gradient-to-r from-rose-500 to-red-500 rounded-full"></div>
+                <h2 class="text-sm font-black uppercase tracking-[0.4em] text-slate-300">I. Hvad er varme egentlig?</h2>
+            </div>
+
+            <div class="glass-card p-10 md:p-16 border-t-4 border-rose-500">
+                <div class="flex flex-col lg:flex-row gap-16 items-center">
+                    <div class="flex-1 space-y-8">
+                        <div class="border-b border-white/10 pb-6">
+                            <h3 class="text-3xl font-bold text-white tracking-tight mb-4 flex items-center gap-4">
+                                Makro vs. Mikro
+                                <button onclick="openInfo('termisk_mikro')" class="i-btn">i</button>
+                            </h3>
+                            <p class="text-slate-400 font-medium leading-relaxed mb-4">
+                                I det forrige emne kiggede vi på <em>mekanisk energi</em> – når en hel genstand (makro) bevæger sig eller løftes op. Men hvad sker der, når genstanden rammer jorden og ligger stille? Energien er ikke væk!
+                            </p>
+                            <p class="text-slate-400 font-medium leading-relaxed">
+                                Den er konverteret til <strong>termisk energi (varme)</strong>. På mikroskopisk niveau betyder dette simpelthen, at atomerne og molekylerne inde i genstanden er begyndt at vibrere og bevæge sig meget hurtigere imellem hinanden.
+                            </p>
+                        </div>
+                        
+                        <div class="bg-rose-900/10 border border-rose-500/20 p-6 rounded-3xl">
+                            <p class="text-sm font-bold text-rose-400 uppercase tracking-widest mb-2">Huskeregel</p>
+                            <p class="text-white font-medium">Termisk energi er bare kinetisk energi (bevægelse) på mikroskopisk atom-niveau!</p>
+                        </div>
+                    </div>
+
+                    <!-- Atom Simulator -->
+                    <div class="w-full lg:w-[450px]">
+                        <div class="sim-container h-[400px] flex flex-col relative border border-rose-500/20">
+                            <div class="absolute top-4 w-full text-center z-10">
+                                <span class="text-[10px] font-black uppercase text-rose-400 tracking-widest bg-black/50 px-4 py-2 rounded-full border border-white/10">Atomar Vibration</span>
+                            </div>
+                            
+                            <canvas id="atom-canvas" class="sim-canvas absolute inset-0 z-0"></canvas>
+                            
+                            <div class="absolute bottom-6 w-full px-8 z-10">
+                                <div class="bg-black/80 backdrop-blur-md p-5 rounded-2xl border border-white/10 shadow-2xl">
+                                    <div class="flex justify-between items-center mb-4">
+                                        <span class="text-[10px] font-black uppercase text-slate-400 tracking-widest">Termisk Energi (Temperatur)</span>
+                                        <span id="temp-label" class="text-xs font-black text-rose-400 bg-rose-500/20 px-2 py-1 rounded border border-rose-500/30">20°C</span>
+                                    </div>
+                                    <input type="range" id="temp-slider" min="-273" max="500" value="20" class="input-range accent-rose-500">
+                                    <p class="text-[9px] text-slate-500 uppercase mt-4 text-center">Ved Absolut Nulpunkt (-273°C) står atomerne næsten helt stille.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- AFSNIT 2: Varmekapacitet (C vs c) -->
+        <section class="mb-40">
+            <div class="flex items-center gap-5 mb-12">
+                <div class="w-16 h-1 bg-gradient-to-r from-amber-500 to-rose-500 rounded-full"></div>
+                <h2 class="text-sm font-black uppercase tracking-[0.4em] text-amber-400">II. C kontra c</h2>
+            </div>
+
+            <div class="glass-card p-10 md:p-16">
+                <div class="flex flex-col lg:flex-row gap-16 items-start">
+                    
+                    <div class="flex-1 space-y-6">
+                        <div class="flex items-center justify-between pb-4 border-b border-white/10">
+                            <h3 class="text-3xl font-bold text-white tracking-tight flex items-center gap-3">
+                                Varmekapacitet (<em class="font-serif">C</em>)
+                                <button onclick="openInfo('stor_C')" class="i-btn text-amber-400 border-amber-500/30 hover:bg-amber-500 shadow-[0_0_15px_rgba(245,158,11,0.3)]">i</button>
+                            </h3>
+                        </div>
+                        <p class="text-slate-400 font-medium leading-relaxed">
+                            Det store <strong><em class="text-white">C</em></strong> gælder for en hel, specifik genstand – for eksempel et helt paprør, en bestemt stegepande eller et helt hus.
+                        </p>
+                        <p class="text-slate-400 font-medium leading-relaxed">
+                            Det fortæller os, hvor meget energi der skal tilfæres lige netop dén genstand for at opvarme den 1 °C. Enheden er Joule pr. grad Celsius: <em class="text-white math-font bg-white/5 px-2 py-0.5 rounded">J / °C</em>.
+                        </p>
+                    </div>
+
+                    <div class="flex-1 space-y-6">
+                        <div class="flex items-center justify-between pb-4 border-b border-white/10">
+                            <h3 class="text-3xl font-bold text-white tracking-tight flex items-center gap-3">
+                                Specifik Varmekap. (<em class="font-serif">c</em>)
+                                <button onclick="openInfo('lille_c')" class="i-btn">i</button>
+                            </h3>
+                        </div>
+                        <p class="text-slate-400 font-medium leading-relaxed">
+                            Det lille <strong><em class="text-white">c</em></strong> er en materiale-egenskab. Den gælder generelt for et stof (fx bly, vand, jern), uanset hvor meget man har af det.
+                        </p>
+                        <p class="text-slate-400 font-medium leading-relaxed">
+                            Det fortæller os, hvor meget energi det kræver at opvarme præcis <strong>1 kg</strong> af stoffet med 1 °C. Enheden inddrager massen: <em class="text-white math-font bg-white/5 px-2 py-0.5 rounded">J / (kg · °C)</em>.
+                        </p>
+                    </div>
+
+                </div>
+                
+                <div class="mt-12 p-8 bg-black/60 rounded-[2rem] border border-white/10 shadow-inner flex flex-col md:flex-row items-center justify-center gap-8">
+                    <span class="text-slate-400 uppercase tracking-widest font-bold text-xs">Sammenhængen:</span>
+                    <span class="text-4xl font-black italic tracking-widest text-white math-font">
+                        C = m · c
+                    </span>
+                    <span class="text-slate-500 text-sm">(Hel genstand = masse · stoffets egenskab)</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- AFSNIT 3: Faldforsøget (Blyhagl) -->
+        <section class="mb-40">
+            <div class="flex items-center gap-5 mb-12">
+                <div class="w-16 h-1 bg-gradient-to-r from-red-600 to-rose-600 rounded-full"></div>
+                <h2 class="text-sm font-black uppercase tracking-[0.4em] text-rose-500">III. Blyhagls-Laboratoriet</h2>
+            </div>
+
+            <div class="glass-card p-10 md:p-16 border-t-4 border-rose-500 relative overflow-hidden">
+                <div class="absolute -right-32 -top-32 w-[600px] h-[600px] bg-rose-600/10 rounded-full blur-[120px] pointer-events-none"></div>
+
+                <div class="flex flex-col lg:flex-row gap-16 items-start relative z-10">
+                    <div class="flex-1 space-y-8">
+                        <div class="border-b border-white/10 pb-6">
+                            <h3 class="text-3xl font-bold text-white tracking-tight mb-4 flex items-center gap-4">
+                                Beviset på Energibevarelse
+                                <button onclick="openInfo('faldforsoeg')" class="i-btn">i</button>
+                            </h3>
+                            <p class="text-slate-400 font-medium leading-relaxed mb-4">
+                                I dette forsøg lader vi blyhagl falde ned gennem et paprør igen og igen. Hver gang de falder længden (<em class="text-white">h</em>), mister de potentiel energi. Når de rammer bunden, forsvinder bevægelsen, og energien konverteres til termisk energi i blyet!
+                            </p>
+                            <p class="text-slate-400 font-medium leading-relaxed">
+                                Vi sætter den tabte mekaniske energi (efter <em class="text-white">N</em> vendinger) lig med den vundne termiske energi:
+                            </p>
+                        </div>
+                        
+                        <div class="p-8 bg-[#0a0505] rounded-3xl border border-rose-500/30 shadow-[0_0_30px_rgba(244,63,94,0.1)]">
+                            <div class="flex flex-col gap-6 text-center">
+                                <span class="text-2xl font-black italic text-slate-300 math-font">E<sub>mek(tabt)</sub> = E<sub>termisk(vundet)</sub></span>
+                                <span class="text-3xl font-black italic text-white math-font">N · <span class="text-rose-400">m</span> · g · h = <span class="text-rose-400">m</span> · c · ΔT</span>
+                            </div>
+                            <div class="mt-6 p-4 bg-rose-900/20 border border-rose-500/30 rounded-xl">
+                                <p class="text-sm text-rose-300 font-medium text-center">
+                                    Massen (<em class="text-rose-400">m</em>) optræder på begge sider og går derfor ud! Det betyder, at vi <em>ikke</em> behøver at vide, hvor mange blyhagl der er i røret.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Blyhagl Simulator -->
+                    <div class="w-full lg:w-[450px]">
+                        <div class="sim-container p-6 flex flex-col relative border border-rose-500/20 bg-stone-900 shadow-2xl">
+                            <div class="absolute top-4 left-4 z-10 flex gap-2">
+                                <span class="text-[10px] font-black uppercase text-slate-900 tracking-widest bg-rose-400 px-3 py-1 rounded-full shadow-lg">Faldforsøg Lab</span>
+                            </div>
+                            
+                            <div class="flex gap-6 mt-12 mb-6">
+                                <!-- Rør Visuel -->
+                                <div class="w-24 h-64 bg-[#111] rounded-full border border-slate-700 relative shadow-inner mx-auto flex items-center justify-center">
+                                    <div id="tube" class="w-20 h-60 border-2 border-amber-900/50 bg-[#1a1a1a] rounded-full relative overflow-hidden tube-container">
+                                        <!-- Blyhagl (bliver tegnet i JS for performance) -->
+                                        <canvas id="tube-canvas" class="absolute inset-0 w-full h-full"></canvas>
+                                    </div>
+                                </div>
+
+                                <!-- Live Data Dashboard -->
+                                <div class="flex-1 bg-black/80 rounded-2xl p-4 border border-white/10 font-mono text-xs flex flex-col justify-between">
+                                    <div class="text-slate-400 mb-2 border-b border-white/10 pb-2">
+                                        <span class="block text-[10px] uppercase tracking-widest text-rose-400">Forsøgsdata</span>
+                                    </div>
+                                    <div class="space-y-3 text-[11px]">
+                                        <div>
+                                            <span class="text-slate-500">Vendinger (<em class="math-font text-white">N</em>):</span><br>
+                                            <span id="sim-n" class="text-white font-bold text-sm">0</span>
+                                        </div>
+                                        <div>
+                                            <span class="text-slate-500">Rørlængde (<em class="math-font text-white">h</em>):</span><br>
+                                            <span class="text-slate-300">1.0 m</span>
+                                        </div>
+                                        <div>
+                                            <span class="text-slate-500">Tyngdeacc. (<em class="math-font text-white">g</em>):</span><br>
+                                            <span class="text-slate-300">9.82 m/s²</span>
+                                        </div>
+                                        <div class="border-t border-white/10 pt-2 mt-2">
+                                            <span class="text-slate-500">Temp. Stigning (<em class="math-font text-white">ΔT</em>):</span><br>
+                                            <span id="sim-dt" class="text-rose-500 font-bold text-lg">0.00 °C</span>
+                                            <p class="text-[9px] text-slate-600 mt-1">Beregnet m. c_bly = 130 J/(kg°C)</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Controls -->
+                            <div class="bg-black/60 p-5 rounded-[2rem] border border-white/10 backdrop-blur-md">
+                                <button id="btn-flip" onclick="flipTube()" class="w-full py-4 bg-rose-600 rounded-full font-black text-xs uppercase tracking-widest text-white hover:bg-rose-500 transition shadow-[0_0_15px_rgba(244,63,94,0.4)] active:scale-95 border border-rose-500">
+                                    Vend Røret 180°
+                                </button>
+                                <button onclick="resetTube()" class="w-full mt-3 py-2 bg-white/5 rounded-full font-bold text-[10px] uppercase tracking-widest text-slate-400 hover:bg-white/10 transition">
+                                    Nulstil Forsøg
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Eksamens Disposition -->
+        <footer class="bg-gradient-to-b from-[#1c1917] to-[#0a0a0a] rounded-[3rem] p-12 md:p-16 text-center text-white relative overflow-hidden shadow-[0_20px_60px_-15px_rgba(0,0,0,1)] border border-white/5 mb-10">
+            <div class="relative z-10">
+                <span class="text-[10px] font-black uppercase tracking-[0.4em] text-rose-400 mb-6 block drop-shadow-[0_0_10px_rgba(244,63,94,0.8)]">Oversigt til Eksamen</span>
+                <h3 class="text-4xl font-black mb-12 italic text-white">Tjekliste til Tavlen</h3>
+                <div class="text-left max-w-3xl mx-auto space-y-6 mb-14 bg-white/5 p-8 md:p-12 rounded-[2.5rem] border border-white/10 backdrop-blur-md">
+                    
+                    <div class="flex gap-6">
+                        <div class="w-8 h-8 rounded-full bg-rose-900/50 text-rose-400 flex items-center justify-center flex-shrink-0 border border-rose-500/50 font-black text-sm shadow-inner">1</div>
+                        <div>
+                            <h5 class="font-bold text-white mb-2 text-lg">Makro til Mikro</h5>
+                            <p class="text-slate-400 text-sm leading-relaxed">Definer termisk energi. Forklar at den mekaniske energi fra haglenes fald bliver bevaret og konverteres til termisk energi (kinetisk energi på mikroskopisk/atomart plan).</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex gap-6">
+                        <div class="w-8 h-8 rounded-full bg-amber-900/50 text-amber-400 flex items-center justify-center flex-shrink-0 border border-amber-500/50 font-black text-sm shadow-inner">2</div>
+                        <div>
+                            <h5 class="font-bold text-white mb-2 text-lg">C kontra c</h5>
+                            <p class="text-slate-400 text-sm leading-relaxed">Redegør for forskellen. Stort <em class="text-white">C</em> = Varmekapacitet for en hel genstand (fx paprøret). Lille <em class="text-white">c</em> = Specifik varmekapacitet (en materialeegenskab pr. kg, her for stoffet bly). Ligningen er <span class="math-font text-white bg-white/10 px-1.5 py-0.5 rounded mx-1 shadow-inner">C = m · c</span>.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex gap-6">
+                        <div class="w-8 h-8 rounded-full bg-red-900/50 text-red-400 flex items-center justify-center flex-shrink-0 border border-red-500/50 font-black text-sm shadow-inner">3</div>
+                        <div>
+                            <h5 class="font-bold text-white mb-2 text-lg">Gennemgang af Faldforsøget</h5>
+                            <p class="text-slate-400 text-sm leading-relaxed">Opskriv ligningen <span class="math-font text-white bg-white/10 px-1.5 py-0.5 rounded mx-1 shadow-inner">N · m · g · h = m · c · ΔT</span> på tavlen. Vis læreren matematisk, at <em class="text-white">m</em> går ud på begge sider. Forklar at vi vender røret <em class="text-white">N</em> gange for at få temperaturstigningen stor nok til at kunne måles præcist.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex gap-6">
+                        <div class="w-8 h-8 rounded-full bg-orange-900/50 text-orange-400 flex items-center justify-center flex-shrink-0 border border-orange-500/50 font-black text-sm shadow-inner">4</div>
+                        <div>
+                            <h5 class="font-bold text-white mb-2 text-lg">Hvorfor Blyhagl? (Fejlkilder)</h5>
+                            <p class="text-slate-400 text-sm leading-relaxed">Bly har en meget <em>lav</em> specifik varmekapacitet (kun ca. 130), hvilket betyder temperaturen stiger hurtigt, når det får energi. Fejlkilder: Varmen fra haglene ledes over i luften og paprøret (derfor bruger vi også rør-varmekapaciteten <em>C</em> for præcise udregninger).</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="absolute -top-32 -left-32 w-[50rem] h-[50rem] bg-rose-600/10 rounded-full blur-[200px] pointer-events-none"></div>
+            <div class="absolute -bottom-32 -right-32 w-[50rem] h-[50rem] bg-amber-600/10 rounded-full blur-[200px] pointer-events-none"></div>
+        </footer>
+
+    </main>
+
+    <script>
+        // --- DATA TIL VIDENS-SKUFFE ---
+        const infoData = {
+            'termisk_mikro': {
+                title: 'Termisk Energi',
+                text: 'Mekanisk energi handler om genstande vi kan se – en bold der flyver eller en sten der falder.<br><br>Men på det helt mikroskopiske plan består alle ting af atomer og molekyler. Når en genstand rammer jorden, sættes alle dens indre atomer i svingninger. Atomerne "ryster" hurtigere. Det er dét vi mærker som varme! Termisk energi er altså blot kinetisk bevægelsesenergi, vi har bare zoomet ind på atom-niveauet.'
+            },
+            'stor_C': {
+                title: 'Varmekapacitet (C)',
+                text: 'Det store <strong>C</strong> beskriver en specifik, færdig genstands evne til at holde på varme. <br><br>Hvis vi tager paprøret fra forsøget, vil det have en bestemt varmekapacitet, lad os sige 30 J/°C. Det betyder, at uanset hvad paprøret vejer, eller hvilket pap det er lavet af, så koster det 30 Joule for at varme hele røret én grad op.'
+            },
+            'lille_c': {
+                title: 'Specifik Varmekapacitet (c)',
+                text: 'Det lille <strong>c</strong> beskriver selve materialet (stoffet). Vi dividerer genstandens varmekapacitet med dens vægt, for at finde ud af hvor meget 1 kg af stoffet kræver.<br><br><strong>c_bly</strong> er meget lav, ca. 130 J/(kg·°C). Det betyder, at bly bliver lynhurtigt varmt. <strong>c_vand</strong> er meget høj, ca. 4186 J/(kg·°C). Hvis vi havde brugt vand i stedet for blyhagl i faldforsøget, skulle vi have vendt røret tusindvis af gange for at måle en temperaturændring!'
+            },
+            'faldforsoeg': {
+                title: 'Forsøgets Matematik',
+                text: 'Vi kender formlen for potentiel energi: <em class="math-font">E_pot = m · g · h</em>. I forsøget falder haglene ikke én gang, men <strong>N</strong> gange. Total tilført energi er derfor: <em class="math-font">N · m · g · h</em>.<br><br>Ligningen for opvarmning er: <em class="math-font">E_varme = m · c · ΔT</em>.<br><br>Sætter vi dem lig hinanden:<br><em class="math-font">N · m · g · h = m · c · ΔT</em><br>Massen <em>m</em> går ud på begge sider. Det betyder at haglenes vægt er ligegyldig for, hvor mange grader (ΔT) termometeret stiger!'
+            }
+        };
+
+        function openInfo(key) {
+            const data = infoData[key];
+            document.getElementById('drawer-title').innerText = data.title;
+            document.getElementById('drawer-content').innerHTML = `<p>${data.text}</p>`;
+            document.getElementById('info-drawer').classList.add('open');
+        }
+
+        function closeDrawer() {
+            document.getElementById('info-drawer').classList.remove('open');
+        }
+
+        // --- ATOM VIBRATION SIMULATOR ---
+        const atomCanvas = document.getElementById('atom-canvas');
+        const atomCtx = atomCanvas.getContext('2d');
+        const tempSlider = document.getElementById('temp-slider');
+        const tempLabel = document.getElementById('temp-label');
+        
+        let aW, aH;
+        let atoms = [];
+
+        function initAtomCanvas() {
+            const dp = 2;
+            aW = atomCanvas.parentElement.clientWidth;
+            aH = atomCanvas.parentElement.clientHeight;
+            atomCanvas.width = aW * dp;
+            atomCanvas.height = aH * dp;
+            atomCtx.scale(dp, dp);
+            
+            // Grid of atoms for solid lattice
+            atoms = [];
+            const rows = 6;
+            const cols = 8;
+            const spacingX = aW / cols;
+            const spacingY = aH / rows;
+
+            for(let i=1; i<cols; i++) {
+                for(let j=1; j<rows; j++) {
+                    atoms.push({
+                        baseX: i * spacingX,
+                        baseY: j * spacingY,
+                        x: i * spacingX,
+                        y: j * spacingY,
+                        angle: Math.random() * Math.PI * 2
+                    });
+                }
+            }
+        }
+
+        function drawAtoms() {
+            atomCtx.clearRect(0, 0, aW, aH);
+            
+            const tempVal = parseFloat(tempSlider.value); // -273 to 500
+            tempLabel.innerText = tempVal + "°C";
+
+            // Vibration amplitude og speed baseret på temp
+            // Ved -273 (Absolut nulpunkt) står de næsten stille.
+            const k = (tempVal + 273) / 100; // Skaleringsfaktor for bevægelse
+            const amplitude = k * 1.5; 
+            const speed = k * 0.1;
+
+            // Farve transition (blå = kold, rød/hvid = meget varm)
+            let r = Math.min(255, 100 + k*50);
+            let g = Math.max(50, 200 - k*30);
+            let b = Math.max(50, 255 - k*40);
+            const atomColor = `rgb(${r}, ${g}, ${b})`;
+
+            // Draw lattice bonds (springs)
+            atomCtx.strokeStyle = 'rgba(255,255,255,0.1)';
+            atomCtx.lineWidth = 1;
+            
+            // Simpel lattice drawing (not perfect distance checking, just structural logic)
+            // Atoms were added column by column, row by row.
+            const rows = 5; // since j=1 to <6
+            for(let i=0; i<atoms.length; i++) {
+                let a = atoms[i];
+                // Vib rate
+                a.angle += speed + Math.random()*0.1;
+                a.x = a.baseX + Math.sin(a.angle) * amplitude;
+                a.y = a.baseY + Math.cos(a.angle * 1.5) * amplitude;
+
+                // Connect right
+                if(i + rows < atoms.length) {
+                    atomCtx.beginPath(); atomCtx.moveTo(a.x, a.y); atomCtx.lineTo(atoms[i+rows].x, atoms[i+rows].y); atomCtx.stroke();
+                }
+                // Connect down
+                if((i + 1) % rows !== 0) {
+                    atomCtx.beginPath(); atomCtx.moveTo(a.x, a.y); atomCtx.lineTo(atoms[i+1].x, atoms[i+1].y); atomCtx.stroke();
+                }
+            }
+
+            // Draw atoms
+            atoms.forEach(a => {
+                atomCtx.beginPath(); atomCtx.arc(a.x, a.y, 6, 0, Math.PI*2);
+                atomCtx.fillStyle = atomColor; atomCtx.shadowBlur = 10; atomCtx.shadowColor = atomColor; atomCtx.fill();
+                atomCtx.shadowBlur = 0;
+            });
+
+            requestAnimationFrame(drawAtoms);
+        }
+
+        // --- BLYHAGL RØR SIMULATOR ---
+        const tubeCanvas = document.getElementById('tube-canvas');
+        const tCtx = tubeCanvas.getContext('2d');
+        const tubeContainer = document.getElementById('tube');
+        const btnFlip = document.getElementById('btn-flip');
+        
+        // Data dashboard
+        const simN = document.getElementById('sim-n');
+        const simDT = document.getElementById('sim-dt');
+
+        let tW, tH;
+        let pellets = [];
+        let tubeRotation = 0; // i grader
+        let flips = 0;
+        let currentDt = 0; // Temp rise
+        
+        const g = 9.82;
+        const tubeHeightMeters = 1.0;
+        const c_bly = 130; 
+
+        function initTubeCanvas() {
+            const dp = 2;
+            tW = tubeCanvas.parentElement.clientWidth;
+            tH = tubeCanvas.parentElement.clientHeight;
+            tubeCanvas.width = tW * dp;
+            tubeCanvas.height = tH * dp;
+            tCtx.scale(dp, dp);
+            
+            pellets = [];
+            for(let i=0; i<30; i++) {
+                pellets.push({
+                    x: Math.random() * (tW - 10) + 5,
+                    y: tH - 10 - Math.random() * 30, // Starter i bunden
+                    vx: 0, vy: 0
+                });
+            }
+            drawTube();
+        }
+
+        function flipTube() {
+            flips++;
+            simN.innerText = flips;
+            
+            // Fysik formel: dT = (N * g * h) / c
+            currentDt = (flips * g * tubeHeightMeters) / c_bly;
+            simDT.innerText = currentDt.toFixed(2) + " °C";
+
+            // Visual Rør rotation (CSS)
+            tubeRotation += 180;
+            tubeContainer.style.transform = `rotate(${tubeRotation}deg)`;
+
+            // Sæt fart på haglene så de falder ned gennem røret!
+            // I vores canvas koordinatsystem (lokalt for røret), betyder en vending at haglene 
+            // "tror" de er i toppen nu og skal falde.
+            // Pga CSS rotation drejer hele canvas med rundt. Men gravity retningen for haglene ændres lokalt.
+            // Egentlig forsimpler vi: Hver gang vi "vender", rykker vi dem ikke, vi skifter bare tyngdekraftens retning lokalt i canvas!
+            // Men CSS roterer dem jo... Så relativt til røret, ændrer 'ned' sig.
+            
+            // Vent et øjeblik for at css transitionen starter, slip dem så.
+            setTimeout(() => {
+                pellets.forEach(p => {
+                    // Giv et lille skub
+                    p.vx = (Math.random() - 0.5) * 2;
+                });
+            }, 100);
+        }
+
+        function resetTube() {
+            flips = 0;
+            simN.innerText = flips;
+            currentDt = 0;
+            simDT.innerText = "0.00 °C";
+            tubeRotation = 0;
+            tubeContainer.style.transform = `rotate(0deg)`;
+            
+            pellets.forEach(p => {
+                p.y = tH - 10 - Math.random() * 30; // Force to bottom
+                p.vy = 0;
+            });
+        }
+
+        function drawTube() {
+            tCtx.clearRect(0, 0, tW, tH);
+
+            // Tjek retningen af tyngdekraften relativt til røret.
+            // Hvis tubeRotation er 0, 360... er "ned" positiv y.
+            // Hvis tubeRotation er 180, 540... er "ned" negativ y.
+            let fallsToBottom = (tubeRotation / 180) % 2 === 0;
+
+            pellets.forEach(p => {
+                // Gravity
+                if(fallsToBottom) {
+                    p.vy += 0.5; // Accelerer mod bunden (høj y)
+                } else {
+                    p.vy -= 0.5; // Accelerer mod toppen (lav y)
+                }
+
+                p.x += p.vx;
+                p.y += p.vy;
+
+                // Collision Y
+                if(fallsToBottom) {
+                    if(p.y > tH - 5) { p.y = tH - 5; p.vy *= -0.3; p.vx *= 0.8; }
+                } else {
+                    if(p.y < 5) { p.y = 5; p.vy *= -0.3; p.vx *= 0.8; }
+                }
+
+                // Collision X
+                if(p.x < 5) { p.x = 5; p.vx *= -0.5; }
+                if(p.x > tW - 5) { p.x = tW - 5; p.vx *= -0.5; }
+
+                // Inter-pellet collision (simple push apart)
+                for(let j=0; j<pellets.length; j++) {
+                    if(p === pellets[j]) continue;
+                    let dx = p.x - pellets[j].x;
+                    let dy = p.y - pellets[j].y;
+                    let dist = dx*dx + dy*dy;
+                    if(dist < 36) { // radius is 3, distSq < (3+3)^2 = 36
+                        p.x += dx*0.05; p.y += dy*0.05;
+                    }
+                }
+
+                // Tegn Hagl
+                tCtx.beginPath();
+                tCtx.arc(p.x, p.y, 4, 0, Math.PI*2);
+                tCtx.fillStyle = '#64748b'; // Bly farve (slate)
+                tCtx.fill();
+            });
+
+            requestAnimationFrame(drawTube);
+        }
+
+        // --- BACKGROUND PARTICLES ---
+        const bgCanvas = document.getElementById('particle-canvas');
+        const bgCtx = bgCanvas.getContext('2d');
+        let bgParticles = [];
+        
+        function initBg() {
+            bgCanvas.width = window.innerWidth; 
+            bgCanvas.height = window.innerHeight;
+            bgParticles = [];
+            for (let i = 0; i < 40; i++) {
+                bgParticles.push({
+                    x: Math.random() * bgCanvas.width, 
+                    y: Math.random() * bgCanvas.height,
+                    size: Math.random() * 2 + 0.5,
+                    vx: (Math.random() - 0.5) * 0.3, 
+                    vy: -Math.random() * 1.5 - 0.5, // Går konsekvent opad som varme
+                    color: Math.random() > 0.6 ? '#f43f5e' : (Math.random() > 0.5 ? '#f59e0b' : '#e11d48')
+                });
+            }
+        }
+        
+        function animateBg() {
+            bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
+            bgParticles.forEach(p => {
+                p.x += p.vx; 
+                p.y += p.vy;
+                
+                if (p.x > bgCanvas.width || p.x < 0) p.vx *= -1;
+                if (p.y < 0) {
+                    p.y = bgCanvas.height;
+                    p.x = Math.random() * bgCanvas.width;
+                }
+                
+                bgCtx.fillStyle = p.color; 
+                bgCtx.beginPath(); 
+                bgCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2); 
+                bgCtx.fill();
+            });
+            requestAnimationFrame(animateBg);
+        }
+
+        window.addEventListener('scroll', () => {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            document.getElementById('reading-progress').style.width = scrolled + "%";
+        });
+
+        window.addEventListener('resize', () => {
+            initBg();
+            initAtomCanvas();
+            initTubeCanvas();
+        });
+        
+        window.onload = () => { 
+            initBg(); animateBg(); 
+            initAtomCanvas(); drawAtoms();
+            initTubeCanvas();
+        };
+    </script>
+</body>
+</html>

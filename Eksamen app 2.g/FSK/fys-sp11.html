@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>11. Lysbølger | FysikQuest C</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Optik & Laser Tema (Violet, Cyan, Laser Grøn/Rød) */
+            --primary: #a855f7; /* Purple 500 */
+            --primary-glow: rgba(168, 85, 247, 0.4);
+            --secondary: #10b981; /* Emerald 500 (Laser Green) */
+            --accent: #f43f5e; /* Rose 500 (Laser Red) */
+            
+            --slate-bg: #030008; /* Dyb mørk rumsort */
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--slate-bg);
+            color: #f8fafc;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+            background-image: 
+                linear-gradient(rgba(168, 85, 247, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(168, 85, 247, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+        }
+
+        /* Foton partikler */
+        #particle-canvas {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -2; pointer-events: none; opacity: 0.8;
+        }
+
+        .ambient-laser {
+            position: fixed; border-radius: 50%; filter: blur(150px);
+            z-index: -1; pointer-events: none; opacity: 0.4;
+        }
+
+        .glass-card {
+            background: rgba(10, 5, 15, 0.85);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(168, 85, 247, 0.2);
+            border-radius: 2.5rem;
+            transition: all 0.5s var(--ease-out-expo);
+            box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.8);
+        }
+
+        .glass-card:hover {
+            box-shadow: 0 25px 60px -10px var(--primary-glow);
+            border-color: rgba(168, 85, 247, 0.4);
+        }
+
+        #info-drawer {
+            transform: translateX(100%);
+            transition: transform 0.6s var(--ease-out-expo);
+        }
+        #info-drawer.open { transform: translateX(0); }
+
+        .text-gradient {
+            @apply text-transparent bg-clip-text bg-gradient-to-r from-violet-400 via-fuchsia-400 to-emerald-400 drop-shadow-[0_0_20px_rgba(168,85,247,0.5)];
+        }
+
+        #reading-progress {
+            position: fixed; top: 0; left: 0; height: 5px;
+            background: linear-gradient(to right, #a855f7, #10b981, #f43f5e);
+            z-index: 100; width: 0%;
+            box-shadow: 0 0 20px rgba(168, 85, 247, 0.8);
+        }
+
+        .math-font { font-family: 'Space Grotesk', sans-serif; }
+
+        .lab-container {
+            background: #010003;
+            border-radius: 2rem;
+            position: relative;
+            overflow: hidden;
+            box-shadow: inset 0 0 60px rgba(0,0,0,0.9);
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .lab-canvas { 
+            position: absolute; inset: 0; width: 100%; height: 100%; display: block; outline: none; 
+        }
+
+        .i-btn {
+            @apply w-8 h-8 rounded-full bg-white/10 text-violet-400 flex items-center justify-center text-xs font-black hover:bg-violet-500 hover:text-white transition-all shadow-[0_0_15px_rgba(168,85,247,0.3)] border border-violet-500/30 cursor-pointer flex-shrink-0 z-10;
+        }
+
+        .input-range {
+            @apply w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-violet-500 outline-none;
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
+        ::-webkit-scrollbar-thumb { background: rgba(168, 85, 247, 0.5); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(168, 85, 247, 0.8); }
+    </style>
+</head>
+<body class="min-h-screen pb-40">
+
+    <div id="reading-progress"></div>
+    <canvas id="particle-canvas"></canvas>
+    
+    <div class="ambient-laser w-[600px] h-[600px] bg-violet-600/15 top-[-10%] left-[-10%]"></div>
+    <div class="ambient-laser w-[800px] h-[800px] bg-emerald-600/10 bottom-[-10%] right-[-10%]"></div>
+
+    <!-- Info Drawer -->
+    <div id="info-drawer" class="fixed top-0 right-0 h-full w-full max-w-md bg-[#020005]/95 backdrop-blur-3xl shadow-[-40px_0_80px_rgba(0,0,0,0.9)] z-[200] p-10 border-l border-violet-500/40 flex flex-col">
+        <button onclick="closeDrawer()" class="self-end p-3 bg-white/5 hover:bg-violet-500/20 rounded-full transition mb-6 text-slate-400 hover:text-violet-400">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-width="2.5" stroke-linecap="round"/></svg>
+        </button>
+        <div class="flex items-center gap-4 mb-8">
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-violet-500 to-fuchsia-500 flex items-center justify-center text-white font-black italic text-xl shadow-[0_0_30px_rgba(168,85,247,0.5)]">i</div>
+            <h3 id="drawer-title" class="text-2xl font-black text-white uppercase tracking-tighter">Videnscenter</h3>
+        </div>
+        <div id="drawer-content" class="text-slate-300 leading-relaxed space-y-6 font-medium text-sm overflow-y-auto pr-4"></div>
+        <div class="mt-auto pt-6">
+            <div class="p-6 bg-gradient-to-br from-violet-900/30 to-fuchsia-900/30 rounded-3xl border border-white/10 shadow-inner">
+                <p class="text-[10px] font-black uppercase text-violet-400 tracking-widest mb-2 flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"/><path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"/></svg>
+                    Eksamens-Tip
+                </p>
+                <p class="text-xs text-slate-400">Når du taler om lysets farver, så husk reglen <strong>ROGGBIF</strong> (Rød, Orange, Gul, Grøn, Blå, Indigo, Violet). Rød har den længste bølgelængde, Violet har den korteste!</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-50 bg-[#030008]/90 backdrop-blur-2xl border-b border-white/5 shadow-md">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <a href="fysik_landing.html" class="group flex items-center gap-4 text-slate-300 font-bold uppercase text-xs tracking-widest hover:text-violet-400 transition">
+                <div class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center border border-white/10 group-hover:border-violet-500/50 group-hover:bg-violet-500/20 transition shadow-sm">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M10 19l-7-7m0 0l7-7m-7 7h18" stroke-width="2.5" stroke-linecap="round"/></svg>
+                </div>
+                Tilbage til Oversigt
+            </a>
+            <span class="px-5 py-2 rounded-full bg-violet-600/20 text-violet-400 font-black text-[10px] uppercase tracking-[0.2em] border border-violet-500/30 shadow-[0_0_15px_rgba(168,85,247,0.2)]">Spørgsmål 11</span>
+        </div>
+    </nav>
+
+    <main class="max-w-6xl mx-auto px-6 pt-20">
+        
+        <!-- Header -->
+        <header class="mb-32 text-center relative">
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-violet-600/15 blur-[150px] rounded-full pointer-events-none -z-10"></div>
+            <div class="inline-block mb-6 px-6 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-bold text-[10px] tracking-[0.25em] uppercase shadow-lg shadow-emerald-500/20">
+                Fysik C • Bølger & Lys
+            </div>
+            <h1 class="text-6xl md:text-8xl font-black tracking-tighter text-white mb-8 uppercase leading-[0.9]">
+                Lys<span class="text-gradient">bølger</span>
+            </h1>
+            <p class="text-slate-400 text-lg md:text-xl max-w-3xl mx-auto font-medium leading-relaxed">
+                Fra mikrobølger til usynlig stråling. Forstå lysets natur, udforsk farvernes bølgelængder og afkod gitterligningen i laserforsøget.
+            </p>
+        </header>
+
+        <!-- AFSNIT 1: Det Elektromagnetiske Spektrum -->
+        <section class="mb-40">
+            <div class="flex items-center gap-5 mb-12">
+                <div class="w-16 h-1 bg-gradient-to-r from-violet-400 to-fuchsia-500 rounded-full"></div>
+                <h2 class="text-sm font-black uppercase tracking-[0.4em] text-slate-300">I. Lys er Bølger</h2>
+            </div>
+
+            <div class="glass-card p-10 md:p-16 border-t-4 border-violet-500">
+                <div class="flex flex-col lg:flex-row gap-16 items-center">
+                    <div class="flex-1 space-y-8">
+                        <div class="border-b border-white/10 pb-6">
+                            <h3 class="text-3xl font-bold text-white tracking-tight mb-4 flex items-center gap-4">
+                                Det Synlige Spektrum
+                                <button onclick="openInfo('em_boelger')" class="i-btn">i</button>
+                            </h3>
+                            <p class="text-slate-400 font-medium leading-relaxed mb-4">
+                                Lydbølger kræver luft for at kunne bevæge sig. Lys er anderledes. Lys er <strong>elektromagnetiske bølger</strong> (EM-bølger), som sagtens kan rejse gennem det tomme rum.
+                            </p>
+                            <p class="text-slate-400 font-medium leading-relaxed">
+                                Det lys, vores øjne kan se, er kun en lille brøkdel af hele spektret. Vi måler lysets bølgelængde (λ) i nanometer (nm). <strong>Forskellige bølgelængder opfattes af hjernen som forskellige farver!</strong>
+                            </p>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div class="p-6 bg-[#010003] rounded-3xl border border-rose-500/20 shadow-inner flex flex-col justify-center items-center text-center">
+                                <h4 class="text-white font-bold mb-2">Lysets Hastighed (<em class="text-rose-400">c</em>)</h4>
+                                <span class="text-2xl font-black italic tracking-widest text-rose-400 math-font drop-shadow-md">300.000 km/s</span>
+                                <p class="text-[10px] text-slate-500 mt-2 font-bold uppercase tracking-widest">Konstant i vakuum</p>
+                            </div>
+                            <div class="p-6 bg-[#010003] rounded-3xl border border-violet-500/20 shadow-inner flex flex-col justify-center items-center text-center relative overflow-hidden">
+                                <div class="absolute inset-0 bg-gradient-to-br from-violet-500/10 to-transparent"></div>
+                                <h4 class="text-white font-bold mb-2 relative z-10">Farlig stråling</h4>
+                                <p class="text-xs text-slate-400 mt-1 relative z-10 leading-relaxed">
+                                    Kort bølgelængde (som UV) = Høj frekvens = Høj energi (<em class="text-violet-400">Ioniserende</em>).
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- EM Spectrum Simulator -->
+                    <div class="w-full lg:w-[450px]">
+                        <div class="lab-container p-6 flex flex-col relative border border-violet-500/20 shadow-2xl">
+                            <div class="absolute top-4 left-4 z-10">
+                                <span class="text-[10px] font-black uppercase text-slate-900 tracking-widest bg-violet-400 px-3 py-1 rounded-full shadow-lg">Spektrum Simulator</span>
+                            </div>
+                            
+                            <div class="w-full h-64 mt-12 mb-6 bg-[#010003] rounded-2xl border border-white/10 relative overflow-hidden shadow-inner flex shrink-0">
+                                <canvas id="spectrum-canvas" class="lab-canvas"></canvas>
+                            </div>
+                            
+                            <div class="bg-black/60 p-5 rounded-[2rem] border border-white/10 backdrop-blur-md text-center">
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Bølgelængde (λ)</span>
+                                    <span id="spec-nm-label" class="text-xs font-black text-white">550 nm</span>
+                                </div>
+                                <input type="range" id="spec-slider" min="350" max="750" step="1" value="550" class="input-range mb-4" oninput="updateSpectrumUI()">
+                                
+                                <div id="spec-color-box" class="w-full py-2 rounded-xl border border-white/20 font-black text-white text-sm tracking-widest uppercase shadow-[0_0_15px_rgba(255,255,255,0.2)] transition-colors duration-300">
+                                    GRØN
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- AFSNIT 2: Det Optiske Gitter -->
+        <section class="mb-40">
+            <div class="flex items-center gap-5 mb-12">
+                <div class="w-16 h-1 bg-gradient-to-r from-emerald-500 to-cyan-500 rounded-full"></div>
+                <h2 class="text-sm font-black uppercase tracking-[0.4em] text-emerald-400">II. Optisk Gitter & Interferens</h2>
+            </div>
+
+            <div class="glass-card p-10 md:p-16 border-t-4 border-emerald-500 relative overflow-hidden">
+                <div class="absolute -right-32 -top-32 w-[600px] h-[600px] bg-emerald-600/10 rounded-full blur-[120px] pointer-events-none"></div>
+
+                <div class="flex flex-col lg:flex-row gap-16 items-center relative z-10">
+                    <div class="flex-1 space-y-8">
+                        <div class="border-b border-white/10 pb-6">
+                            <h3 class="text-3xl font-bold text-white tracking-tight mb-4 flex items-center gap-4">
+                                Hvorfor bruger vi en laser?
+                                <button onclick="openInfo('laserlys')" class="i-btn text-emerald-400 border-emerald-500/30 hover:bg-emerald-500">i</button>
+                            </h3>
+                            <p class="text-slate-400 font-medium leading-relaxed mb-4">
+                                Et <strong>Optisk Gitter</strong> er en plade med tusindvis af usynlige, fine ridser. For at skabe det smukke prikmønster på væggen, er vi nødt til at bruge en laser.
+                            </p>
+                            <p class="text-slate-400 font-medium leading-relaxed">
+                                Dette skyldes, at laserlys er <em>monokromatisk</em> (består af præcis én bølgelængde/farve) og <em>kohærent</em> (alle lysbølgerne svinger fuldstændig i takt). Hvis vi lyste med en hvid lommelygte gennem gitteret, ville hvidt lys (som indeholder alle farver) blive splittet op til udtværede regnbuer!
+                            </p>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4 text-center">
+                            <div class="p-6 bg-[#010003] rounded-3xl border border-emerald-500/20 shadow-inner">
+                                <span class="text-[10px] font-black uppercase text-emerald-400 tracking-widest block mb-2">Konstruktiv Interferens</span>
+                                <span class="text-sm font-medium text-slate-300 block">Bølgetop møder bølgetop. Skaber de lyse <strong>prikker</strong> på væggen.</span>
+                            </div>
+                            <div class="p-6 bg-[#010003] rounded-3xl border border-slate-700 shadow-inner">
+                                <span class="text-[10px] font-black uppercase text-slate-400 tracking-widest block mb-2">Destruktiv Interferens</span>
+                                <span class="text-sm font-medium text-slate-300 block">Bølgetop møder dal. Lyset slukker for sig selv i <strong>mørket</strong> mellem prikkerne.</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="w-full lg:w-96 bg-[#010003] border border-white/10 rounded-[3rem] p-10 shadow-2xl relative text-center">
+                        <div class="absolute -inset-4 bg-gradient-to-b from-emerald-500/20 to-transparent blur-xl -z-10 rounded-full"></div>
+                        
+                        <h4 class="text-white font-bold mb-6">Gitterkonstanten (<em class="text-emerald-400">d</em>)</h4>
+                        <p class="text-xs text-slate-400 leading-relaxed mb-6">
+                            Gitterkonstanten er afstanden mellem to ridser (spalter) i gitteret. Den er utroligt lille og måles ofte i nanometer.
+                        </p>
+                        <div class="p-4 bg-white/5 rounded-xl border border-white/10">
+                            <p class="text-[10px] uppercase tracking-widest text-slate-500 mb-1">Eksempel:</p>
+                            <p class="text-sm font-bold text-emerald-300">300 linjer / mm</p>
+                            <p class="text-xs text-slate-400 mt-1">betyder at <em class="text-white font-serif">d</em> = 1 / 300 mm.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- AFSNIT 3: Laser & Gitter Laboratorium -->
+        <section class="mb-40">
+            <div class="flex items-center gap-5 mb-12">
+                <div class="w-16 h-1 bg-gradient-to-r from-rose-500 to-violet-500 rounded-full"></div>
+                <h2 class="text-sm font-black uppercase tracking-[0.4em] text-rose-400">III. Gitterligningen i Praksis</h2>
+            </div>
+
+            <div class="glass-card p-10 md:p-16 border-t-4 border-rose-500">
+                <div class="flex flex-col lg:flex-row gap-16 items-start">
+                    
+                    <div class="flex-1 space-y-8">
+                        <div class="border-b border-white/10 pb-6">
+                            <h3 class="text-3xl font-bold text-white tracking-tight flex items-center gap-3 mb-4">
+                                Beregning af vinklen
+                                <button onclick="openInfo('gitterligningen')" class="i-btn text-rose-400 border-rose-500/30 hover:bg-rose-500 shadow-[0_0_15px_rgba(244,63,94,0.3)]">i</button>
+                            </h3>
+                            <p class="text-slate-400 font-medium leading-relaxed">
+                                I laboratoriet skyder vi en laser gennem gitteret mod en væg. Den prik, der går lige igennem (i midten), kaldes <strong>0. orden (n=0)</strong>. På begge sider opstår nye prikker, kaldet 1. orden, 2. orden osv.
+                            </p>
+                            <p class="text-slate-400 font-medium leading-relaxed mt-4">
+                                Hvor stor vinklen er ud til disse prikker, bestemmes af <strong>Gitterligningen</strong>. Læg mærke til i simulatoren, at hvis bølgelængden (farven) stiger, eller hvis gitteret gøres tættere, bliver afbøjningsvinklen større!
+                            </p>
+                        </div>
+
+                        <div class="p-8 bg-[#010003] rounded-[2rem] border border-rose-500/20 shadow-inner flex flex-col items-center gap-4">
+                            <span class="text-[10px] font-black uppercase text-rose-400 tracking-widest">Gitterligningen</span>
+                            <span class="text-4xl font-black italic tracking-widest text-white math-font">
+                                n · λ = d · sin(θ)
+                            </span>
+                            <div class="grid grid-cols-2 gap-x-8 gap-y-2 mt-4 text-xs font-bold text-slate-500 text-left">
+                                <div><span class="text-white">n:</span> Orden (1, 2, 3...)</div>
+                                <div><span class="text-violet-400">λ:</span> Bølgelængde</div>
+                                <div><span class="text-emerald-400">d:</span> Gitterkonstant</div>
+                                <div><span class="text-rose-400">θ:</span> Afbøjningsvinkel</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Laser Gitter Simulator -->
+                    <div class="w-full lg:w-[500px]">
+                        <div class="lab-container p-6 flex flex-col relative border border-rose-500/20 shadow-2xl bg-[#010003]">
+                            <div class="absolute top-4 left-4 z-10 flex gap-2">
+                                <span class="text-[10px] font-black uppercase text-slate-900 tracking-widest bg-rose-400 px-3 py-1 rounded-full shadow-lg">Laser Lab Simulator</span>
+                            </div>
+                            
+                            <div class="flex justify-center mt-14 mb-6 relative">
+                                <!-- Simulator Canvas -->
+                                <div class="w-full h-64 bg-[#05010a] rounded-2xl border border-slate-700 relative overflow-hidden shadow-[inset_0_0_30px_rgba(0,0,0,0.8)] flex items-center justify-center shrink-0">
+                                    <canvas id="laser-canvas" class="lab-canvas"></canvas>
+                                    
+                                    <!-- Simuleret Gitter i bunden -->
+                                    <div class="absolute bottom-0 w-full h-2 flex justify-between px-[45%] opacity-50">
+                                        <div class="w-px h-full bg-slate-400"></div><div class="w-px h-full bg-slate-400"></div><div class="w-px h-full bg-slate-400"></div><div class="w-px h-full bg-slate-400"></div><div class="w-px h-full bg-slate-400"></div>
+                                    </div>
+                                    <div class="absolute bottom-2 left-1/2 -translate-x-1/2 text-[9px] text-slate-500 uppercase font-bold tracking-widest">Gitter</div>
+                                </div>
+                            </div>
+                            
+                            <!-- Controls -->
+                            <div class="bg-slate-900/60 p-5 rounded-[2rem] border border-white/10 backdrop-blur-md space-y-5">
+                                <div>
+                                    <div class="flex justify-between items-center mb-2">
+                                        <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Laser Farve (<em class="text-white">λ</em>)</span>
+                                        <span id="lab-laser-val" class="text-[10px] font-black text-rose-400 bg-rose-900/50 px-2 py-1 rounded border border-rose-500/30">Rød (650 nm)</span>
+                                    </div>
+                                    <!-- Rød (650), Grøn (532), Blå (450) -->
+                                    <input type="range" id="lab-laser-slider" min="450" max="650" step="1" value="650" class="input-range accent-rose-500 h-1.5" oninput="updateLaserUI()">
+                                </div>
+                                <div>
+                                    <div class="flex justify-between items-center mb-2">
+                                        <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Gittertæthed</span>
+                                        <span id="lab-d-val" class="text-[10px] font-black text-emerald-400 bg-emerald-900/50 px-2 py-1 rounded border border-emerald-500/30">300 linjer/mm</span>
+                                    </div>
+                                    <!-- 100 til 600 linjer / mm -->
+                                    <input type="range" id="lab-d-slider" min="100" max="600" step="50" value="300" class="input-range accent-emerald-500 h-1.5" oninput="updateLaserUI()">
+                                </div>
+                                
+                                <div class="p-3 bg-white/5 rounded-xl border border-white/10 text-center">
+                                    <span class="text-[9px] uppercase font-bold text-slate-400 tracking-widest">1. Ordens Vinkel (θ₁):</span>
+                                    <div id="lab-angle-val" class="text-lg font-black text-white mt-1 math-font">11.2 °</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Eksamens Disposition -->
+        <footer class="bg-gradient-to-b from-[#030008] to-[#010003] rounded-[3rem] p-12 md:p-16 text-center text-white relative overflow-hidden shadow-[0_20px_60px_-15px_rgba(0,0,0,1)] border border-white/5 mb-10">
+            <div class="relative z-10">
+                <span class="text-[10px] font-black uppercase tracking-[0.4em] text-violet-400 mb-6 block drop-shadow-[0_0_10px_rgba(168,85,247,0.8)]">Oversigt til Eksamen</span>
+                <h3 class="text-4xl font-black mb-12 italic text-white">Tjekliste til Tavlen</h3>
+                <div class="text-left max-w-3xl mx-auto space-y-6 mb-14 bg-white/5 p-8 md:p-12 rounded-[2.5rem] border border-white/10 backdrop-blur-md">
+                    
+                    <div class="flex gap-6">
+                        <div class="w-8 h-8 rounded-full bg-slate-800 text-slate-300 flex items-center justify-center flex-shrink-0 border border-slate-600 font-black text-sm shadow-inner">1</div>
+                        <div>
+                            <h5 class="font-bold text-white mb-2 text-lg">Lysets Natur & Energi</h5>
+                            <p class="text-slate-400 text-sm leading-relaxed">Forklar at lys er elektromagnetiske bølger (<em class="math-font text-white bg-white/10 px-1.5 py-0.5 rounded mx-1 shadow-inner">c = f · λ</em>). Nævn <strong>ROGGBIF</strong> (Rød = lang λ, lav energi. Violet = kort λ, høj energi). Fotons energi stiger med frekvensen, hvilket gør UV/røntgen <em>ioniserende</em> og farligt.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex gap-6">
+                        <div class="w-8 h-8 rounded-full bg-emerald-900/50 text-emerald-400 flex items-center justify-center flex-shrink-0 border border-emerald-500/50 font-black text-sm shadow-inner">2</div>
+                        <div>
+                            <h5 class="font-bold text-white mb-2 text-lg">Hvorfor Laser?</h5>
+                            <p class="text-slate-400 text-sm leading-relaxed">Et gitter spreder lys via diffraktion og danner et interferensmønster. Forklar at vi bruger en laser fordi den er <strong>monokromatisk</strong> (én bølgelængde) og <strong>kohærent</strong>. Hvidt lys ville give gnidrede regnbuer.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex gap-6">
+                        <div class="w-8 h-8 rounded-full bg-rose-900/50 text-rose-400 flex items-center justify-center flex-shrink-0 border border-rose-500/50 font-black text-sm shadow-inner">3</div>
+                        <div>
+                            <h5 class="font-bold text-white mb-2 text-lg">Gitterligningen</h5>
+                            <p class="text-slate-400 text-sm leading-relaxed">Skriv <em class="math-font text-white bg-white/10 px-1.5 py-0.5 rounded mx-1 shadow-inner">n · λ = d · sin(θ)</em> på tavlen. Forklar at <em>n</em> er ordenen (prikken talt fra midten), <em>λ</em> er bølgelængden, <em>d</em> er gitterkonstanten (afstanden mellem ridser), og <em>θ</em> er afbøjningsvinklen.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex gap-6">
+                        <div class="w-8 h-8 rounded-full bg-violet-900/50 text-violet-400 flex items-center justify-center flex-shrink-0 border border-violet-500/50 font-black text-sm shadow-inner">4</div>
+                        <div>
+                            <h5 class="font-bold text-white mb-2 text-lg">Eksperimentet (Målingen)</h5>
+                            <p class="text-slate-400 text-sm leading-relaxed">Forklar hvordan I fandt vinklen <em>θ</em>: Mål afstanden fra gitter til væg, og afstanden fra 0. orden (midterprikken) til 1. orden. Brug tangent til at finde vinklen, og isæt i gitterligningen for at bevise laserens λ.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="absolute -top-32 -left-32 w-[50rem] h-[50rem] bg-violet-600/10 rounded-full blur-[200px] pointer-events-none"></div>
+            <div class="absolute -bottom-32 -right-32 w-[50rem] h-[50rem] bg-rose-600/10 rounded-full blur-[200px] pointer-events-none"></div>
+        </footer>
+
+    </main>
+
+    <script>
+        // --- DATA TIL VIDENS-SKUFFE ---
+        const infoData = {
+            'em_boelger': {
+                title: 'Elektromagnetiske Bølger & Fotoner',
+                text: 'Lys er svingninger i elektriske og magnetiske felter og rejser med 300.000 km/s. Lys kan også opfattes som små energipakker, kaldet <em>fotoner</em>.<br><br><strong>Huskeregel for eksamen:</strong> Fotonens energi afhænger af frekvensen! Jo kortere bølgelængden (λ) er, jo højere er frekvensen, og jo mere energi bærer fotonen. Derfor er radiobølger og mikrobølger (lang λ) ufarlige, mens UV-lys, røntgen og gammastråling (kort λ) er <em>ioniserende</em> og kan smadre vores DNA!'
+            },
+            'optisk_gitter': {
+                title: 'Det Optiske Gitter',
+                text: 'Hvis du lyser gennem en lille spalte, vil lyset sprede sig ud som en vifte (Diffraktion). Et optisk gitter består af tusindvis af disse ridser tæt ved siden af hinanden.<br><br>Lyset spreder sig fra dem alle sammen samtidig. Da lyset er en bølge, vil bølgetoppe møde bølgetoppe bestemte steder (Konstruktiv interferens) og danne skarpe, lyse prikker på væggen. Mellem prikkerne møder bølgetop en bølgedal, de ophæver hinanden (Destruktiv interferens), og der bliver fuldstændig mørkt!'
+            },
+            'laserlys': {
+                title: 'Hvorfor netop en laser?',
+                text: 'Gitterligningen bygger på interferens. For at skabe tydelige og præcise interferenspletter på væggen, er vi nødt til at bruge en laser.<br><br>Dette skyldes to ting: Laserlys er <strong>Monokromatisk</strong> (det består kun af én bestemt bølgelængde/farve) og det er <strong>Kohærent</strong> (alle bølgerne sendes afsted i præcis samme fase/takt). Hvis vi brugte en lommelygte, ville de mange forskellige farver bøjes forskelligt, og prikkerne ville blive smurt ud til regnbuer på væggen.'
+            },
+            'gitterligningen': {
+                title: 'Gitterligningen & Matematikken',
+                text: 'Formlen er: <em class="text-rose-400">n · λ = d · sin(θ)</em>.<br><br>Ligningen fortæller os, at afbøjningen afhænger af farven. Rødt lys (stor bølgelængde, ca. 650 nm) vil blive afbøjet i en større vinkel end blåt lys (kort bølgelængde, ca. 450 nm). Kender vi gitteret (d) og afbøjningsvinklen (θ), kan vi nemt udregne lysets sande farve i nanometer. Vi kan altså bruge linealer til at måle lys!'
+            }
+        };
+
+        function openInfo(key) {
+            const data = infoData[key];
+            document.getElementById('drawer-title').innerText = data.title;
+            document.getElementById('drawer-content').innerHTML = `<p>${data.text}</p>`;
+            document.getElementById('info-drawer').classList.add('open');
+        }
+
+        function closeDrawer() {
+            document.getElementById('info-drawer').classList.remove('open');
+        }
+
+        // --- SIKKER CANVAS HÅNDTERING ---
+        const specState = { w: 0, h: 0, time: 0 };
+        const laserState = { w: 0, h: 0, time: 0 };
+
+        let specCtx, laserCtx;
+
+        function attachResizer(canvasId, state) {
+            const canvas = document.getElementById(canvasId);
+            const parent = canvas.parentElement;
+            const ctx = canvas.getContext('2d');
+            
+            const ro = new ResizeObserver(entries => {
+                for (let entry of entries) {
+                    const { width, height } = entry.contentRect;
+                    if (width > 0 && height > 0) {
+                        const dp = window.devicePixelRatio || 1;
+                        canvas.width = width * dp;
+                        canvas.height = height * dp;
+                        canvas.style.width = width + "px";
+                        canvas.style.height = height + "px";
+                        ctx.setTransform(1, 0, 0, 1, 0, 0);
+                        ctx.scale(dp, dp);
+                        state.w = width;
+                        state.h = height;
+                    }
+                }
+            });
+            ro.observe(parent);
+            return ctx;
+        }
+
+        // --- FARVE-HJÆLPER (Wavelength til RGB) ---
+        // Simpel mapning af nm til rgb (400nm - 700nm ca.)
+        function wavelengthToColor(wl) {
+            let r=0, g=0, b=0;
+            if (wl >= 380 && wl < 440) {
+                r = -(wl - 440) / (440 - 380);
+                g = 0;
+                b = 1;
+            } else if (wl >= 440 && wl < 490) {
+                r = 0;
+                g = (wl - 440) / (490 - 440);
+                b = 1;
+            } else if (wl >= 490 && wl < 510) {
+                r = 0;
+                g = 1;
+                b = -(wl - 510) / (510 - 490);
+            } else if (wl >= 510 && wl < 580) {
+                r = (wl - 510) / (580 - 510);
+                g = 1;
+                b = 0;
+            } else if (wl >= 580 && wl < 645) {
+                r = 1;
+                g = -(wl - 645) / (645 - 580);
+                b = 0;
+            } else if (wl >= 645 && wl <= 780) {
+                r = 1;
+                g = 0;
+                b = 0;
+            }
+            
+            // Fald af i enderne (usynligt lys)
+            let factor = 1;
+            if (wl >= 380 && wl < 420) factor = 0.3 + 0.7 * (wl - 380) / (420 - 380);
+            else if (wl >= 700 && wl <= 780) factor = 0.3 + 0.7 * (780 - wl) / (780 - 700);
+
+            r = Math.round(r * factor * 255);
+            g = Math.round(g * factor * 255);
+            b = Math.round(b * factor * 255);
+            
+            // Hvis vi er uden for, gør det gråt/usynligt
+            if(wl < 380 || wl > 780) { r=30; g=30; b=30; }
+
+            return `rgb(${r}, ${g}, ${b})`;
+        }
+        
+        function getColorName(wl) {
+            if (wl < 380) return "Ultraviolet (Usynlig)";
+            if (wl < 450) return "Violet / Indigo";
+            if (wl < 495) return "Blå";
+            if (wl < 570) return "Grøn";
+            if (wl < 590) return "Gul";
+            if (wl < 620) return "Orange";
+            if (wl <= 750) return "Rød";
+            return "Infrarød (Usynlig varme)";
+        }
+
+
+        // --- 1. SPEKTRUM SIMULATOR ---
+        const specSlider = document.getElementById('spec-slider');
+        const specNmLabel = document.getElementById('spec-nm-label');
+        const specColorBox = document.getElementById('spec-color-box');
+
+        function updateSpectrumUI() {
+            // Opdater DOM via js funktionen for at forhindre frys
+        }
+
+        function drawSpectrum() {
+            if (specState.w === 0 || specState.h === 0) {
+                requestAnimationFrame(drawSpectrum);
+                return;
+            }
+
+            specCtx.clearRect(0, 0, specState.w, specState.h);
+            
+            const wl = parseInt(specSlider.value); // 350 to 750
+            const currentColor = wavelengthToColor(wl);
+            
+            // Opdater UI i loopet for at undgå blocking
+            specNmLabel.innerText = wl + " nm";
+            specColorBox.innerText = getColorName(wl);
+            specColorBox.style.backgroundColor = currentColor;
+            specColorBox.style.borderColor = currentColor;
+            specColorBox.style.boxShadow = `0 0 20px ${currentColor}`;
+            if(wl < 380 || wl > 750) specColorBox.style.color = '#a1a1aa'; 
+            else specColorBox.style.color = '#fff';
+
+            specState.time += 0.1;
+
+            const visualLambda = (wl / 400) * (specState.w * 0.15); 
+            const amplitude = specState.h * 0.35;
+            const yOffset = specState.h / 2;
+
+            specCtx.strokeStyle = 'rgba(255,255,255,0.05)';
+            specCtx.lineWidth = 1;
+            specCtx.setLineDash([5, 5]);
+            specCtx.beginPath();
+            specCtx.moveTo(0, yOffset);
+            specCtx.lineTo(specState.w, yOffset);
+            specCtx.stroke();
+            specCtx.setLineDash([]);
+
+            specCtx.beginPath();
+            const k = (Math.PI * 2) / visualLambda;
+            
+            for (let x = 0; x <= specState.w; x += 2) {
+                const y = yOffset + amplitude * Math.sin(k * x - specState.time);
+                if (x === 0) specCtx.moveTo(x, y);
+                else specCtx.lineTo(x, y);
+            }
+            
+            specCtx.strokeStyle = currentColor; 
+            specCtx.lineWidth = 5;
+            specCtx.lineCap = 'round';
+            specCtx.shadowBlur = 20;
+            specCtx.shadowColor = currentColor;
+            specCtx.stroke();
+            specCtx.shadowBlur = 0;
+
+            requestAnimationFrame(drawSpectrum);
+        }
+
+        // --- 2. LASER GITTER SIMULATOR ---
+        const labLaserSlider = document.getElementById('lab-laser-slider');
+        const labDSlider = document.getElementById('lab-d-slider');
+        const labLaserVal = document.getElementById('lab-laser-val');
+        const labDVal = document.getElementById('lab-d-val');
+        const labAngleVal = document.getElementById('lab-angle-val');
+
+        function updateLaserUI() {}
+
+        function drawLaserLab() {
+            if (laserState.w === 0 || laserState.h === 0) {
+                requestAnimationFrame(drawLaserLab);
+                return;
+            }
+
+            // Let "røg" i luften så man kan se laserstrålen
+            laserCtx.fillStyle = 'rgba(1, 0, 3, 0.3)'; 
+            laserCtx.fillRect(0, 0, laserState.w, laserState.h);
+
+            const lambda_nm = parseFloat(labLaserSlider.value); 
+            const lines_per_mm = parseFloat(labDSlider.value); 
+
+            if (lambda_nm >= 600) { labLaserVal.innerText = `Rød (${lambda_nm} nm)`; labLaserVal.className = "text-[10px] font-black text-red-400 bg-red-900/50 px-2 py-1 rounded border border-red-500/30"; }
+            else if (lambda_nm >= 500) { labLaserVal.innerText = `Grøn (${lambda_nm} nm)`; labLaserVal.className = "text-[10px] font-black text-emerald-400 bg-emerald-900/50 px-2 py-1 rounded border border-emerald-500/30"; }
+            else { labLaserVal.innerText = `Blå (${lambda_nm} nm)`; labLaserVal.className = "text-[10px] font-black text-blue-400 bg-blue-900/50 px-2 py-1 rounded border border-blue-500/30"; }
+
+            labDVal.innerText = lines_per_mm + " linjer/mm";
+
+            // Fysik:
+            const sinTheta1 = 1 * lambda_nm * lines_per_mm * 1e-6;
+            
+            let angleDeg = 0;
+            if (sinTheta1 <= 1) {
+                angleDeg = Math.asin(sinTheta1) * (180 / Math.PI);
+                labAngleVal.innerText = angleDeg.toFixed(1) + " °";
+            } else {
+                labAngleVal.innerText = "Ingen afbøjning";
+            }
+
+            const gitterX = laserState.w / 2;
+            const gitterY = laserState.h;
+            const projWallY = 20; 
+
+            const laserColor = wavelengthToColor(lambda_nm);
+
+            laserCtx.shadowBlur = 15;
+            laserCtx.shadowColor = laserColor;
+            laserCtx.lineWidth = 3;
+            laserCtx.lineCap = 'round';
+
+            function drawBeam(n) {
+                const sinT = n * lambda_nm * lines_per_mm * 1e-6;
+                if (Math.abs(sinT) > 1) return; 
+
+                const alpha = 1 - (Math.abs(n) * 0.25); 
+                if (alpha <= 0) return;
+
+                laserCtx.strokeStyle = `rgba(${laserColor.match(/\d+/g).join(',')}, ${alpha})`;
+
+                const angleRad = Math.asin(sinT);
+                const distY = gitterY - projWallY;
+                const deltaX = Math.tan(angleRad) * distY;
+                const hitX = gitterX + deltaX;
+
+                laserCtx.beginPath();
+                laserCtx.moveTo(gitterX, gitterY);
+                laserCtx.lineTo(hitX, projWallY);
+                laserCtx.stroke();
+
+                laserCtx.beginPath();
+                laserCtx.arc(hitX, projWallY, 5, 0, Math.PI*2);
+                laserCtx.fillStyle = '#fff';
+                laserCtx.shadowBlur = 20;
+                laserCtx.fill();
+            }
+
+            drawBeam(0);
+            for(let i=1; i<=3; i++) {
+                drawBeam(i);
+                drawBeam(-i);
+            }
+
+            laserCtx.shadowBlur = 0; 
+
+            laserCtx.beginPath();
+            laserCtx.moveTo(0, projWallY);
+            laserCtx.lineTo(laserState.w, projWallY);
+            laserCtx.strokeStyle = 'rgba(255,255,255,0.2)';
+            laserCtx.lineWidth = 2;
+            laserCtx.stroke();
+
+            requestAnimationFrame(drawLaserLab);
+        }
+
+        // --- BACKGROUND FOTON PARTICLES ---
+        const bgCanvas = document.getElementById('particle-canvas');
+        const bgCtx = bgCanvas.getContext('2d');
+        let bgParticles = [];
+        
+        function initBg() {
+            bgCanvas.width = window.innerWidth; 
+            bgCanvas.height = window.innerHeight;
+            bgParticles = [];
+            for (let i = 0; i < 40; i++) {
+                bgParticles.push({
+                    x: Math.random() * bgCanvas.width, 
+                    y: Math.random() * bgCanvas.height,
+                    length: Math.random() * 40 + 20, 
+                    // Hastighed gjort meget langsommere som anmodet:
+                    speed: Math.random() * 4 + 2, 
+                    color: Math.random() > 0.6 ? '#f43f5e' : (Math.random() > 0.5 ? '#10b981' : '#a855f7')
+                });
+            }
+        }
+        
+        function animateBg() {
+            bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
+
+            bgParticles.forEach(p => {
+                p.x += p.speed; 
+                
+                // Wrap rundt mod højre
+                if (p.x - p.length > bgCanvas.width) {
+                    p.x = -p.length;
+                    p.y = Math.random() * bgCanvas.height;
+                }
+                
+                bgCtx.strokeStyle = p.color; 
+                bgCtx.lineWidth = 2;
+                bgCtx.lineCap = "round";
+                bgCtx.beginPath(); 
+                bgCtx.moveTo(p.x, p.y);
+                bgCtx.lineTo(p.x - p.length, p.y); 
+                bgCtx.stroke();
+                
+                bgCtx.shadowBlur = 10;
+                bgCtx.shadowColor = p.color;
+                bgCtx.stroke();
+                bgCtx.shadowBlur = 0;
+            });
+            requestAnimationFrame(animateBg);
+        }
+
+        window.addEventListener('resize', initBg);
+        
+        window.onload = () => { 
+            specCtx = attachResizer('spectrum-canvas', specState);
+            laserCtx = attachResizer('laser-canvas', laserState);
+            
+            initBg(); 
+            animateBg(); 
+            requestAnimationFrame(drawSpectrum);
+            requestAnimationFrame(drawLaserLab);
+        };
+    </script>
+</body>
+</html>

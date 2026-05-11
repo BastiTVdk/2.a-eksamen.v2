@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>10. Lydbølger | FysikQuest C</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Sonar / Lyd Tema (Lime / Amber) */
+            --primary: #84cc16; /* Lime 500 */
+            --primary-glow: rgba(132, 204, 22, 0.4);
+            --secondary: #f59e0b; /* Amber 500 */
+            --accent: #22c55e; /* Green 500 */
+            
+            --slate-bg: #0a0f0a; /* Meget mørk grøn/sort */
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--slate-bg);
+            color: #f8fafc;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+            background-image: 
+                linear-gradient(rgba(132, 204, 22, 0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(132, 204, 22, 0.03) 1px, transparent 1px);
+            background-size: 50px 50px;
+        }
+
+        /* Lydbølge partikler i baggrunden */
+        #particle-canvas {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -2; pointer-events: none; opacity: 0.6;
+        }
+
+        .ambient-sonar {
+            position: fixed; border-radius: 50%; filter: blur(150px);
+            z-index: -1; pointer-events: none; opacity: 0.5;
+        }
+
+        .glass-card {
+            background: rgba(10, 15, 10, 0.85);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(132, 204, 22, 0.2);
+            border-radius: 2.5rem;
+            transition: all 0.5s var(--ease-out-expo);
+            box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.8);
+        }
+
+        .glass-card:hover {
+            box-shadow: 0 25px 60px -10px var(--primary-glow);
+            border-color: rgba(132, 204, 22, 0.4);
+        }
+
+        #info-drawer {
+            transform: translateX(100%);
+            transition: transform 0.6s var(--ease-out-expo);
+        }
+        #info-drawer.open { transform: translateX(0); }
+
+        .text-gradient {
+            @apply text-transparent bg-clip-text bg-gradient-to-r from-lime-400 via-green-400 to-amber-400 drop-shadow-[0_0_20px_rgba(132,204,22,0.5)];
+        }
+
+        #reading-progress {
+            position: fixed; top: 0; left: 0; height: 5px;
+            background: linear-gradient(to right, #f59e0b, #84cc16, #22c55e);
+            z-index: 100; width: 0%;
+            box-shadow: 0 0 20px rgba(132, 204, 22, 0.8);
+        }
+
+        .math-font { font-family: 'Space Grotesk', sans-serif; }
+
+        .lab-container {
+            background: #020502;
+            border-radius: 2rem;
+            position: relative;
+            overflow: hidden;
+            box-shadow: inset 0 0 60px rgba(0,0,0,0.8);
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        /* Skudsikker canvas styling */
+        .lab-canvas { 
+            position: absolute; inset: 0; width: 100%; height: 100%; display: block; outline: none; 
+        }
+
+        .i-btn {
+            @apply w-8 h-8 rounded-full bg-white/10 text-lime-400 flex items-center justify-center text-xs font-black hover:bg-lime-500 hover:text-white transition-all shadow-[0_0_15px_rgba(132,204,22,0.3)] border border-lime-500/30 cursor-pointer flex-shrink-0 z-10;
+        }
+
+        .input-range {
+            @apply w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-lime-500 outline-none;
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
+        ::-webkit-scrollbar-thumb { background: rgba(132, 204, 22, 0.5); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(132, 204, 22, 0.8); }
+    </style>
+</head>
+<body class="min-h-screen pb-40">
+
+    <div id="reading-progress"></div>
+    <canvas id="particle-canvas"></canvas>
+    
+    <div class="ambient-sonar w-[600px] h-[600px] bg-lime-600/15 top-[-10%] left-[-10%]"></div>
+    <div class="ambient-sonar w-[800px] h-[800px] bg-amber-600/10 bottom-[-10%] right-[-10%]"></div>
+
+    <!-- Info Drawer -->
+    <div id="info-drawer" class="fixed top-0 right-0 h-full w-full max-w-md bg-[#050a05]/95 backdrop-blur-3xl shadow-[-40px_0_80px_rgba(0,0,0,0.9)] z-[200] p-10 border-l border-lime-500/40 flex flex-col">
+        <button onclick="closeDrawer()" class="self-end p-3 bg-white/5 hover:bg-lime-500/20 rounded-full transition mb-6 text-slate-400 hover:text-lime-400">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-width="2.5" stroke-linecap="round"/></svg>
+        </button>
+        <div class="flex items-center gap-4 mb-8">
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-lime-400 to-green-600 flex items-center justify-center text-white font-black italic text-xl shadow-[0_0_30px_rgba(132,204,22,0.5)]">i</div>
+            <h3 id="drawer-title" class="text-2xl font-black text-white uppercase tracking-tighter">Videnscenter</h3>
+        </div>
+        <div id="drawer-content" class="text-slate-300 leading-relaxed space-y-6 font-medium text-sm overflow-y-auto pr-4"></div>
+        <div class="mt-auto pt-6">
+            <div class="p-6 bg-gradient-to-br from-lime-900/30 to-amber-900/30 rounded-3xl border border-white/10 shadow-inner">
+                <p class="text-[10px] font-black uppercase text-lime-400 tracking-widest mb-2 flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path d="M11 3a1 1 0 100 2h2.586l-6.293 6.293a1 1 0 101.414 1.414L15 6.414V9a1 1 0 102 0V4a1 1 0 00-1-1h-5z"/><path d="M5 5a2 2 0 00-2 2v8a2 2 0 002 2h8a2 2 0 002-2v-3a1 1 0 10-2 0v3H5V7h3a1 1 0 000-2H5z"/></svg>
+                    Eksamens-Tip
+                </p>
+                <p class="text-xs text-slate-400">Det er meget vigtigt, at du forstår at lyd <em>ikke kan eksistere i et vakuum</em> (som rummet). Lyd er mekaniske trykbølger, og uden et medie (som luft eller vand) at skubbe til, er der fuldstændig tavst!</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-50 bg-[#050a05]/90 backdrop-blur-2xl border-b border-white/5 shadow-md">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <a href="fysik_landing.html" class="group flex items-center gap-4 text-slate-300 font-bold uppercase text-xs tracking-widest hover:text-lime-400 transition">
+                <div class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center border border-white/10 group-hover:border-lime-500/50 group-hover:bg-lime-500/20 transition shadow-sm">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M10 19l-7-7m0 0l7-7m-7 7h18" stroke-width="2.5" stroke-linecap="round"/></svg>
+                </div>
+                Tilbage til Oversigt
+            </a>
+            <span class="px-5 py-2 rounded-full bg-lime-600/20 text-lime-400 font-black text-[10px] uppercase tracking-[0.2em] border border-lime-500/30 shadow-[0_0_15px_rgba(132,204,22,0.2)]">Spørgsmål 10</span>
+        </div>
+    </nav>
+
+    <main class="max-w-6xl mx-auto px-6 pt-20">
+        
+        <!-- Header -->
+        <header class="mb-32 text-center relative">
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-lime-600/15 blur-[150px] rounded-full pointer-events-none -z-10"></div>
+            <div class="inline-block mb-6 px-6 py-2 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 font-bold text-[10px] tracking-[0.25em] uppercase shadow-lg shadow-amber-500/20">
+                Fysik C • Bølger & Akustik
+            </div>
+            <h1 class="text-6xl md:text-8xl font-black tracking-tighter text-white mb-8 uppercase leading-[0.9]">
+                Lyd<span class="text-gradient">bølger</span>
+            </h1>
+            <p class="text-slate-400 text-lg md:text-xl max-w-3xl mx-auto font-medium leading-relaxed">
+                Når luften vibrerer. Forstå trykbølger, lær hvordan frekvens og amplitude skaber det vi hører, og se det visuelle bevis på Dopplereffekten.
+            </p>
+        </header>
+
+        <!-- AFSNIT 1: Længdebølger (Longitudinale bølger) -->
+        <section class="mb-40">
+            <div class="flex items-center gap-5 mb-12">
+                <div class="w-16 h-1 bg-gradient-to-r from-lime-400 to-green-500 rounded-full"></div>
+                <h2 class="text-sm font-black uppercase tracking-[0.4em] text-slate-300">I. Hvad er lyd egentlig?</h2>
+            </div>
+
+            <div class="glass-card p-10 md:p-16 border-t-4 border-lime-500">
+                <div class="flex flex-col lg:flex-row gap-16 items-center">
+                    <div class="flex-1 space-y-8">
+                        <div class="border-b border-white/10 pb-6">
+                            <h3 class="text-3xl font-bold text-white tracking-tight mb-4 flex items-center gap-4">
+                                Usynlige trykbølger
+                                <button onclick="openInfo('laengdeboelger')" class="i-btn">i</button>
+                            </h3>
+                            <p class="text-slate-400 font-medium leading-relaxed mb-4">
+                                I forrige spørgsmål så vi på <em>transversale bølger</em> (hvor snoren svingede op og ned, mens bølgen kørte fremad). Men lydbølger i luften er <strong>longitudinale bølger</strong> (længdebølger).
+                            </p>
+                            <p class="text-slate-400 font-medium leading-relaxed">
+                                Det betyder, at luftmolekylerne svinger frem og tilbage i <em>samme retning</em> som bølgen bevæger sig. Lyden skaber zoner, hvor molekylerne klemmes sammen (fortætninger) og zoner, hvor de trækkes fra hinanden (fortyndinger). Lyd er altså mikroskopiske ændringer i lufttrykket!
+                            </p>
+                        </div>
+                        
+                        <div class="p-8 bg-[#020502] rounded-3xl border border-lime-500/20 shadow-inner flex flex-col justify-center items-center gap-4 text-center">
+                            <h4 class="text-white font-bold mb-2">Lydens Fart (<em class="math-font text-lime-400">v</em>)</h4>
+                            <p class="text-sm text-slate-400 leading-relaxed mb-2">
+                                I atmosfærisk luft ved stuetemperatur bevæger disse trykbølger sig med cirka:
+                            </p>
+                            <span class="text-4xl font-black italic tracking-widest text-lime-400 math-font drop-shadow-md">
+                                340 m/s
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Længdebølge Simulator -->
+                    <div class="w-full lg:w-[450px]">
+                        <div class="lab-container p-6 flex flex-col relative border border-lime-500/20 shadow-2xl">
+                            <div class="absolute top-4 left-4 z-10">
+                                <span class="text-[10px] font-black uppercase text-slate-900 tracking-widest bg-lime-400 px-3 py-1 rounded-full shadow-lg">Luftmolekyle Simulator</span>
+                            </div>
+                            
+                            <div class="w-full h-64 mt-12 mb-6 bg-[#020502] rounded-2xl border border-white/10 relative overflow-hidden shadow-inner flex shrink-0">
+                                <canvas id="longitudinal-canvas" class="lab-canvas"></canvas>
+                                <!-- Højttaler ikon overlay til venstre -->
+                                <div class="absolute left-2 top-1/2 -translate-y-1/2 text-4xl opacity-50 drop-shadow-[0_0_10px_rgba(132,204,22,1)]">🔊</div>
+                            </div>
+                            
+                            <div class="bg-black/60 p-5 rounded-[2rem] border border-white/10 backdrop-blur-md text-center">
+                                <p class="text-[10px] text-slate-400 leading-relaxed">
+                                    Bemærk hvordan selve prikkerne (molekylerne) kun svinger en lille smule frem og tilbage om deres hvileposition, mens de tætte zoner (bølgen/energien) rejser tværs over skærmen!
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- AFSNIT 2: Frekvens & Amplitude (Oscilloskopet) -->
+        <section class="mb-40">
+            <div class="flex items-center gap-5 mb-12">
+                <div class="w-16 h-1 bg-gradient-to-r from-lime-500 to-amber-500 rounded-full"></div>
+                <h2 class="text-sm font-black uppercase tracking-[0.4em] text-lime-400">II. Tone og Lydstyrke</h2>
+            </div>
+
+            <div class="glass-card p-10 md:p-16 border-t-4 border-amber-500 relative overflow-hidden">
+                <div class="absolute -right-32 -top-32 w-[600px] h-[600px] bg-amber-600/10 rounded-full blur-[120px] pointer-events-none"></div>
+
+                <div class="flex flex-col lg:flex-row gap-16 items-center relative z-10">
+                    <div class="flex-1 space-y-8">
+                        <div class="border-b border-white/10 pb-6">
+                            <h3 class="text-3xl font-bold text-white tracking-tight mb-4 flex items-center gap-4">
+                                Hvad vi kan høre
+                                <button onclick="openInfo('hjemmefrekvens')" class="i-btn text-amber-400 border-amber-500/30 hover:bg-amber-500">i</button>
+                            </h3>
+                            <p class="text-slate-400 font-medium leading-relaxed mb-4">
+                                Selvom lyd i virkeligheden er længdebølger i luften, omdanner en mikrofon og et <strong>oscilloskop</strong> dem til transversale bølger på en skærm, så de er lettere at analysere.
+                            </p>
+                            <p class="text-slate-400 font-medium leading-relaxed">
+                                Her kan vi tydeligt se to ting: Bølgens <strong>Frekvens</strong> (hvor tæt bølgerne ligger) bestemmer selve <em>tonen</em>. Bølgens <strong>Amplitude</strong> (hvor høje bølgerne er) bestemmer lydens <em>styrke</em>.
+                            </p>
+                        </div>
+                        
+                        <div class="grid grid-cols-2 gap-4 text-center">
+                            <div class="p-6 bg-[#020502] rounded-3xl border border-amber-500/20 shadow-inner">
+                                <span class="text-[10px] font-black uppercase text-amber-400 tracking-widest block mb-2">Lys / Mørk Tone</span>
+                                <span class="text-2xl font-black italic text-white math-font block">Frekvens (Hz)</span>
+                            </div>
+                            <div class="p-6 bg-[#020502] rounded-3xl border border-lime-500/20 shadow-inner">
+                                <span class="text-[10px] font-black uppercase text-lime-400 tracking-widest block mb-2">Lydstyrken</span>
+                                <span class="text-2xl font-black italic text-white math-font block">Amplitude</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- CRT Oscilloskop Simulator -->
+                    <div class="w-full lg:w-[450px]">
+                        <div class="lab-container p-6 flex flex-col relative border border-lime-500/30 shadow-[0_0_40px_rgba(132,204,22,0.15)] bg-[#021002]">
+                            <div class="absolute top-4 left-4 z-10 flex gap-2 items-center">
+                                <span class="text-[10px] font-black uppercase text-black tracking-widest bg-lime-400 px-3 py-1 rounded-full shadow-lg border border-lime-300">OSCILLOSKOP CRT</span>
+                                <div class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></div>
+                            </div>
+                            
+                            <div class="flex gap-4 mt-12 mb-6">
+                                <div class="flex-1 h-64 bg-[#010801] rounded-xl border-4 border-[#113311] relative overflow-hidden shadow-[inset_0_0_50px_rgba(0,0,0,1)] flex shrink-0">
+                                    <!-- Gitter overlay -->
+                                    <div class="absolute inset-0 pointer-events-none opacity-20 bg-[linear-gradient(#22c55e_1px,transparent_1px),linear-gradient(90deg,#22c55e_1px,transparent_1px)] bg-[size:20px_20px]"></div>
+                                    <canvas id="oscillo-canvas" class="lab-canvas"></canvas>
+                                    <!-- CRT Scanline effekt -->
+                                    <div class="absolute inset-0 pointer-events-none bg-[linear-gradient(rgba(255,255,255,0),rgba(255,255,255,0)_50%,rgba(0,0,0,0.1)_50%,rgba(0,0,0,0.1))] bg-[size:100%_4px]"></div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-[#051505] p-5 rounded-2xl border border-lime-900/50 space-y-5">
+                                <div>
+                                    <div class="flex justify-between items-center mb-2">
+                                        <span class="text-[10px] font-black text-lime-600 uppercase tracking-widest">Tone (Frekvens)</span>
+                                        <span id="osc-freq-label" class="text-[10px] font-black text-lime-400 font-mono">440 Hz</span>
+                                    </div>
+                                    <input type="range" id="osc-freq-slider" min="100" max="1000" step="10" value="440" class="w-full h-2 bg-[#021002] rounded-lg appearance-none cursor-pointer accent-lime-500 border border-lime-900/50">
+                                </div>
+                                <div>
+                                    <div class="flex justify-between items-center mb-2">
+                                        <span class="text-[10px] font-black text-lime-600 uppercase tracking-widest">Styrke (Amplitude)</span>
+                                        <span id="osc-amp-label" class="text-[10px] font-black text-lime-400 font-mono">Norm</span>
+                                    </div>
+                                    <input type="range" id="osc-amp-slider" min="0" max="100" step="1" value="50" class="w-full h-2 bg-[#021002] rounded-lg appearance-none cursor-pointer accent-lime-500 border border-lime-900/50">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- AFSNIT 3: Dopplereffekten -->
+        <section class="mb-40">
+            <div class="flex items-center gap-5 mb-12">
+                <div class="w-16 h-1 bg-gradient-to-r from-amber-500 to-red-500 rounded-full"></div>
+                <h2 class="text-sm font-black uppercase tracking-[0.4em] text-amber-400">III. Sirenen der nærmer sig</h2>
+            </div>
+
+            <div class="glass-card p-10 md:p-16 border-t-4 border-amber-500">
+                <div class="flex flex-col lg:flex-row gap-16 items-start">
+                    
+                    <div class="flex-1 space-y-8">
+                        <div class="border-b border-white/10 pb-6">
+                            <h3 class="text-3xl font-bold text-white tracking-tight flex items-center gap-3 mb-4">
+                                Dopplereffekten
+                                <button onclick="openInfo('doppler')" class="i-btn text-amber-400 border-amber-500/30 hover:bg-amber-500 shadow-[0_0_15px_rgba(245,158,11,0.3)]">i</button>
+                            </h3>
+                            <p class="text-slate-400 font-medium leading-relaxed">
+                                Du har garanteret oplevet det: En ambulance kommer kørende mod dig. Mens den nærmer sig, lyder sirenen lys og insisterende (høj frekvens). I det øjeblik den passerer og kører væk, falder lyden pludselig til en mørkere tone (lav frekvens).
+                            </p>
+                            <p class="text-slate-400 font-medium leading-relaxed mt-4">
+                                Dette kaldes <strong>Dopplereffekten</strong>. Det sker, fordi lydbølgerne foran køretøjet "presses sammen", fordi bilen flytter sig efter lyden. Bagved bilen bliver bølgerne derimod trukket fra hinanden.
+                            </p>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <div class="bg-[#020502] border border-lime-500/20 p-6 rounded-3xl text-center shadow-inner">
+                                <h4 class="text-lime-400 font-bold mb-2 uppercase tracking-widest text-xs">Foran kilden</h4>
+                                <p class="text-xs text-slate-400 leading-relaxed">Bølgelængden (λ) bliver kortere. Derfor <em>stiger</em> frekvensen (lysere tone).</p>
+                            </div>
+                            <div class="bg-[#020502] border border-amber-500/20 p-6 rounded-3xl text-center shadow-inner">
+                                <h4 class="text-amber-400 font-bold mb-2 uppercase tracking-widest text-xs">Bagved kilden</h4>
+                                <p class="text-xs text-slate-400 leading-relaxed">Bølgelængden (λ) trækkes ud. Derfor <em>falder</em> frekvensen (mørkere tone).</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Doppler Simulator -->
+                    <div class="w-full lg:w-[500px]">
+                        <div class="lab-container p-6 flex flex-col relative border border-amber-500/20 shadow-2xl bg-black">
+                            <div class="absolute top-4 left-4 z-10 flex gap-2">
+                                <span class="text-[10px] font-black uppercase text-slate-900 tracking-widest bg-amber-400 px-3 py-1 rounded-full shadow-lg">Doppler Lab</span>
+                                <button onclick="openInfo('mach_kegle')" class="i-btn text-amber-400 border-amber-500/30 hover:bg-amber-500 shadow-none">i</button>
+                            </div>
+                            
+                            <div class="flex justify-center mt-14 mb-6 relative">
+                                <!-- Simulator Canvas -->
+                                <div class="w-full h-64 bg-[#0a0f0a] rounded-2xl border border-slate-700 relative overflow-hidden shadow-[inset_0_0_30px_rgba(0,0,0,0.8)] flex items-center justify-center shrink-0">
+                                    <canvas id="doppler-canvas" class="lab-canvas absolute inset-0"></canvas>
+                                    
+                                    <!-- Observation points -->
+                                    <div class="absolute left-6 top-1/2 -translate-y-1/2 w-4 h-4 bg-amber-500 rounded-full border-2 border-white shadow-[0_0_10px_orange] z-10 flex items-center justify-center"><div class="text-[8px]">👤</div></div>
+                                    <div class="absolute right-6 top-1/2 -translate-y-1/2 w-4 h-4 bg-lime-500 rounded-full border-2 border-white shadow-[0_0_10px_lime] z-10 flex items-center justify-center"><div class="text-[8px]">👤</div></div>
+                                </div>
+                            </div>
+                            
+                            <!-- Controls & Live Data -->
+                            <div class="bg-slate-900/60 p-5 rounded-[2rem] border border-white/10 backdrop-blur-md space-y-4">
+                                <div>
+                                    <div class="flex justify-between items-center mb-2">
+                                        <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Kildens Fart (<em class="text-white">v<sub>kilde</sub></em>)</span>
+                                        <span id="doppler-speed-val" class="text-[10px] font-black text-white bg-amber-600/30 px-2 py-1 rounded border border-amber-500/30">Lydløs (0 Mach)</span>
+                                    </div>
+                                    <!-- Slider from 0 to 1.5 Mach -->
+                                    <input type="range" id="doppler-speed-slider" min="0" max="1.5" step="0.05" value="0.5" class="input-range accent-amber-400 h-1.5">
+                                </div>
+                                <p class="text-[9px] text-center text-slate-500 mt-2">Prøv at skrue bilen op til <strong class="text-red-400">Mach 1+</strong> (over lydens hastighed) for at skabe et Sonic Boom!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Eksamens Disposition -->
+        <footer class="bg-gradient-to-b from-[#0a0f0a] to-[#020502] rounded-[3rem] p-12 md:p-16 text-center text-white relative overflow-hidden shadow-[0_20px_60px_-15px_rgba(0,0,0,1)] border border-white/5 mb-10">
+            <div class="relative z-10">
+                <span class="text-[10px] font-black uppercase tracking-[0.4em] text-lime-400 mb-6 block drop-shadow-[0_0_10px_rgba(132,204,22,0.8)]">Oversigt til Eksamen</span>
+                <h3 class="text-4xl font-black mb-12 italic text-white">Tjekliste til Tavlen</h3>
+                <div class="text-left max-w-3xl mx-auto space-y-6 mb-14 bg-white/5 p-8 md:p-12 rounded-[2.5rem] border border-white/10 backdrop-blur-md">
+                    
+                    <div class="flex gap-6">
+                        <div class="w-8 h-8 rounded-full bg-slate-800 text-slate-300 flex items-center justify-center flex-shrink-0 border border-slate-600 font-black text-sm shadow-inner">1</div>
+                        <div>
+                            <h5 class="font-bold text-white mb-2 text-lg">Lydens Natur (Longitudinale bølger)</h5>
+                            <p class="text-slate-400 text-sm leading-relaxed">Forklar at lyd ikke er noget, der flyver fra A til B, men derimod trykbølger. Molekylerne svinger frem og tilbage (længdebølger) og skaber fortætninger og fortyndinger i luften. Lyd har brug for et medie (ingen lyd i rummet).</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex gap-6">
+                        <div class="w-8 h-8 rounded-full bg-lime-900/50 text-lime-400 flex items-center justify-center flex-shrink-0 border border-lime-500/50 font-black text-sm shadow-inner">2</div>
+                        <div>
+                            <h5 class="font-bold text-white mb-2 text-lg">Frekvens og Amplitude</h5>
+                            <p class="text-slate-400 text-sm leading-relaxed">Tegn et oscilloskop-billede (en transversalbølge) for at gøre det lettere at forklare. Frekvensen (bølgernes tæthed) bestemmer <strong>tonen</strong> (høj hz = lys tone). Amplituden (bølgens højde) bestemmer <strong>lydstyrken</strong>.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex gap-6">
+                        <div class="w-8 h-8 rounded-full bg-amber-900/50 text-amber-400 flex items-center justify-center flex-shrink-0 border border-amber-500/50 font-black text-sm shadow-inner">3</div>
+                        <div>
+                            <h5 class="font-bold text-white mb-2 text-lg">Bølgeligningen</h5>
+                            <p class="text-slate-400 text-sm leading-relaxed">Skriv formlen: <em class="math-font text-white bg-white/10 px-1.5 py-0.5 rounded mx-1 shadow-inner">v = f · λ</em>. Nævn at lydens fart i luft (ved 20°C) er ca. 340 m/s. Farten er konstant, så hvis frekvensen stiger, <em>må</em> bølgelængden (λ) blive kortere.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex gap-6">
+                        <div class="w-8 h-8 rounded-full bg-red-900/50 text-red-400 flex items-center justify-center flex-shrink-0 border border-red-500/50 font-black text-sm shadow-inner">4</div>
+                        <div>
+                            <h5 class="font-bold text-white mb-2 text-lg">Dopplereffekten</h5>
+                            <p class="text-slate-400 text-sm leading-relaxed">Tegn cirklerne der presses sammen foran en kørende bil. Forklar kvalitativt: Når kilden nærmer sig, presses bølgerne sammen (kortere λ), hvilket giver en højere frekvens/lysere tone. Når kilden kører væk, trækkes de fra hinanden (længere λ), hvilket giver en mørkere tone.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="absolute -top-32 -left-32 w-[50rem] h-[50rem] bg-lime-600/10 rounded-full blur-[200px] pointer-events-none"></div>
+            <div class="absolute -bottom-32 -right-32 w-[50rem] h-[50rem] bg-amber-600/10 rounded-full blur-[200px] pointer-events-none"></div>
+        </footer>
+
+    </main>
+
+    <script>
+        // --- DATA TIL VIDENS-SKUFFE ---
+        const infoData = {
+            'laengdeboelger': {
+                title: 'Longitudinale Bølger',
+                text: 'Lyd er <strong>longitudinale bølger</strong> (længdebølger). Det betyder, at svingningerne foregår parallelt med udbredelsesretningen.<br><br>Forestil dig en lang, blød fjeder: Puffer du til den i den ene ende, rejser der sig en bølge af "sammenpressede ringe" ned langs fjederen. I luften er "ringene" luftmolekyler, som skubbes sammen til et højt tryk (fortætning) og derefter trækkes fra hinanden til et lavt tryk (fortynding). Vores trommehinde opfanger disse trykændringer!'
+            },
+            'hjemmefrekvens': {
+                title: 'Frekvenser for mennesker',
+                text: 'Menneskets øre kan typisk opfatte frekvenser i intervallet <strong>20 Hz til 20.000 Hz</strong>.<br><br>Alt under 20 Hz kaldes <em>infralyd</em> (som f.eks. jordskælv og elefanters rumlen).<br>Alt over 20.000 Hz kaldes <em>ultralyd</em> (som f.eks. flagermus og hunde-fløjter bruger).'
+            },
+            'doppler': {
+                title: 'Dopplereffekten',
+                text: 'Dette fænomen gælder for alle bølger (også lys!), når enten afsenderen eller modtageren bevæger sig.<br><br>Forestil dig, at du kaster en sten i vandet en gang i sekundet fra en båd. Bølgerne vil danne perfekte ringe udenom dig. Men hvis båden begynder at sejle fremad, vil den kaste den næste sten <em>tættere</em> på den bølge, den lige har lavet foran sig. Bølgerne foran båden presses tættere sammen (højere frekvens), og bølgerne bag båden trækkes fra hinanden (lavere frekvens).'
+            },
+            'mach_kegle': {
+                title: 'Sonic Boom (Mach 1)',
+                text: 'Hvad sker der, hvis kilden (f.eks. et jetfly) bevæger sig præcis lige så hurtigt som de lydbølger, det udsender? (Altså Mach 1 = 340 m/s).<br><br>Flyet vil hele tiden "indhente" sine egne lydbølger. Alle bølgetoppene vil bygge sig op ovenpå hinanden foran flyet og danne en massiv mur af tryk: Lydmuren.<br><br>Bryder flyet lydmuren (Mach 1+), trækker det en kegleformet chokbølge efter sig (Mach-keglen). Når keglen rammer jorden, hører vi et gigantisk knald, kendt som et <strong>Sonic Boom</strong>.'
+            }
+        };
+
+        function openInfo(key) {
+            const data = infoData[key];
+            document.getElementById('drawer-title').innerText = data.title;
+            document.getElementById('drawer-content').innerHTML = `<p>${data.text}</p>`;
+            document.getElementById('info-drawer').classList.add('open');
+        }
+
+        function closeDrawer() {
+            document.getElementById('info-drawer').classList.remove('open');
+        }
+
+        // --- SIKKER CANVAS HÅNDTERING ---
+        const longState = { w: 0, h: 0, time: 0 };
+        const oscState = { w: 0, h: 0, time: 0 };
+        const dopState = { w: 0, h: 0, time: 0 };
+
+        let longCtx, oscCtx, dopCtx;
+
+        function attachResizer(canvasId, state) {
+            const canvas = document.getElementById(canvasId);
+            const parent = canvas.parentElement;
+            const ctx = canvas.getContext('2d');
+            
+            const ro = new ResizeObserver(entries => {
+                for (let entry of entries) {
+                    const { width, height } = entry.contentRect;
+                    if (width > 0 && height > 0) {
+                        const dp = window.devicePixelRatio || 1;
+                        canvas.width = width * dp;
+                        canvas.height = height * dp;
+                        canvas.style.width = width + "px";
+                        canvas.style.height = height + "px";
+                        ctx.setTransform(1, 0, 0, 1, 0, 0);
+                        ctx.scale(dp, dp);
+                        state.w = width;
+                        state.h = height;
+                    }
+                }
+            });
+            ro.observe(parent);
+            return ctx;
+        }
+
+        // --- 1. LÆNGDEBØLGE SIMULATOR ---
+        // Generer molekyler i et grid
+        const numCols = 40;
+        const numRows = 10;
+        let molecules = [];
+        
+        function initLongitudinalMolecules() {
+            molecules = [];
+            for (let c = 0; c < numCols; c++) {
+                for (let r = 0; r < numRows; r++) {
+                    molecules.push({
+                        baseX: c / (numCols - 1), // Normaliseret (0-1)
+                        baseY: (r + 1) / (numRows + 1), // Normaliseret
+                        randomOffsetX: (Math.random() - 0.5) * 0.02,
+                        randomOffsetY: (Math.random() - 0.5) * 0.02
+                    });
+                }
+            }
+        }
+        initLongitudinalMolecules();
+
+        function drawLongitudinal() {
+            if (longState.w === 0 || longState.h === 0) {
+                requestAnimationFrame(drawLongitudinal);
+                return;
+            }
+
+            longCtx.clearRect(0, 0, longState.w, longState.h);
+            
+            // Hastighed for bølgen
+            longState.time += 0.05;
+
+            // Bølgen parametre
+            const amplitude = longState.w * 0.04; 
+            const k = Math.PI * 4; // Bølgetal (2 bølgelængder på skærmen)
+
+            longCtx.fillStyle = '#84cc16'; // Lime
+            
+            molecules.forEach(m => {
+                // Den fysiske beregning: x = x0 + A * sin(k * x0 - w * t)
+                // Molekylerne svinger frem og tilbage om deres hvileposition!
+                const displacement = Math.sin(k * m.baseX - longState.time) * amplitude;
+                
+                const drawX = (m.baseX + m.randomOffsetX) * longState.w + displacement;
+                const drawY = (m.baseY + m.randomOffsetY) * longState.h;
+
+                longCtx.beginPath();
+                longCtx.arc(drawX, drawY, 2, 0, Math.PI * 2);
+                longCtx.fill();
+            });
+
+            requestAnimationFrame(drawLongitudinal);
+        }
+
+        // --- 2. OSCILLOSKOP SIMULATOR ---
+        const oscFreqSlider = document.getElementById('osc-freq-slider');
+        const oscAmpSlider = document.getElementById('osc-amp-slider');
+        const oscFreqLabel = document.getElementById('osc-freq-label');
+        const oscAmpLabel = document.getElementById('osc-amp-label');
+
+        function drawOscilloscope() {
+            if (oscState.w === 0 || oscState.h === 0) {
+                requestAnimationFrame(drawOscilloscope);
+                return;
+            }
+
+            // Gammel CRT fade effekt
+            oscCtx.fillStyle = 'rgba(1, 8, 1, 0.2)'; 
+            oscCtx.fillRect(0, 0, oscState.w, oscState.h);
+
+            const f = parseInt(oscFreqSlider.value); // 100 til 1000
+            const a = parseInt(oscAmpSlider.value); // 0 til 100
+            
+            oscFreqLabel.innerText = f + " Hz";
+            if(a < 30) oscAmpLabel.innerText = "Svag";
+            else if(a < 70) oscAmpLabel.innerText = "Norm";
+            else oscAmpLabel.innerText = "Høj";
+
+            // Map UI to physics
+            // Frequency affects how many waves we see. Speed is constant, so higher f = smaller lambda
+            const lambda = oscState.w / (f / 100); 
+            // Amplitude pixels
+            const currentAmplitude = (a / 100) * (oscState.h * 0.4);
+            const yOffset = oscState.h / 2;
+
+            oscState.time += (f/100) * 0.1; // Animation speed
+
+            oscCtx.beginPath();
+            const k = (Math.PI * 2) / lambda;
+            
+            for (let x = 0; x <= oscState.w; x += 2) {
+                const y = yOffset + currentAmplitude * Math.sin(k * x - oscState.time);
+                if (x === 0) oscCtx.moveTo(x, y);
+                else oscCtx.lineTo(x, y);
+            }
+            
+            // CRT Green Glow
+            oscCtx.strokeStyle = '#22c55e'; // Green 500
+            oscCtx.lineWidth = 3;
+            oscCtx.lineCap = 'round';
+            oscCtx.shadowBlur = 15;
+            oscCtx.shadowColor = '#4ade80'; // Lighter green glow
+            oscCtx.stroke();
+            oscCtx.shadowBlur = 0;
+
+            requestAnimationFrame(drawOscilloscope);
+        }
+
+        // --- 3. DOPPLER SIMULATOR ---
+        const dopSpeedSlider = document.getElementById('doppler-speed-slider');
+        const dopSpeedLabel = document.getElementById('doppler-speed-val');
+        
+        let dopRings = [];
+        let dopSource = { x: -50 }; // Starter lidt udenfor
+
+        function drawDoppler() {
+            if (dopState.w === 0 || dopState.h === 0) {
+                requestAnimationFrame(drawDoppler);
+                return;
+            }
+
+            dopCtx.clearRect(0, 0, dopState.w, dopState.h);
+            
+            const mach = parseFloat(dopSpeedSlider.value); // 0 til 1.5
+            
+            if(mach === 0) dopSpeedLabel.innerText = "Stille (0 Mach)";
+            else if(mach < 0.5) dopSpeedLabel.innerText = "Bykørsel (0.3 Mach)";
+            else if(mach < 1.0) dopSpeedLabel.innerText = "Hurtig (0.8 Mach)";
+            else if(mach === 1.0) dopSpeedLabel.innerText = "Lydmuren (1.0 Mach)";
+            else {
+                dopSpeedLabel.innerHTML = "<span class='text-red-400'>Supersonisk (1.5 Mach)</span>";
+            }
+
+            const c = 3; // Lydens hastighed (pixels per frame i simulationen)
+            const v_s = mach * c; // Kildens hastighed
+
+            // Opdater kildens position
+            dopSource.x += v_s;
+            
+            // Hvis den kører af skærmen, reset (inkl. ringe)
+            if (dopSource.x > dopState.w + 100) {
+                dopSource.x = -50;
+                dopRings = [];
+            }
+
+            dopState.time++;
+
+            // Emit en ny lydbølge hver N frames, BARE kilden er på skærmen (ca.)
+            // Undgå dog at spamme hvis den holder helt stille
+            if (dopState.time % 12 === 0) {
+                dopRings.push({
+                    x: dopSource.x,
+                    y: dopState.h / 2,
+                    radius: 0
+                });
+            }
+
+            // Opdater og tegn alle ringe
+            for (let i = dopRings.length - 1; i >= 0; i--) {
+                let r = dopRings[i];
+                r.radius += c; // Ringene vokser med lydens hastighed c
+                
+                if (r.radius > dopState.w * 1.5) {
+                    dopRings.splice(i, 1); // Fjern gamle ringe
+                    continue;
+                }
+
+                dopCtx.beginPath();
+                dopCtx.arc(r.x, r.y, r.radius, 0, Math.PI * 2);
+                dopCtx.strokeStyle = `rgba(245, 158, 11, ${Math.max(0, 1 - r.radius/(dopState.w*0.8))})`; // Amber fader ud
+                dopCtx.lineWidth = 2;
+                dopCtx.stroke();
+            }
+
+            // Tegn selve kilden (Bilen/Flyet)
+            dopCtx.beginPath();
+            dopCtx.arc(dopSource.x, dopState.h / 2, 6, 0, Math.PI * 2);
+            dopCtx.fillStyle = '#fff';
+            dopCtx.shadowBlur = 10;
+            dopCtx.shadowColor = '#fff';
+            dopCtx.fill();
+            dopCtx.shadowBlur = 0;
+
+            requestAnimationFrame(drawDoppler);
+        }
+
+        // --- BACKGROUND SONAR PARTICLES ---
+        const bgCanvas = document.getElementById('particle-canvas');
+        const bgCtx = bgCanvas.getContext('2d');
+        let bgRings = [];
+        let globalBgTime = 0;
+        
+        function initBg() {
+            bgCanvas.width = window.innerWidth; 
+            bgCanvas.height = window.innerHeight;
+            bgRings = [];
+        }
+        
+        function animateBg() {
+            bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
+            globalBgTime++;
+
+            // Tilføj nye ringe tilfældigt
+            if(globalBgTime % 60 === 0 && Math.random() > 0.3) {
+                bgRings.push({
+                    x: Math.random() * bgCanvas.width,
+                    y: Math.random() * bgCanvas.height,
+                    radius: 0,
+                    maxRadius: 200 + Math.random()*300,
+                    color: Math.random() > 0.5 ? '132, 204, 22' : '245, 158, 11' // Lime or Amber
+                });
+            }
+
+            for(let i=bgRings.length-1; i>=0; i--) {
+                let r = bgRings[i];
+                r.radius += 1; // Expanderer langsomt
+                
+                let alpha = 1 - (r.radius / r.maxRadius);
+                
+                if(alpha <= 0) {
+                    bgRings.splice(i, 1);
+                } else {
+                    bgCtx.beginPath();
+                    bgCtx.arc(r.x, r.y, r.radius, 0, Math.PI*2);
+                    bgCtx.strokeStyle = `rgba(${r.color}, ${alpha * 0.3})`; // Svag opacity
+                    bgCtx.lineWidth = 1;
+                    bgCtx.stroke();
+                }
+            }
+            requestAnimationFrame(animateBg);
+        }
+
+        window.addEventListener('resize', initBg);
+        
+        window.onload = () => { 
+            // Initialize resizers
+            longCtx = attachResizer('longitudinal-canvas', longState);
+            oscCtx = attachResizer('oscillo-canvas', oscState);
+            dopCtx = attachResizer('doppler-canvas', dopState);
+            
+            initBg(); 
+            animateBg(); 
+            requestAnimationFrame(drawLongitudinal);
+            requestAnimationFrame(drawOscilloscope);
+            requestAnimationFrame(drawDoppler);
+        };
+    </script>
+</body>
+</html>

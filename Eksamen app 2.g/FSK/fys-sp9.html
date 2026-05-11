@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>09. Stående Bølger | FysikQuest C</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Bølger & Lys Tema (Cyan / Indigo) */
+            --primary: #06b6d4; /* Cyan 500 */
+            --primary-glow: rgba(6, 182, 212, 0.4);
+            --secondary: #6366f1; /* Indigo 500 */
+            --accent: #8b5cf6; /* Violet 500 */
+            
+            --slate-bg: #040812; /* Dyb, mørk ocean-blå */
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--slate-bg);
+            color: #f8fafc;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+            background-image: 
+                linear-gradient(rgba(6, 182, 212, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(6, 182, 212, 0.05) 1px, transparent 1px);
+            background-size: 50px 50px;
+        }
+
+        #particle-canvas {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -2; pointer-events: none; opacity: 0.6;
+        }
+
+        .ambient-wave {
+            position: fixed; border-radius: 50%; filter: blur(150px);
+            z-index: -1; pointer-events: none; opacity: 0.5;
+        }
+
+        .glass-card {
+            background: rgba(10, 15, 25, 0.85);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(6, 182, 212, 0.2);
+            border-radius: 2.5rem;
+            transition: all 0.5s var(--ease-out-expo);
+            box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.8);
+        }
+
+        .glass-card:hover {
+            box-shadow: 0 25px 60px -10px var(--primary-glow);
+            border-color: rgba(6, 182, 212, 0.4);
+        }
+
+        #info-drawer {
+            transform: translateX(100%);
+            transition: transform 0.6s var(--ease-out-expo);
+        }
+        #info-drawer.open { transform: translateX(0); }
+
+        .text-gradient {
+            @apply text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-500 to-indigo-400 drop-shadow-[0_0_20px_rgba(6,182,212,0.5)];
+        }
+
+        #reading-progress {
+            position: fixed; top: 0; left: 0; height: 5px;
+            background: linear-gradient(to right, #22d3ee, #06b6d4, #6366f1);
+            z-index: 100; width: 0%;
+            box-shadow: 0 0 20px rgba(6, 182, 212, 0.8);
+        }
+
+        .math-font { font-family: 'Space Grotesk', sans-serif; }
+
+        .lab-container {
+            background: #020617;
+            border-radius: 2rem;
+            position: relative;
+            overflow: hidden;
+            box-shadow: inset 0 0 60px rgba(0,0,0,0.8);
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        /* Vigtigt: Sørger for at canvas ikke collapses */
+        .lab-canvas { 
+            position: absolute; inset: 0; width: 100%; height: 100%; display: block; outline: none; 
+        }
+
+        .i-btn {
+            @apply w-8 h-8 rounded-full bg-white/10 text-cyan-400 flex items-center justify-center text-xs font-black hover:bg-cyan-500 hover:text-white transition-all shadow-[0_0_15px_rgba(6,182,212,0.3)] border border-cyan-500/30 cursor-pointer flex-shrink-0 z-10;
+        }
+
+        .input-range {
+            @apply w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-cyan-500 outline-none;
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
+        ::-webkit-scrollbar-thumb { background: rgba(6, 182, 212, 0.5); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(6, 182, 212, 0.8); }
+    </style>
+</head>
+<body class="min-h-screen pb-40">
+
+    <div id="reading-progress"></div>
+    <canvas id="particle-canvas"></canvas>
+    
+    <div class="ambient-wave w-[600px] h-[600px] bg-cyan-600/15 top-[-10%] left-[-10%]"></div>
+    <div class="ambient-wave w-[800px] h-[800px] bg-indigo-600/15 bottom-[-10%] right-[-10%]"></div>
+
+    <!-- Info Drawer -->
+    <div id="info-drawer" class="fixed top-0 right-0 h-full w-full max-w-md bg-[#020612]/95 backdrop-blur-3xl shadow-[-40px_0_80px_rgba(0,0,0,0.9)] z-[200] p-10 border-l border-cyan-500/40 flex flex-col">
+        <button onclick="closeDrawer()" class="self-end p-3 bg-white/5 hover:bg-cyan-500/20 rounded-full transition mb-6 text-slate-400 hover:text-cyan-400">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-width="2.5" stroke-linecap="round"/></svg>
+        </button>
+        <div class="flex items-center gap-4 mb-8">
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-cyan-400 to-indigo-600 flex items-center justify-center text-white font-black italic text-xl shadow-[0_0_30px_rgba(6,182,212,0.5)]">i</div>
+            <h3 id="drawer-title" class="text-2xl font-black text-white uppercase tracking-tighter">Videnscenter</h3>
+        </div>
+        <div id="drawer-content" class="text-slate-300 leading-relaxed space-y-6 font-medium text-sm overflow-y-auto pr-4"></div>
+        <div class="mt-auto pt-6">
+            <div class="p-6 bg-gradient-to-br from-cyan-900/30 to-indigo-900/30 rounded-3xl border border-white/10 shadow-inner">
+                <p class="text-[10px] font-black uppercase text-cyan-400 tracking-widest mb-2 flex items-center gap-2">Eksamens-Tip</p>
+                <p class="text-xs text-slate-400">Det er centralt, at du kan forklare, at en bølge udelukkende er transport af <strong>energi</strong>, ikke af stof. Gør du amplituden dobbelt så stor, bærer bølgen fire gange så meget energi!</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-50 bg-[#040812]/90 backdrop-blur-2xl border-b border-white/5 shadow-md">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <a href="fysik_landing.html" class="group flex items-center gap-4 text-slate-300 font-bold uppercase text-xs tracking-widest hover:text-cyan-400 transition">
+                <div class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center border border-white/10 group-hover:border-cyan-500/50 group-hover:bg-cyan-500/20 transition shadow-sm">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M10 19l-7-7m0 0l7-7m-7 7h18" stroke-width="2.5" stroke-linecap="round"/></svg>
+                </div>
+                Tilbage til Oversigt
+            </a>
+            <span class="px-5 py-2 rounded-full bg-cyan-600/20 text-cyan-400 font-black text-[10px] uppercase tracking-[0.2em] border border-cyan-500/30 shadow-[0_0_15px_rgba(6,182,212,0.2)]">Spørgsmål 09</span>
+        </div>
+    </nav>
+
+    <main class="max-w-6xl mx-auto px-6 pt-20">
+        
+        <!-- Header -->
+        <header class="mb-32 text-center relative">
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-cyan-600/15 blur-[150px] rounded-full pointer-events-none -z-10"></div>
+            <div class="inline-block mb-6 px-6 py-2 rounded-full bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 font-bold text-[10px] tracking-[0.25em] uppercase shadow-lg shadow-indigo-500/20">
+                Fysik C • Bølger & Lys
+            </div>
+            <h1 class="text-6xl md:text-8xl font-black tracking-tighter text-white mb-8 uppercase leading-[0.9]">
+                Stående <br><span class="text-gradient">Bølger</span>
+            </h1>
+            <p class="text-slate-400 text-lg md:text-xl max-w-3xl mx-auto font-medium leading-relaxed">
+                Når energi rejser uden at flytte stof. Forstå bølgeligningen, oplev hvordan energien afhænger af amplituden, og mestre de harmoniske mønstre på en vibrerende snor.
+            </p>
+        </header>
+
+        <!-- AFSNIT 1: Bølgens Anatomi -->
+        <section class="mb-40">
+            <div class="flex items-center gap-5 mb-12">
+                <div class="w-16 h-1 bg-gradient-to-r from-cyan-400 to-indigo-500 rounded-full"></div>
+                <h2 class="text-sm font-black uppercase tracking-[0.4em] text-slate-300">I. Bølgens Anatomi & Ligning</h2>
+            </div>
+
+            <div class="glass-card p-10 md:p-16 border-t-4 border-cyan-500">
+                <div class="flex flex-col lg:flex-row gap-16 items-center">
+                    <div class="flex-1 space-y-8">
+                        <div class="border-b border-white/10 pb-6">
+                            <h3 class="text-3xl font-bold text-white tracking-tight mb-4 flex items-center gap-4">
+                                Den grundlæggende formel
+                                <button onclick="openInfo('boelgeligningen')" class="i-btn">i</button>
+                            </h3>
+                            <p class="text-slate-400 font-medium leading-relaxed mb-4">
+                                En bølge er udbredelse af en forstyrrelse i et medie. Det fantastiske er, at bølgen bevæger sig fremad, uden at selve mediet flytter sig blivende (tænk på "bølgen" på et fodboldstadion).
+                            </p>
+                            <p class="text-slate-400 font-medium leading-relaxed">
+                                Den vigtigste ligning til at beskrive denne rejse kaldes <strong>Bølgeligningen</strong>. Den forbinder bølgens udbredelsesfart (v) med dens frekvens (f) og bølgelængde (λ).
+                            </p>
+                        </div>
+                        
+                        <div class="p-8 bg-[#020612] rounded-3xl border border-cyan-500/20 shadow-inner flex flex-col justify-center items-center gap-4">
+                            <span class="text-[10px] font-black uppercase text-cyan-400 tracking-widest">Bølgeligningen</span>
+                            <span class="text-5xl font-black italic tracking-widest text-white math-font text-center drop-shadow-md">
+                                v = f · λ
+                            </span>
+                            <div class="flex gap-6 w-full justify-center mt-4 text-xs font-bold text-slate-500">
+                                <div class="text-center"><span class="text-cyan-400 block mb-1">v:</span> Fart (m/s)</div>
+                                <div class="text-center"><span class="text-indigo-400 block mb-1">f:</span> Frekvens (Hz)</div>
+                                <div class="text-center"><span class="text-purple-400 block mb-1">λ:</span> Bølgelængde (m)</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Bølge Anatomi Simulator -->
+                    <div class="w-full lg:w-[450px]">
+                        <div class="lab-container p-6 flex flex-col relative border border-cyan-500/20 shadow-2xl">
+                            <div class="absolute top-4 left-4 z-10">
+                                <span class="text-[10px] font-black uppercase text-slate-900 tracking-widest bg-cyan-400 px-3 py-1 rounded-full shadow-lg">Skridende Bølge (Transversal)</span>
+                            </div>
+                            
+                            <div class="w-full h-64 mt-12 mb-6 bg-[#020612] rounded-2xl border border-white/10 relative overflow-hidden shadow-inner flex shrink-0">
+                                <canvas id="traveling-wave-canvas" class="lab-canvas"></canvas>
+                            </div>
+                            
+                            <div class="bg-black/60 p-5 rounded-[2rem] border border-white/10 backdrop-blur-md space-y-4">
+                                <div>
+                                    <div class="flex justify-between items-center mb-2">
+                                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Frekvens (f)</span>
+                                        <span id="tw-freq-label" class="text-xs font-black text-indigo-400">Mellem</span>
+                                    </div>
+                                    <input type="range" id="tw-freq-slider" min="1" max="5" step="0.1" value="3" class="input-range accent-indigo-500">
+                                </div>
+                                <p class="text-[10px] text-center text-slate-500 leading-relaxed">
+                                    Når vi holder farten konstant, vil en højere frekvens resultere i en synligt kortere bølgelængde (λ).
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- AFSNIT 2: Bølgens Energi -->
+        <section class="mb-40">
+            <div class="flex items-center gap-5 mb-12">
+                <div class="w-16 h-1 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full"></div>
+                <h2 class="text-sm font-black uppercase tracking-[0.4em] text-indigo-400">II. Transport af Energi</h2>
+            </div>
+
+            <div class="glass-card p-10 md:p-16 border-t-4 border-indigo-500 relative overflow-hidden">
+                <div class="absolute -right-32 -top-32 w-[600px] h-[600px] bg-indigo-600/10 rounded-full blur-[120px] pointer-events-none"></div>
+
+                <div class="flex flex-col lg:flex-row gap-16 items-center relative z-10">
+                    <div class="flex-1 space-y-8">
+                        <div class="border-b border-white/10 pb-6">
+                            <h3 class="text-3xl font-bold text-white tracking-tight mb-4 flex items-center gap-4">
+                                Amplitudens Vigtighed
+                                <button onclick="openInfo('boelge_energi')" class="i-btn text-indigo-400 border-indigo-500/30 hover:bg-indigo-500">i</button>
+                            </h3>
+                            <p class="text-slate-400 font-medium leading-relaxed mb-4">
+                                Bølger er i bund og grund maskiner designet til at transportere <strong>energi</strong> fra ét sted til et andet. Men hvor meget energi bærer de egentlig?
+                            </p>
+                            <p class="text-slate-400 font-medium leading-relaxed">
+                                Energien afhænger direkte af bølgens <strong>Amplitude (A)</strong>, som er afstanden fra hvilestillingen op til bølgetoppen. Faktisk vokser energien med amplituden i <em>anden potens</em>. Det vil sige, at hvis du fordobler højden på bølgen, bærer den hele <strong>fire gange så meget energi</strong>!
+                            </p>
+                        </div>
+                        
+                        <div class="p-8 bg-[#020612] rounded-3xl border border-indigo-500/20 shadow-[0_0_30px_rgba(99,102,241,0.1)] flex items-center justify-center gap-8">
+                            <span class="text-slate-500 uppercase tracking-widest font-bold text-xs">Sammenhængen:</span>
+                            <span class="text-4xl font-black italic text-white math-font drop-shadow-md">
+                                E <span class="text-indigo-400 mx-2">∝</span> A²
+                            </span>
+                        </div>
+                    </div>
+
+                    <!-- Bølge Energi Simulator -->
+                    <div class="w-full lg:w-[450px]">
+                        <div class="lab-container p-6 flex flex-col relative border border-indigo-500/20 shadow-2xl">
+                            <div class="absolute top-4 left-4 z-10">
+                                <span class="text-[10px] font-black uppercase text-slate-900 tracking-widest bg-indigo-400 px-3 py-1 rounded-full shadow-lg">Energi Simulator</span>
+                            </div>
+                            
+                            <div class="flex gap-4 mt-12 mb-6">
+                                <!-- Bølge Canvas -->
+                                <div class="flex-1 h-64 bg-[#020612] rounded-2xl border border-white/10 relative overflow-hidden shadow-inner flex shrink-0">
+                                    <canvas id="energy-wave-canvas" class="lab-canvas"></canvas>
+                                </div>
+                                <!-- Energi Søjle -->
+                                <div class="w-16 h-64 bg-black/80 rounded-2xl border border-white/10 relative overflow-hidden flex flex-col justify-end p-2 shrink-0">
+                                    <div id="energy-bar" class="w-full bg-gradient-to-t from-indigo-600 to-pink-500 rounded-lg transition-all duration-300 shadow-[0_0_15px_rgba(236,72,153,0.5)]" style="height: 10%;"></div>
+                                    <div class="absolute top-4 left-0 w-full text-center">
+                                        <span class="text-[9px] font-bold text-white uppercase">Energi</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="bg-black/60 p-5 rounded-[2rem] border border-white/10 backdrop-blur-md space-y-4">
+                                <div>
+                                    <div class="flex justify-between items-center mb-2">
+                                        <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Amplitude (Højde)</span>
+                                        <span id="ew-amp-label" class="text-xs font-black text-pink-400 bg-pink-500/20 border border-pink-500/30 px-2 py-0.5 rounded">1.0 x</span>
+                                    </div>
+                                    <input type="range" id="ew-amp-slider" min="1" max="5" step="0.1" value="1" class="input-range accent-pink-500">
+                                </div>
+                                <p class="text-[10px] text-center text-slate-500">Når amplituden stiger liniært, skyder energien (søjlen) i vejret eksponentielt!</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- AFSNIT 3: Interferens og Stående Bølger -->
+        <section class="mb-40">
+            <div class="flex items-center gap-5 mb-12">
+                <div class="w-16 h-1 bg-gradient-to-r from-purple-500 to-cyan-400 rounded-full"></div>
+                <h2 class="text-sm font-black uppercase tracking-[0.4em] text-purple-400">III. Når Bølger Mødes</h2>
+            </div>
+
+            <div class="glass-card p-10 md:p-16">
+                <div class="flex flex-col lg:flex-row gap-16 items-start">
+                    
+                    <div class="flex-1 space-y-8">
+                        <div class="border-b border-white/10 pb-6">
+                            <h3 class="text-3xl font-bold text-white tracking-tight flex items-center gap-3 mb-4">
+                                Interferens
+                                <button onclick="openInfo('interferens')" class="i-btn text-purple-400 border-purple-500/30 hover:bg-purple-500">i</button>
+                            </h3>
+                            <p class="text-slate-400 font-medium leading-relaxed">
+                                To bølger kan godt være på præcis samme sted på samme tid. Når det sker, lægges deres amplituder ganske enkelt sammen (Superpositionsprincippet). Dette fænomen kaldes <strong>interferens</strong>.
+                            </p>
+                            <p class="text-slate-400 font-medium leading-relaxed mt-4">
+                                Hvis vi sender en bølge ned langs en fastspændt snor, vil den reflekteres i enden og køre tilbage. Ved de helt rigtige frekvenser vil den fremadgående og tilbagegående bølge interferere perfekt og skabe et mønster, der ser ud til at stå stille: En <strong>Stående Bølge</strong>.
+                            </p>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <div class="bg-[#020612] border border-cyan-500/20 p-6 rounded-3xl text-center shadow-inner">
+                                <h4 class="text-cyan-400 font-bold mb-2 uppercase tracking-widest text-xs">Bug</h4>
+                                <p class="text-xs text-slate-400 leading-relaxed">Det punkt på den stående bølge, som svinger maksimalt op og ned (Konstruktiv interferens).</p>
+                            </div>
+                            <div class="bg-[#020612] border border-purple-500/20 p-6 rounded-3xl text-center shadow-inner">
+                                <h4 class="text-purple-400 font-bold mb-2 uppercase tracking-widest text-xs">Knudepunkt</h4>
+                                <p class="text-xs text-slate-400 leading-relaxed">De punkter på snoren, der slet ikke bevæger sig! Bølgerne udsletter præcis hinanden her (Destruktiv interferens).</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </section>
+
+        <!-- AFSNIT 4: Snor-Laboratoriet (Partialtoner) -->
+        <section class="mb-32">
+            <div class="flex items-center gap-5 mb-12">
+                <div class="w-16 h-1 bg-gradient-to-r from-cyan-300 to-white rounded-full"></div>
+                <h2 class="text-sm font-black uppercase tracking-[0.4em] text-white drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]">IV. Snor-Laboratoriet</h2>
+            </div>
+
+            <div class="glass-card p-10 md:p-16 overflow-hidden relative border-t-4 border-cyan-300">
+                <div class="absolute -right-32 -top-32 w-[600px] h-[600px] bg-cyan-500/10 rounded-full blur-[120px] pointer-events-none"></div>
+                
+                <div class="flex flex-col lg:flex-row gap-16 items-center relative z-10">
+                    <div class="flex-1 space-y-8">
+                        <div class="border-b border-white/10 pb-6">
+                            <h3 class="text-3xl font-bold text-white tracking-tight mb-4 flex items-center gap-4">
+                                Partialtoner (Resonans)
+                                <button onclick="openInfo('partialtoner')" class="i-btn text-white border-white/30 hover:bg-white/20 hover:text-cyan-300 shadow-[0_0_15px_rgba(255,255,255,0.3)]">i</button>
+                            </h3>
+                            <p class="text-slate-400 font-medium leading-relaxed">
+                                En snor i laboratoriet (eller en guitarstreng) af længden L er fastspændt i begge ender. Det betyder, at der <em>skal</em> være knudepunkter i enderne. Derfor kan der kun dannes stående bølger ved helt specifikke frekvenser. Disse kaldes <strong>Partialtoner</strong>.
+                            </p>
+                        </div>
+                        
+                        <div class="p-8 bg-[#020612] rounded-3xl border border-cyan-500/30 shadow-[0_0_30px_rgba(6,182,212,0.1)]">
+                            <h5 class="text-cyan-400 font-black uppercase text-[10px] tracking-[0.2em] mb-4 text-center">Betingelsen for Stående Bølger</h5>
+                            <div class="text-center text-xl md:text-2xl font-bold italic text-white math-font space-y-2">
+                                <p>Længde (L) = n · ½ · λ</p>
+                            </div>
+                            <p class="text-center text-sm text-slate-400 mt-4 leading-relaxed font-medium">
+                                Snorens længde skal altid være et helt antal (n) af halve bølgelængder. Omskrives dette fås: <span class="text-white math-font bg-white/5 px-2 py-0.5 rounded ml-1">λ = 2L / n</span>.
+                            </p>
+                        </div>
+                    </div>
+
+                    <!-- Stående Bølge Simulator -->
+                    <div class="w-full lg:w-[500px]">
+                        <div class="lab-container p-6 flex flex-col relative border border-cyan-500/20 bg-[#040812] shadow-2xl">
+                            <div class="absolute top-4 left-4 z-10">
+                                <span class="text-[10px] font-black uppercase text-slate-900 tracking-widest bg-cyan-400 px-3 py-1 rounded-full shadow-lg">Interaktiv Vibrator (Snor)</span>
+                            </div>
+                            
+                            <div class="flex justify-center mt-14 mb-6 relative">
+                                <!-- Simulator Canvas (Fast højde, sikret mod collapse) -->
+                                <div class="w-full h-64 bg-[#020612] rounded-2xl border border-slate-700 relative overflow-hidden shadow-[inset_0_0_30px_rgba(0,0,0,0.8)] flex items-center justify-center p-4 shrink-0">
+                                    
+                                    <!-- End points (Fixed) -->
+                                    <div class="absolute left-4 w-3 h-10 bg-slate-600 rounded-sm z-10 border border-slate-500 shadow-md"></div>
+                                    <div class="absolute right-4 w-3 h-10 bg-slate-600 rounded-sm z-10 border border-slate-500 shadow-md"></div>
+
+                                    <canvas id="standing-wave-canvas" class="lab-canvas absolute inset-0"></canvas>
+                                </div>
+                            </div>
+                            
+                            <!-- Controls & Live Data -->
+                            <div class="bg-black/60 p-5 rounded-[2rem] border border-white/10 backdrop-blur-md space-y-4">
+                                <div>
+                                    <div class="flex justify-between items-center mb-2">
+                                        <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Partialtone (n)</span>
+                                        <span id="lab-n-val" class="text-[10px] font-black text-white bg-cyan-600/30 px-2 py-1 rounded border border-cyan-500/30">1. (Grundtone)</span>
+                                    </div>
+                                    <input type="range" id="lab-n-slider" min="1" max="5" step="1" value="1" class="input-range accent-cyan-400 h-1.5">
+                                </div>
+                                
+                                <!-- Resultat Dashboard -->
+                                <div class="flex justify-between bg-white/5 p-4 rounded-xl border border-white/10 mt-2 text-center items-center">
+                                    <div class="flex-1 border-r border-white/10">
+                                        <span class="text-[9px] uppercase font-bold text-slate-500 tracking-widest block mb-1">Bølgelængde (λ):</span>
+                                        <span id="lab-lambda-val" class="text-base font-black text-cyan-400 math-font">2.00 L</span>
+                                    </div>
+                                    <div class="flex-1">
+                                        <span class="text-[9px] uppercase font-bold text-slate-500 tracking-widest block mb-1">Frekvens (f):</span>
+                                        <span id="lab-freq-val" class="text-base font-black text-indigo-400 math-font">50 Hz</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Eksamens Disposition -->
+        <footer class="bg-gradient-to-b from-[#020612] to-[#01040a] rounded-[3rem] p-12 md:p-16 text-center text-white relative overflow-hidden shadow-[0_20px_60px_-15px_rgba(0,0,0,1)] border border-white/5 mb-10">
+            <div class="relative z-10">
+                <span class="text-[10px] font-black uppercase tracking-[0.4em] text-cyan-400 mb-6 block drop-shadow-[0_0_10px_rgba(6,182,212,0.8)]">Oversigt til Eksamen</span>
+                <h3 class="text-4xl font-black mb-12 italic text-white">Tjekliste til Tavlen</h3>
+                <div class="text-left max-w-3xl mx-auto space-y-6 mb-14 bg-white/5 p-8 md:p-12 rounded-[2.5rem] border border-white/10 backdrop-blur-md">
+                    
+                    <div class="flex gap-6">
+                        <div class="w-8 h-8 rounded-full bg-slate-800 text-slate-300 flex items-center justify-center flex-shrink-0 border border-slate-600 font-black text-sm shadow-inner">1</div>
+                        <div>
+                            <h5 class="font-bold text-white mb-2 text-lg">Bølgens Grundbegreber & Energi</h5>
+                            <p class="text-slate-400 text-sm leading-relaxed">Forklar at bølger transporterer energi, ikke stof. Definer: Amplitude, bølgelængde (λ) og frekvens (f). Nævn at energien afhænger af amplituden i anden (E ∝ A²). Skriv bølgeligningen: <span class="math-font text-white bg-white/10 px-1.5 py-0.5 rounded mx-1 shadow-inner">v = f · λ</span>.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex gap-6">
+                        <div class="w-8 h-8 rounded-full bg-indigo-900/50 text-indigo-400 flex items-center justify-center flex-shrink-0 border border-indigo-500/50 font-black text-sm shadow-inner">2</div>
+                        <div>
+                            <h5 class="font-bold text-white mb-2 text-lg">Interferens & Stående Bølger</h5>
+                            <p class="text-slate-400 text-sm leading-relaxed">Forklar konstruktiv (forstærkning) og destruktiv (udslukning) interferens. Forklar, at en stående bølge opstår, når en fremadgående og tilbagekastet bølge på en snor interfererer med hinanden, så det skaber faste Buge og Knudepunkter.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex gap-6">
+                        <div class="w-8 h-8 rounded-full bg-cyan-900/50 text-cyan-400 flex items-center justify-center flex-shrink-0 border border-cyan-500/50 font-black text-sm shadow-inner">3</div>
+                        <div>
+                            <h5 class="font-bold text-white mb-2 text-lg">Betingelsen (Længde og Buge)</h5>
+                            <p class="text-slate-400 text-sm leading-relaxed">Tegn snoren med 1, 2 og 3 buge. Forklar, at fordi enderne sidder fast, er de <em>tvungne knudepunkter</em>. Længden L svarer til én bug ved grundtonen. Da en bug = ½ bølgelængde, er kravet altid: <span class="math-font text-white bg-white/10 px-1.5 py-0.5 rounded mx-1 shadow-inner">L = n · ½ · λ</span>.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex gap-6">
+                        <div class="w-8 h-8 rounded-full bg-purple-900/50 text-purple-400 flex items-center justify-center flex-shrink-0 border border-purple-500/50 font-black text-sm shadow-inner">4</div>
+                        <div>
+                            <h5 class="font-bold text-white mb-2 text-lg">Partialtoner (Overtoner)</h5>
+                            <p class="text-slate-400 text-sm leading-relaxed">Isoler λ: <span class="math-font text-white bg-white/10 px-1.5 py-0.5 rounded mx-1 shadow-inner">λ = 2L / n</span>. Brug bølgeligningen til at vise læreren, at frekvenserne (tonerne) for overtonerne matematisk set bliver et multiplum af grundtonen: <span class="math-font text-white bg-white/10 px-1.5 py-0.5 rounded mx-1 shadow-inner">f_n = n · f_1</span>.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="absolute -top-32 -left-32 w-[50rem] h-[50rem] bg-cyan-600/10 rounded-full blur-[200px] pointer-events-none"></div>
+            <div class="absolute -bottom-32 -right-32 w-[50rem] h-[50rem] bg-indigo-600/10 rounded-full blur-[200px] pointer-events-none"></div>
+        </footer>
+
+    </main>
+
+    <script>
+        // --- DATA TIL VIDENS-SKUFFE ---
+        const infoData = {
+            'boelgeligningen': {
+                title: 'Bølgeligningen',
+                text: 'Ligningen <span class="math-font text-cyan-400">v = f · λ</span> er det absolutte omdrejningspunkt for bølge-fysik!<br><br>Den siger, at bølgens udbredelsesfart (v) i f.eks. en snor eller i luft, er lig med frekvensen (f, antal svingninger i sekundet) ganget med bølgelængden (λ, afstanden fra bølgetop til bølgetop).<br><br><strong>Vigtigt:</strong> Farten (v) afhænger KUN af mediet (f.eks. snorens tykkelse og stramhed). Sætter du frekvensen op, vil bølgelængden helt automatisk blive kortere, for at regnestykket går op!'
+            },
+            'boelge_energi': {
+                title: 'Bølgens Energi',
+                text: 'Bølger transporterer energi uden at transportere stof. Vandet i havet rejser ikke med bølgen; det kører blot op og ned på stedet, mens energien bevæger sig fremad.<br><br>Energien i en bølge afhænger ekstremt meget af dens <strong>Amplitude (A)</strong>, altså højden på bølgen. Sammenhængen er kvadratisk (<span class="text-indigo-400 font-bold">E ∝ A²</span>). Det betyder, at en tsunami der er dobbelt så høj som en almindelig bølge, smadrer ind i kysten med <em>fire gange</em> så meget energi!'
+            },
+            'interferens': {
+                title: 'Interferens',
+                text: 'Dette fænomen opstår, når to bølger mødes. Bølger har den fantastiske egenskab, at de kan "bygges ovenpå hinanden" (Superpositionsprincippet).<br><br><strong>Konstruktiv interferens:</strong> To bølgetoppe mødes. Deres amplituder plusses, og vi får en gigantisk bølgetop (Bug).<br><strong>Destruktiv interferens:</strong> En bølgetop møder en bølgedal. De ophæver hinanden, og for et kort øjeblik står mediet fuldstændig fladt og stille (Knudepunkt)!'
+            },
+            'partialtoner': {
+                title: 'Partialtoner (Overtoner)',
+                text: 'Når en snor er fastspændt i to ender, skabes der "tvungne knudepunkter" i enderne.<br><br>Den laveste frekvens, der kan danne en stående bølge, er den, hvor hele snoren blot svinger op og ned som én stor "Bug". Det kaldes <strong>Grundtonen (1. partialtone, n=1)</strong>. Ved denne tone udgør snorens længde præcis én halv bølgelængde.<br><br>Øger man frekvensen på vibratoren, vil man ramme 2. partialtone (n=2), hvor snoren slår en dobbeltbølge med et knudepunkt i midten, derefter n=3 (to knudepunkter), osv.'
+            }
+        };
+
+        function openInfo(key) {
+            const data = infoData[key];
+            document.getElementById('drawer-title').innerText = data.title;
+            document.getElementById('drawer-content').innerHTML = `<p>${data.text}</p>`;
+            document.getElementById('info-drawer').classList.add('open');
+        }
+
+        function closeDrawer() {
+            document.getElementById('info-drawer').classList.remove('open');
+        }
+
+        // --- SKUDSIKKER CANVAS SETUP (RESIZEOBSERVER) ---
+        // Dette sikrer at vores canvas ALDRIG kollapser til 0x0, uanset browser!
+        const twState = { w: 0, h: 0, time: 0 };
+        const ewState = { w: 0, h: 0, time: 0 };
+        const swState = { w: 0, h: 0, time: 0 };
+
+        let twCtx, ewCtx, swCtx;
+
+        function attachResizer(canvasId, state) {
+            const canvas = document.getElementById(canvasId);
+            const parent = canvas.parentElement;
+            const ctx = canvas.getContext('2d');
+            
+            const ro = new ResizeObserver(entries => {
+                for (let entry of entries) {
+                    const { width, height } = entry.contentRect;
+                    if (width > 0 && height > 0) {
+                        const dp = window.devicePixelRatio || 1;
+                        canvas.width = width * dp;
+                        canvas.height = height * dp;
+                        // Forcer fast CSS størrelse for at undgå flex-collapse
+                        canvas.style.width = width + "px";
+                        canvas.style.height = height + "px";
+                        ctx.setTransform(1, 0, 0, 1, 0, 0);
+                        ctx.scale(dp, dp);
+                        state.w = width;
+                        state.h = height;
+                    }
+                }
+            });
+            ro.observe(parent);
+            return ctx;
+        }
+
+        // --- 1. BØLGE ANATOMI SIMULATOR (Skridende bølge) ---
+        const twSlider = document.getElementById('tw-freq-slider');
+        const twLabel = document.getElementById('tw-freq-label');
+
+        function drawTravelingWave() {
+            if (twState.w === 0 || twState.h === 0) {
+                requestAnimationFrame(drawTravelingWave);
+                return;
+            }
+
+            twCtx.clearRect(0, 0, twState.w, twState.h);
+            
+            const f = parseFloat(twSlider.value); 
+            if(f < 2) twLabel.innerText = "Lav (" + f.toFixed(1) + " Hz)";
+            else if(f < 4) twLabel.innerText = "Mellem (" + f.toFixed(1) + " Hz)";
+            else twLabel.innerText = "Høj (" + f.toFixed(1) + " Hz)";
+
+            const v = 150;
+            const lambda = v / f;
+            
+            twState.time += f * 0.05;
+
+            const amplitude = twState.h * 0.3;
+            const yOffset = twState.h / 2;
+
+            // Midterlinje (Hvileposition)
+            twCtx.strokeStyle = 'rgba(255,255,255,0.1)';
+            twCtx.lineWidth = 1;
+            twCtx.setLineDash([5, 5]);
+            twCtx.beginPath();
+            twCtx.moveTo(0, yOffset);
+            twCtx.lineTo(twState.w, yOffset);
+            twCtx.stroke();
+            twCtx.setLineDash([]);
+
+            // Tegn Bølgen: y = A * sin(k*x - w*t)
+            twCtx.beginPath();
+            const k = (Math.PI * 2) / lambda;
+            
+            for (let x = 0; x <= twState.w; x += 2) {
+                const y = yOffset + amplitude * Math.sin(k * x - twState.time);
+                if (x === 0) twCtx.moveTo(x, y);
+                else twCtx.lineTo(x, y);
+            }
+            
+            twCtx.strokeStyle = '#06b6d4'; 
+            twCtx.lineWidth = 4;
+            twCtx.lineCap = 'round';
+            twCtx.shadowBlur = 10;
+            twCtx.shadowColor = '#06b6d4';
+            twCtx.stroke();
+            twCtx.shadowBlur = 0;
+
+            // Flere markører på hver bølgetop, der bevæger sig mod højre
+            const phaseShift = twState.time;
+            for (let n = -10; n < 10; n++) {
+                let px = (Math.PI / 2 + phaseShift + n * Math.PI * 2) / k;
+                if (px >= 0 && px <= twState.w) {
+                    twCtx.beginPath();
+                    twCtx.arc(px, yOffset - amplitude, 6, 0, Math.PI*2);
+                    twCtx.fillStyle = '#f8fafc'; 
+                    twCtx.shadowBlur = 12;
+                    twCtx.shadowColor = '#fff';
+                    twCtx.fill();
+                    twCtx.shadowBlur = 0;
+                }
+            }
+
+            requestAnimationFrame(drawTravelingWave);
+        }
+
+        // --- 2. BØLGE ENERGI SIMULATOR ---
+        const ewSlider = document.getElementById('ew-amp-slider');
+        const ewLabel = document.getElementById('ew-amp-label');
+        const ewBar = document.getElementById('energy-bar');
+
+        function drawEnergyWave() {
+            if (ewState.w === 0 || ewState.h === 0) {
+                requestAnimationFrame(drawEnergyWave);
+                return;
+            }
+
+            ewCtx.clearRect(0, 0, ewState.w, ewState.h);
+            ewState.time += 0.08;
+
+            const ampFactor = parseFloat(ewSlider.value); 
+            ewLabel.innerText = ampFactor.toFixed(1) + " x";
+
+            // E er proportional med A^2
+            const energyPercent = ((ampFactor * ampFactor) / 25) * 100;
+            ewBar.style.height = energyPercent + "%";
+
+            const baseAmplitude = ewState.h * 0.08; 
+            const currentAmplitude = baseAmplitude * ampFactor;
+            const yOffset = ewState.h / 2;
+            const lambda = ewState.w / 2; 
+
+            // Midterlinje
+            ewCtx.strokeStyle = 'rgba(255,255,255,0.05)';
+            ewCtx.lineWidth = 1;
+            ewCtx.beginPath();
+            ewCtx.moveTo(0, yOffset);
+            ewCtx.lineTo(ewState.w, yOffset);
+            ewCtx.stroke();
+
+            // Farven skifter intensitet med højden
+            let r = Math.min(255, 99 + (ampFactor-1)*40);  
+            let g = Math.max(50, 102 - (ampFactor-1)*10);
+            let b = Math.min(255, 241 + (ampFactor-1)*5);
+            const waveColor = `rgb(${r}, ${g}, ${b})`;
+
+            ewCtx.beginPath();
+            const k = (Math.PI * 2) / lambda;
+            
+            for (let x = 0; x <= ewState.w; x += 2) {
+                const y = yOffset + currentAmplitude * Math.sin(k * x - ewState.time);
+                if (x === 0) ewCtx.moveTo(x, y);
+                else ewCtx.lineTo(x, y);
+            }
+            
+            ewCtx.strokeStyle = waveColor;
+            ewCtx.lineWidth = 4 + (ampFactor * 0.5); 
+            ewCtx.lineCap = 'round';
+            ewCtx.shadowBlur = ampFactor * 5;
+            ewCtx.shadowColor = waveColor;
+            ewCtx.stroke();
+            ewCtx.shadowBlur = 0;
+
+            // Center Markør (Viser amplituden tydeligt)
+            const centerX = ewState.w / 2;
+            const centerY = yOffset + currentAmplitude * Math.sin(k * centerX - ewState.time);
+            ewCtx.beginPath();
+            ewCtx.arc(centerX, centerY, 8, 0, Math.PI*2);
+            ewCtx.fillStyle = '#fff';
+            ewCtx.shadowBlur = 15;
+            ewCtx.shadowColor = waveColor;
+            ewCtx.fill();
+            ewCtx.shadowBlur = 0;
+
+            requestAnimationFrame(drawEnergyWave);
+        }
+
+        // --- 3. STÅENDE BØLGER LAB (Snor-Laboratoriet) ---
+        const labNSlider = document.getElementById('lab-n-slider');
+        const labNVal = document.getElementById('lab-n-val');
+        const labLambdaVal = document.getElementById('lab-lambda-val');
+        const labFreqVal = document.getElementById('lab-freq-val');
+
+        const f1 = 50; 
+
+        function updateStandingWaveUI() {
+            const n = parseInt(labNSlider.value);
+            if(n === 1) labNVal.innerText = "1. (Grundtone)";
+            else labNVal.innerText = `${n}. Partialtone`;
+
+            const lambdaKoef = 2 / n;
+            labLambdaVal.innerText = lambdaKoef.toFixed(2) + " L";
+            labFreqVal.innerText = (n * f1) + " Hz";
+        }
+        
+        labNSlider.addEventListener('input', updateStandingWaveUI);
+        updateStandingWaveUI();
+
+        function drawStandingWave() {
+            if (swState.w === 0 || swState.h === 0) {
+                requestAnimationFrame(drawStandingWave);
+                return;
+            }
+
+            swCtx.clearRect(0, 0, swState.w, swState.h);
+            
+            const n = parseInt(labNSlider.value);
+            swState.time += (n * 0.1); 
+
+            const padX = 20;
+            const L = swState.w - padX*2; 
+            const yOffset = swState.h / 2;
+            const amplitude = swState.h * 0.35; 
+
+            // Hvilelinje
+            swCtx.strokeStyle = 'rgba(255,255,255,0.05)';
+            swCtx.lineWidth = 1;
+            swCtx.beginPath();
+            swCtx.moveTo(padX, yOffset);
+            swCtx.lineTo(padX + L, yOffset);
+            swCtx.stroke();
+
+            // Den stående bølge
+            swCtx.beginPath();
+            const timeOscillation = Math.cos(swState.time); 
+            
+            for (let x = 0; x <= L; x += 2) {
+                const y = yOffset + amplitude * Math.sin((x / L) * Math.PI * n) * timeOscillation;
+                if (x === 0) swCtx.moveTo(padX + x, y);
+                else swCtx.lineTo(padX + x, y);
+            }
+            
+            swCtx.strokeStyle = '#0ea5e9'; 
+            swCtx.lineWidth = 4;
+            swCtx.lineCap = 'round';
+            swCtx.lineJoin = 'round';
+            swCtx.stroke();
+
+            // Skygge (hurtig bevægelse visuel effekt)
+            swCtx.beginPath();
+            const timeOscillationShadow = Math.cos(swState.time - 0.2); 
+            for (let x = 0; x <= L; x += 4) {
+                const y = yOffset + amplitude * Math.sin((x / L) * Math.PI * n) * timeOscillationShadow;
+                if (x === 0) swCtx.moveTo(padX + x, y);
+                else swCtx.lineTo(padX + x, y);
+            }
+            swCtx.strokeStyle = 'rgba(14, 165, 233, 0.3)';
+            swCtx.lineWidth = 2;
+            swCtx.stroke();
+
+            // Tegn Knudepunkterne eksplicit ind
+            for (let i = 0; i <= n; i++) {
+                const nodeX = padX + L * (i / n);
+                swCtx.beginPath();
+                swCtx.arc(nodeX, yOffset, 5, 0, Math.PI*2);
+                swCtx.fillStyle = '#f8fafc'; 
+                swCtx.shadowBlur = 10;
+                swCtx.shadowColor = '#fff';
+                swCtx.fill();
+                swCtx.shadowBlur = 0;
+            }
+
+            requestAnimationFrame(drawStandingWave);
+        }
+
+        // --- BACKGROUND SINE WAVE PARTICLES ---
+        const bgCanvas = document.getElementById('particle-canvas');
+        const bgCtx = bgCanvas.getContext('2d');
+        let bgParticles = [];
+        let globalTime = 0;
+        
+        function initBg() {
+            bgCanvas.width = window.innerWidth; 
+            bgCanvas.height = window.innerHeight;
+            bgParticles = [];
+            for (let i = 0; i < 50; i++) {
+                bgParticles.push({
+                    x: Math.random() * bgCanvas.width, 
+                    yBase: Math.random() * bgCanvas.height, 
+                    size: Math.random() * 2 + 1,
+                    speedX: Math.random() * 0.5 + 0.2, 
+                    phase: Math.random() * Math.PI * 2, 
+                    freq: Math.random() * 0.02 + 0.01, 
+                    amp: Math.random() * 30 + 10, 
+                    color: Math.random() > 0.5 ? '#06b6d4' : '#8b5cf6' 
+                });
+            }
+        }
+        
+        function animateBg() {
+            bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
+            globalTime += 1;
+
+            bgParticles.forEach(p => {
+                p.x += p.speedX; 
+                p.y = p.yBase + Math.sin(globalTime * p.freq + p.phase) * p.amp;
+                
+                if (p.x > bgCanvas.width) {
+                    p.x = -10;
+                    p.yBase = Math.random() * bgCanvas.height;
+                }
+                
+                bgCtx.fillStyle = p.color; 
+                bgCtx.beginPath(); 
+                bgCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2); 
+                bgCtx.fill();
+                
+                bgCtx.shadowBlur = 8;
+                bgCtx.shadowColor = p.color;
+                bgCtx.fill();
+                bgCtx.shadowBlur = 0;
+            });
+            requestAnimationFrame(animateBg);
+        }
+
+        window.addEventListener('resize', initBg);
+        
+        window.onload = () => { 
+            // Initialize resizers directly, which will trigger the animations
+            twCtx = attachResizer('traveling-wave-canvas', twState);
+            ewCtx = attachResizer('energy-wave-canvas', ewState);
+            swCtx = attachResizer('standing-wave-canvas', swState);
+            
+            initBg(); 
+            animateBg(); 
+            requestAnimationFrame(drawTravelingWave);
+            requestAnimationFrame(drawEnergyWave);
+            requestAnimationFrame(drawStandingWave);
+        };
+    </script>
+</body>
+</html>

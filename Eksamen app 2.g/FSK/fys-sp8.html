@@ -1,0 +1,735 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>08. Faseovergange | FysikQuest C</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            /* Vand til Damp Tema (Lilla/Cyan) */
+            --primary: #8b5cf6; /* Violet 500 */
+            --primary-glow: rgba(139, 92, 246, 0.4);
+            --secondary: #06b6d4; /* Cyan 500 */
+            --accent: #c084fc; /* Purple 400 */
+            
+            --slate-bg: #0f121e; /* Dyb mørk slate/violet */
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--slate-bg);
+            color: #f8fafc;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+            background-image: 
+                linear-gradient(rgba(139, 92, 246, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(139, 92, 246, 0.05) 1px, transparent 1px);
+            background-size: 50px 50px;
+        }
+
+        /* Damp partikler */
+        #particle-canvas {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -2; pointer-events: none; opacity: 0.7;
+        }
+
+        .ambient-vapor {
+            position: fixed; border-radius: 50%; filter: blur(150px);
+            z-index: -1; pointer-events: none; opacity: 0.5;
+        }
+
+        .glass-card {
+            background: rgba(15, 18, 30, 0.85);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(139, 92, 246, 0.2);
+            border-radius: 2.5rem;
+            transition: all 0.5s var(--ease-out-expo);
+            box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.8);
+        }
+
+        .glass-card:hover {
+            box-shadow: 0 25px 60px -10px var(--primary-glow);
+            border-color: rgba(139, 92, 246, 0.4);
+        }
+
+        #info-drawer {
+            transform: translateX(100%);
+            transition: transform 0.6s var(--ease-out-expo);
+        }
+        #info-drawer.open { transform: translateX(0); }
+
+        .text-gradient {
+            @apply text-transparent bg-clip-text bg-gradient-to-r from-violet-400 via-fuchsia-400 to-cyan-400 drop-shadow-[0_0_20px_rgba(139,92,246,0.5)];
+        }
+
+        #reading-progress {
+            position: fixed; top: 0; left: 0; height: 5px;
+            background: linear-gradient(to right, #06b6d4, #8b5cf6, #c084fc);
+            z-index: 100; width: 0%;
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.8);
+        }
+
+        .math-font { font-family: 'Space Grotesk', sans-serif; }
+
+        .lab-container {
+            background: #06080e;
+            border-radius: 1.5rem;
+            position: relative;
+            overflow: hidden;
+            box-shadow: inset 0 0 60px rgba(0,0,0,0.8);
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .i-btn {
+            @apply w-8 h-8 rounded-full bg-white/10 text-violet-400 flex items-center justify-center text-xs font-black hover:bg-violet-500 hover:text-white transition-all shadow-[0_0_15px_rgba(139,92,246,0.3)] border border-violet-500/30 cursor-pointer flex-shrink-0 z-10;
+        }
+
+        .input-range {
+            @apply w-full h-2 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-violet-500 outline-none;
+        }
+
+        .svg-graph-path {
+            fill: none;
+            stroke-width: 2.5;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
+        ::-webkit-scrollbar-thumb { background: rgba(139, 92, 246, 0.5); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(139, 92, 246, 0.8); }
+    </style>
+</head>
+<body class="min-h-screen pb-40">
+
+    <div id="reading-progress"></div>
+    <canvas id="particle-canvas"></canvas>
+    
+    <div class="ambient-vapor w-[600px] h-[600px] bg-violet-600/20 top-[-10%] left-[-10%]"></div>
+    <div class="ambient-vapor w-[800px] h-[800px] bg-cyan-600/15 bottom-[-10%] right-[-10%]"></div>
+
+    <!-- Info Drawer -->
+    <div id="info-drawer" class="fixed top-0 right-0 h-full w-full max-w-md bg-[#06080e]/95 backdrop-blur-3xl shadow-[-40px_0_80px_rgba(0,0,0,0.9)] z-[200] p-10 border-l border-violet-500/40 flex flex-col">
+        <button onclick="closeDrawer()" class="self-end p-3 bg-white/5 hover:bg-violet-500/20 rounded-full transition mb-6 text-slate-400 hover:text-violet-400">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M6 18L18 6M6 6l12 12" stroke-width="2.5" stroke-linecap="round"/></svg>
+        </button>
+        <div class="flex items-center gap-4 mb-8">
+            <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-violet-500 to-cyan-500 flex items-center justify-center text-white font-black italic text-xl shadow-[0_0_30px_rgba(139,92,246,0.5)]">i</div>
+            <h3 id="drawer-title" class="text-2xl font-black text-white uppercase tracking-tighter">Videnscenter</h3>
+        </div>
+        <div id="drawer-content" class="text-slate-300 leading-relaxed space-y-6 font-medium text-sm overflow-y-auto pr-4"></div>
+        <div class="mt-auto pt-6">
+            <div class="p-6 bg-gradient-to-br from-violet-900/30 to-cyan-900/30 rounded-3xl border border-white/10 shadow-inner">
+                <p class="text-[10px] font-black uppercase text-violet-400 tracking-widest mb-2 flex items-center gap-2">Eksamens-Tip</p>
+                <p class="text-xs text-slate-400">Vær opmærksom på forskellen mellem Smeltevarme (L<sub>s</sub>) og Fordampningsvarme (L<sub>f</sub>). Fordampning kræver meget mere energi, fordi molekylerne skal rives fuldstændig fri af hinanden for at blive til gas!</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="sticky top-0 z-50 bg-[#0f121e]/90 backdrop-blur-2xl border-b border-white/5 shadow-md">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <a href="fysik_landing.html" class="group flex items-center gap-4 text-slate-300 font-bold uppercase text-xs tracking-widest hover:text-violet-400 transition">
+                <div class="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center border border-white/10 group-hover:border-violet-500/50 group-hover:bg-violet-500/20 transition shadow-sm">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M10 19l-7-7m0 0l7-7m-7 7h18" stroke-width="2.5" stroke-linecap="round"/></svg>
+                </div>
+                Tilbage
+            </a>
+            <span class="px-5 py-2 rounded-full bg-violet-600/20 text-violet-400 font-black text-[10px] uppercase tracking-[0.2em] border border-violet-500/30 shadow-[0_0_15px_rgba(139,92,246,0.2)]">Spørgsmål 08</span>
+        </div>
+    </nav>
+
+    <main class="max-w-6xl mx-auto px-6 pt-20">
+        
+        <!-- Header -->
+        <header class="mb-32 text-center relative">
+            <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] bg-violet-600/15 blur-[150px] rounded-full pointer-events-none -z-10"></div>
+            <div class="inline-block mb-6 px-6 py-2 rounded-full bg-violet-500/10 border border-violet-500/30 text-violet-400 font-bold text-[10px] tracking-[0.25em] uppercase shadow-lg shadow-violet-500/20">
+                Fysik C • Termodynamik
+            </div>
+            <h1 class="text-6xl md:text-8xl font-black tracking-tighter text-white mb-8 uppercase leading-[0.9]">
+                Fase<span class="text-gradient">overgange</span>
+            </h1>
+            <p class="text-slate-400 text-lg md:text-xl max-w-3xl mx-auto font-medium leading-relaxed">
+                Fra fast stof til flygtig gas. Udforsk de tre tilstandsformer og lær, hvor meget energi der kræves for at bryde naturens stærkeste bindinger.
+            </p>
+        </header>
+
+        <!-- AFSNIT 1: De Tre Tilstandsformer -->
+        <section class="mb-40">
+            <div class="flex items-center gap-5 mb-12">
+                <div class="w-16 h-1 bg-gradient-to-r from-violet-400 to-cyan-500 rounded-full"></div>
+                <h2 class="text-sm font-black uppercase tracking-[0.4em] text-slate-300">I. Fast, Flydende og Gas</h2>
+            </div>
+
+            <div class="glass-card p-10 md:p-16 border-t-4 border-violet-500">
+                <div class="flex flex-col lg:flex-row gap-16 items-center">
+                    <div class="flex-1 space-y-8">
+                        <div class="border-b border-white/10 pb-6">
+                            <h3 class="text-3xl font-bold text-white tracking-tight mb-4 flex items-center gap-4">
+                                På mikroskopisk niveau
+                                <button onclick="openInfo('tilstandsformer')" class="i-btn">i</button>
+                            </h3>
+                            <p class="text-slate-400 font-medium leading-relaxed mb-4">
+                                Ethvert stof kan eksistere i tre tilstandsformer afhængigt af temperaturen (som blot er molekylernes kinetiske energi).
+                            </p>
+                            <p class="text-slate-400 font-medium leading-relaxed">
+                                Når vi tilfører varme, tvinger vi atomerne til at vibrere hurtigere, indtil de til sidst bryder de usynlige bånd, der holder dem sammen.
+                            </p>
+                        </div>
+                        
+                        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            <div class="bg-[#06080e] p-5 rounded-2xl border border-violet-500/20 shadow-inner">
+                                <span class="text-xl mb-2 block">🧊</span>
+                                <h4 class="text-white font-bold text-sm mb-1 uppercase tracking-widest">Fast (Is)</h4>
+                                <p class="text-xs text-slate-500">Molekylerne sidder fastlåst i et gitter. De vibrerer, men kan ikke flytte sig.</p>
+                            </div>
+                            <div class="bg-[#06080e] p-5 rounded-2xl border border-cyan-500/20 shadow-inner">
+                                <span class="text-xl mb-2 block">💧</span>
+                                <h4 class="text-white font-bold text-sm mb-1 uppercase tracking-widest">Flydende</h4>
+                                <p class="text-xs text-slate-500">Gitteret er brudt. Molekylerne hænger stadig sammen, men kan glide rundt mellem hinanden.</p>
+                            </div>
+                            <div class="bg-[#06080e] p-5 rounded-2xl border border-purple-500/20 shadow-inner">
+                                <span class="text-xl mb-2 block">☁️</span>
+                                <h4 class="text-white font-bold text-sm mb-1 uppercase tracking-widest">Gas (Damp)</h4>
+                                <p class="text-xs text-slate-500">Alle bånd er brudt. Molekylerne flyver frit rundt og fylder alt tilgængeligt rum.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- AFSNIT 2: Den Fuldstændige Opvarmningskurve -->
+        <section class="mb-40">
+            <div class="flex items-center gap-5 mb-12">
+                <div class="w-16 h-1 bg-gradient-to-r from-cyan-400 to-purple-500 rounded-full"></div>
+                <h2 class="text-sm font-black uppercase tracking-[0.4em] text-cyan-400">II. Den Komplette Opvarmningskurve</h2>
+            </div>
+
+            <div class="glass-card p-10 md:p-16">
+                <div class="flex flex-col lg:flex-row gap-16 items-start">
+                    
+                    <div class="flex-1 space-y-8">
+                        <div class="border-b border-white/10 pb-6">
+                            <h3 class="text-3xl font-bold text-white tracking-tight flex items-center gap-3 mb-4">
+                                Tålmodighed ved 100 °C
+                                <button onclick="openInfo('fordampningsvarme')" class="i-btn text-cyan-400 border-cyan-500/30 hover:bg-cyan-500 shadow-[0_0_15px_rgba(6,182,212,0.3)]">i</button>
+                            </h3>
+                            <p class="text-slate-400 font-medium leading-relaxed">
+                                I forrige spørgsmål så vi, at temperaturen stod stille ved 0 °C under smeltning. Det samme, bare meget vildere, sker ved kogepunktet (100 °C).
+                            </p>
+                            <p class="text-slate-400 font-medium leading-relaxed mt-4">
+                                At forvandle flydende vand til gas kræver en astronomisk mængde energi, kaldet <strong>Specifik Fordampningsvarme (L<sub>f</sub>)</strong>. For vand er L<sub>f</sub> næsten <em>syv gange større</em> end smeltevarmen! Kig på det massive flade plateau på grafen.
+                            </p>
+                        </div>
+
+                        <div class="flex flex-col sm:flex-row gap-6">
+                            <div class="flex-1 p-6 bg-[#06080e] rounded-2xl border border-blue-500/20 shadow-inner">
+                                <span class="text-[10px] font-black uppercase text-blue-400 tracking-widest block mb-2">Smeltevarme (L<sub>s</sub>)</span>
+                                <span class="text-2xl font-black italic text-white math-font">334 kJ/kg</span>
+                            </div>
+                            <div class="flex-1 p-6 bg-[#06080e] rounded-2xl border border-purple-500/20 shadow-inner">
+                                <span class="text-[10px] font-black uppercase text-purple-400 tracking-widest block mb-2">Fordampningsvarme (L<sub>f</sub>)</span>
+                                <span class="text-2xl font-black italic text-white math-font">2256 kJ/kg</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- FULD FASEOVERGANGS GRAF (Skudsikker SVG) -->
+                    <div class="w-full lg:w-[500px]">
+                        <div class="lab-container p-6 flex flex-col relative border border-violet-500/20 shadow-2xl">
+                            <div class="absolute top-4 left-4 z-10">
+                                <span class="text-[10px] font-black uppercase text-slate-900 tracking-widest bg-cyan-400 px-3 py-1 rounded-full shadow-lg">Komplet Fase-Graf</span>
+                            </div>
+                            
+                            <div class="flex-1 h-72 mt-10 mb-6 bg-[#090b14] rounded-2xl border border-white/10 relative overflow-hidden shadow-inner p-4">
+                                <svg viewBox="0 0 100 50" class="w-full h-full overflow-visible" preserveAspectRatio="none">
+                                    <!-- Gitter og Akser -->
+                                    <line x1="12" y1="10" x2="95" y2="10" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/>
+                                    <line x1="12" y1="35" x2="95" y2="35" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/>
+                                    <line x1="12" y1="45" x2="95" y2="45" stroke="rgba(255,255,255,0.1)" stroke-width="0.5"/>
+                                    
+                                    <text x="10" y="11" fill="#94a3b8" font-size="3" font-family="sans-serif" font-weight="bold" text-anchor="end">100°</text>
+                                    <text x="10" y="36" fill="#94a3b8" font-size="3" font-family="sans-serif" font-weight="bold" text-anchor="end">0°</text>
+                                    <text x="10" y="46" fill="#94a3b8" font-size="3" font-family="sans-serif" font-weight="bold" text-anchor="end">-20°</text>
+                                    <text x="12" y="52" fill="#94a3b8" font-size="2.5" font-family="sans-serif" font-weight="bold">Tilført Energi →</text>
+
+                                    <!-- Baggrundskurve med korrekt proportionale plateauer -->
+                                    <!-- p1(start), p2(0°), p3(smeltet), p4(100°), p5(fordampet), p6(damp) -->
+                                    <path d="M 12 45 L 17 35 L 25 35 L 35 10 L 85 10 L 92 5" class="svg-graph-path" stroke="rgba(255,255,255,0.15)"/>
+                                    
+                                    <!-- Aktiv rute -->
+                                    <path id="svg-active-path" d="M 12 45 L 12 45" class="svg-graph-path" stroke="#e0f2fe"/>
+                                    
+                                    <line id="svg-guide-line" x1="12" y1="45" x2="12" y2="50" stroke="rgba(255,255,255,0.3)" stroke-width="0.5" stroke-dasharray="1 1"/>
+                                    <circle id="svg-marker" cx="12" cy="45" r="1.5" fill="#e0f2fe" class="transition-colors duration-200"/>
+                                    <circle id="svg-glow" cx="12" cy="45" r="3" fill="#e0f2fe" opacity="0.3" class="transition-all duration-200 animate-pulse"/>
+                                </svg>
+                            </div>
+                            
+                            <!-- Controls -->
+                            <div class="bg-black/60 p-5 rounded-[2rem] border border-white/10 backdrop-blur-md text-center">
+                                <div class="flex justify-between items-center mb-4">
+                                    <span class="text-[10px] font-black text-slate-400 uppercase tracking-widest">Tilfør Energi</span>
+                                    <span id="state-label" class="text-xs font-black text-cyan-400">Fast form (Is)</span>
+                                </div>
+                                <input type="range" id="energy-slider" min="0" max="100" value="0" class="input-range mb-2" oninput="updateSVGGraph()">
+                                <p class="text-[10px] text-slate-400 mt-2">Temperatur: <strong id="graph-temp" class="text-white text-lg"> -20.0°C</strong></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- AFSNIT 3: Fordampnings-Laboratoriet -->
+        <section class="mb-32">
+            <div class="flex items-center gap-5 mb-12">
+                <div class="w-16 h-1 bg-gradient-to-r from-purple-400 to-violet-500 rounded-full"></div>
+                <h2 class="text-sm font-black uppercase tracking-[0.4em] text-violet-400 drop-shadow-[0_0_10px_rgba(139,92,246,0.5)]">III. Fordampnings-Laboratoriet</h2>
+            </div>
+
+            <div class="glass-card p-10 md:p-16 overflow-hidden relative border-t-4 border-violet-500">
+                <div class="absolute -right-32 -top-32 w-[600px] h-[600px] bg-violet-500/10 rounded-full blur-[120px] pointer-events-none"></div>
+                
+                <div class="flex flex-col lg:flex-row gap-16 items-center relative z-10">
+                    <div class="flex-1 space-y-8">
+                        <div class="border-b border-white/10 pb-6">
+                            <h3 class="text-3xl font-bold text-white tracking-tight mb-4 flex items-center gap-4">
+                                At koge gryden tør
+                                <button onclick="openInfo('kogning')" class="i-btn text-white border-white/30 hover:bg-white/20 hover:text-violet-300">i</button>
+                            </h3>
+                            <p class="text-slate-400 font-medium leading-relaxed">
+                                Vandet har nået 100 °C, og gryden koger. Hvis du lader kogepladen stå tændt, vil vandet langsomt fordampe og blive til gas.
+                            </p>
+                            <p class="text-slate-400 font-medium leading-relaxed mt-4">
+                                Vi kan beregne præcis hvor lang tid det tager at fordampe en bestemt mængde vand. Det gør vi ved at sætte den <em>tilførte energi</em> (P · t) lig med <em>fordampningsenergien</em> (m · L<sub>f</sub>).
+                            </p>
+                        </div>
+                        
+                        <div class="p-6 bg-[#06080e] rounded-3xl border border-violet-500/30 shadow-[0_0_30px_rgba(139,92,246,0.1)]">
+                            <h5 class="text-violet-400 font-black uppercase text-[10px] tracking-[0.2em] mb-4 text-center">Tid til fuld fordampning</h5>
+                            <div class="text-center text-xl font-bold italic text-white math-font">
+                                P · t = m · L<sub>f</sub>
+                            </div>
+                            <div class="text-center mt-4 text-slate-400 text-sm">
+                                ➔ Isolering af tiden: <em class="text-white math-font bg-white/5 px-2 py-1 rounded ml-1">t = (m · L<sub>f</sub>) / P</em>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Kogeplade Simulator -->
+                    <div class="w-full lg:w-[450px]">
+                        <div class="lab-container p-6 flex flex-col relative border border-violet-500/20 bg-[#02040a] shadow-2xl">
+                            <div class="absolute top-4 left-4 z-10">
+                                <span class="text-[10px] font-black uppercase text-slate-900 tracking-widest bg-violet-400 px-3 py-1 rounded-full shadow-lg">Kogepladen</span>
+                            </div>
+                            
+                            <div class="flex justify-center mt-14 mb-8">
+                                <!-- Gryde Visuel -->
+                                <div class="w-48 h-32 bg-slate-800 rounded-b-2xl border-x-4 border-b-4 border-slate-600 relative shadow-2xl">
+                                    <div id="pot-water" class="absolute bottom-0 left-0 w-full bg-cyan-500/60 transition-all duration-300" style="height: 80%;">
+                                        <div id="pot-bubbles" class="absolute inset-0 overflow-hidden opacity-0 transition-opacity duration-500"></div>
+                                    </div>
+                                    <!-- Varmeplade (Gløder under gryden) -->
+                                    <div id="hot-plate" class="absolute -bottom-4 left-1/2 -translate-x-1/2 w-40 h-2 bg-red-600 rounded-full opacity-0 shadow-[0_0_20px_rgba(239,68,68,1)] transition-opacity duration-1000"></div>
+                                    <!-- Damp -->
+                                    <div id="pot-steam" class="absolute bottom-[80%] left-0 w-full h-32 pointer-events-none overflow-hidden opacity-0"></div>
+                                </div>
+                            </div>
+                            
+                            <!-- Controls & Live Data -->
+                            <div class="bg-black/60 p-5 rounded-[2rem] border border-white/10 backdrop-blur-md space-y-4">
+                                <div>
+                                    <div class="flex justify-between items-center mb-1">
+                                        <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Masse af 100°C vand:</span>
+                                        <span id="lab-boil-mass-val" class="text-[10px] font-black text-cyan-400">0.5 kg</span>
+                                    </div>
+                                    <input type="range" id="lab-boil-mass-slider" min="0.1" max="1.0" step="0.1" value="0.5" class="input-range accent-cyan-500 h-1.5" oninput="updateBoilUI()">
+                                </div>
+                                <div>
+                                    <div class="flex justify-between items-center mb-1">
+                                        <span class="text-[9px] font-black text-slate-400 uppercase tracking-widest">Kogepladens Effekt (P):</span>
+                                        <span id="lab-boil-power-val" class="text-[10px] font-black text-red-400">1500 W</span>
+                                    </div>
+                                    <input type="range" id="lab-boil-power-slider" min="500" max="3000" step="100" value="1500" class="input-range accent-red-500 h-1.5" oninput="updateBoilUI()">
+                                </div>
+                                
+                                <button id="btn-boil" onclick="startBoiling()" class="w-full py-3 mt-2 bg-violet-600 rounded-full font-black text-xs uppercase tracking-widest text-white hover:bg-violet-500 transition shadow-[0_0_15px_rgba(139,92,246,0.4)] active:scale-95 border border-violet-500">
+                                    Start Fordampning
+                                </button>
+                                
+                                <!-- Resultat Dashboard -->
+                                <div class="flex justify-between bg-white/5 p-3 rounded-xl border border-white/10 mt-2 text-center">
+                                    <div>
+                                        <span class="text-[9px] uppercase font-bold text-slate-500 tracking-widest block mb-1">Tid gået:</span>
+                                        <span id="boil-time-val" class="text-sm font-black text-white">0 s</span>
+                                    </div>
+                                    <div>
+                                        <span class="text-[9px] uppercase font-bold text-slate-500 tracking-widest block mb-1">Forventet tid:</span>
+                                        <span id="boil-expected-val" class="text-sm font-black text-violet-400">752 s</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Eksamens Disposition -->
+        <footer class="bg-gradient-to-b from-[#0f121e] to-[#06080e] rounded-[3rem] p-12 md:p-16 text-center text-white relative overflow-hidden shadow-[0_20px_60px_-15px_rgba(0,0,0,1)] border border-white/5 mb-10">
+            <div class="relative z-10">
+                <span class="text-[10px] font-black uppercase tracking-[0.4em] text-violet-400 mb-6 block drop-shadow-[0_0_10px_rgba(139,92,246,0.8)]">Oversigt til Eksamen</span>
+                <h3 class="text-4xl font-black mb-12 italic text-white">Tjekliste til Tavlen</h3>
+                <div class="text-left max-w-3xl mx-auto space-y-6 mb-14 bg-white/5 p-8 md:p-12 rounded-[2.5rem] border border-white/10 backdrop-blur-md">
+                    
+                    <div class="flex gap-6">
+                        <div class="w-8 h-8 rounded-full bg-slate-800 text-slate-300 flex items-center justify-center flex-shrink-0 border border-slate-600 font-black text-sm shadow-inner">1</div>
+                        <div>
+                            <h5 class="font-bold text-white mb-2 text-lg">De 3 Tilstandsformer</h5>
+                            <p class="text-slate-400 text-sm leading-relaxed">Fast, flydende, gas. Forklar at forskellen skyldes molekylernes kinetiske energi (temperatur). Jo varmere det er, jo mere river molekylerne sig løs fra hinanden.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex gap-6">
+                        <div class="w-8 h-8 rounded-full bg-cyan-900/50 text-cyan-400 flex items-center justify-center flex-shrink-0 border border-cyan-500/50 font-black text-sm shadow-inner">2</div>
+                        <div>
+                            <h5 class="font-bold text-white mb-2 text-lg">Opvarmningskurven</h5>
+                            <p class="text-slate-400 text-sm leading-relaxed">Tegn kurven på tavlen (Energi ud ad x-aksen, Temp op ad y-aksen). Vis at kurven står stille (plateau) ved smeltning (0°C) og fordampning (100°C). Forklar ordet <em>Latent varme</em> (skjult energi).</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex gap-6">
+                        <div class="w-8 h-8 rounded-full bg-blue-900/50 text-blue-400 flex items-center justify-center flex-shrink-0 border border-blue-500/50 font-black text-sm shadow-inner">3</div>
+                        <div>
+                            <h5 class="font-bold text-white mb-2 text-lg">Smelte- og Fordampningsvarme</h5>
+                            <p class="text-slate-400 text-sm leading-relaxed">Opskriv formlerne <em class="math-font text-white bg-white/10 px-1.5 py-0.5 rounded mx-1 shadow-inner">E = m · L<sub>s</sub></em> og <em class="math-font text-white bg-white/10 px-1.5 py-0.5 rounded mx-1 shadow-inner">E = m · L<sub>f</sub></em>. Gør stort nummer ud af at fortælle, at L<sub>f</sub> for vand er over 2200 kJ/kg, hvilket er meget højere end smeltevarmen. Gør kurvens 100°C plateau langt!</p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex gap-6">
+                        <div class="w-8 h-8 rounded-full bg-violet-900/50 text-violet-400 flex items-center justify-center flex-shrink-0 border border-violet-500/50 font-black text-sm shadow-inner">4</div>
+                        <div>
+                            <h5 class="font-bold text-white mb-2 text-lg">Fordampningsforsøget</h5>
+                            <p class="text-slate-400 text-sm leading-relaxed">Forklar hvordan man måler L<sub>f</sub>. Tag en gryde med kogende vand. Sæt den på en vægt (så vi kan måle hvor meget masse m der fordamper) og sæt energi lig: <em class="math-font text-white bg-white/10 px-1.5 py-0.5 rounded mx-1 shadow-inner">P · t = m · L<sub>f</sub></em>. Isoler L<sub>f</sub> for at finde resultatet eksperimentelt.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="absolute -top-32 -left-32 w-[50rem] h-[50rem] bg-cyan-600/10 rounded-full blur-[200px] pointer-events-none"></div>
+            <div class="absolute -bottom-32 -right-32 w-[50rem] h-[50rem] bg-violet-600/10 rounded-full blur-[200px] pointer-events-none"></div>
+        </footer>
+
+    </main>
+
+    <script>
+        // --- DATA TIL VIDENS-SKUFFE ---
+        const infoData = {
+            'tilstandsformer': {
+                title: 'De tre tilstandsformer',
+                text: 'Stof findes primært i tre faser: Fast, flydende og gas.<br><br>I <strong>fast form</strong> (is) vibrerer molekylerne kun, og er bundet stærkt sammen i et fast gitter.<br>I <strong>flydende form</strong> (vand) er energien høj nok til, at bindingerne delvist brydes, så molekylerne kan rutsje rundt imellem hinanden (derfor kan vand hældes).<br>I <strong>gasform</strong> (damp) har molekylerne så meget energi, at de har revet sig fuldstændig fri fra hinanden og flyver vildt rundt i alle retninger.'
+            },
+            'fordampningsvarme': {
+                title: 'Fordampningsvarme (L_f)',
+                text: 'Specifik fordampningsvarme (L_f) er den mængde energi det koster at koge 1 kg af et stof fra flydende til gas.<br><br>For vand er L_f = <strong>2.256.000 J/kg</strong> (eller 2256 kJ/kg). Sammenlignet med smeltevarmen (334 kJ/kg) er det ekstremt meget! Grunden til det kræver så utroligt meget energi er, at i fordampning skal molekylerne rives *fuldstændig* fri af hinandens tiltrækning, mens de under smeltning blot skal "løsnes" lidt fra gitteret.'
+            },
+            'kogning': {
+                title: 'Fordampnings-forsøget',
+                text: 'Hvordan beviser vi fordampningsvarmen i virkeligheden?<br><br>Vi stiller en elkedel eller kogeplade på en vægt og lader vandet koge ("bulderkoge"). Mens det koger, fordamper der vand, så massen på vægten falder. Vi tager tid (t) på hvor lang tid det tager for f.eks. 100 gram at fordampe. Da vi kender kogepladens effekt (P), ved vi hvor meget energi vi har tilført (E = P * t). Ved at sætte P * t = m * L_f, kan vi isolere L_f og beregne værdien!'
+            }
+        };
+
+        function openInfo(key) {
+            const data = infoData[key];
+            document.getElementById('drawer-title').innerText = data.title;
+            document.getElementById('drawer-content').innerHTML = `<p>${data.text}</p>`;
+            document.getElementById('info-drawer').classList.add('open');
+        }
+
+        function closeDrawer() {
+            document.getElementById('info-drawer').classList.remove('open');
+        }
+
+        // --- FASEOVERGANGS GRAF (100% SIKKER SVG LØSNING) ---
+        function updateSVGGraph() {
+            const progress = parseFloat(document.getElementById('energy-slider').value); // 0 to 100
+            
+            const minX = 12; const maxX = 92;
+            const curX = minX + (maxX - minX) * (progress / 100);
+            
+            // Justerede proportioner, så fordampnings-plateauet er meget længere end smelte-plateauet.
+            // p1: Start is. p2: Start smelte. p3: Slut smelte. p4: Vand 100g. p5: Slut kog. p6: Gas opvarm.
+            const p1 = {x: 12, y: 45}; // -20 C
+            const p2 = {x: 17, y: 35}; // 0 C start
+            const p3 = {x: 25, y: 35}; // 0 C slut
+            const p4 = {x: 35, y: 10}; // 100 C start
+            const p5 = {x: 85, y: 10}; // 100 C slut (meget langt)
+            const p6 = {x: 92, y: 5};  // 120 C
+
+            let curY, temp, state, color;
+
+            if (curX <= p2.x) {
+                let t = (curX - p1.x) / (p2.x - p1.x || 1);
+                curY = p1.y + (p2.y - p1.y) * t;
+                temp = -20 + (t * 20);
+                state = "Opvarmning (Is)";
+                color = "#e0f2fe"; 
+            } else if (curX <= p3.x) {
+                curY = p2.y;
+                temp = 0;
+                state = "Smelter (Plateau)";
+                color = "#38bdf8"; 
+            } else if (curX <= p4.x) {
+                let t = (curX - p3.x) / (p4.x - p3.x || 1);
+                curY = p3.y + (p4.y - p3.y) * t;
+                temp = t * 100;
+                state = "Opvarmning (Vand)";
+                color = "#8b5cf6"; // Lilla
+            } else if (curX <= p5.x) {
+                curY = p4.y;
+                temp = 100;
+                let boilPct = ((curX - p4.x) / (p5.x - p4.x || 1)) * 100;
+                state = `Koger (Fordampningsvarme) - ${boilPct.toFixed(0)}% damp`;
+                color = "#c084fc"; // Pink-purple
+            } else {
+                let t = (curX - p5.x) / (p6.x - p5.x || 1);
+                curY = p5.y + (p6.y - p5.y) * t;
+                temp = 100 + t * 20;
+                state = "Opvarmning (Damp)";
+                color = "#ec4899"; // Pink
+            }
+
+            let pathD = `M ${p1.x} ${p1.y}`;
+            if (curX <= p2.x) pathD += ` L ${curX} ${curY}`;
+            else if (curX <= p3.x) pathD += ` L ${p2.x} ${p2.y} L ${curX} ${curY}`;
+            else if (curX <= p4.x) pathD += ` L ${p2.x} ${p2.y} L ${p3.x} ${p3.y} L ${curX} ${curY}`;
+            else if (curX <= p5.x) pathD += ` L ${p2.x} ${p2.y} L ${p3.x} ${p3.y} L ${p4.x} ${p4.y} L ${curX} ${curY}`;
+            else pathD += ` L ${p2.x} ${p2.y} L ${p3.x} ${p3.y} L ${p4.x} ${p4.y} L ${p5.x} ${p5.y} L ${curX} ${curY}`;
+
+            document.getElementById('svg-active-path').setAttribute('d', pathD);
+            document.getElementById('svg-active-path').setAttribute('stroke', color);
+            
+            document.getElementById('svg-marker').setAttribute('cx', curX);
+            document.getElementById('svg-marker').setAttribute('cy', curY);
+            document.getElementById('svg-marker').setAttribute('fill', color);
+            
+            document.getElementById('svg-glow').setAttribute('cx', curX);
+            document.getElementById('svg-glow').setAttribute('cy', curY);
+            document.getElementById('svg-glow').setAttribute('fill', color);
+            
+            document.getElementById('svg-guide-line').setAttribute('x1', curX);
+            document.getElementById('svg-guide-line').setAttribute('x2', curX);
+            document.getElementById('svg-guide-line').setAttribute('y1', curY);
+
+            document.getElementById('graph-temp').innerText = temp.toFixed(1) + "°C";
+            document.getElementById('graph-temp').style.color = color;
+            document.getElementById('state-label').innerText = state;
+            document.getElementById('state-label').style.color = color;
+        }
+
+        // --- FORDAMPNINGS LAB CSS/DOM Baseret ---
+        const boilMassSlider = document.getElementById('lab-boil-mass-slider');
+        const boilMassVal = document.getElementById('lab-boil-mass-val');
+        const boilPowerSlider = document.getElementById('lab-boil-power-slider');
+        const boilPowerVal = document.getElementById('lab-boil-power-val');
+        
+        const potWater = document.getElementById('pot-water');
+        const potBubbles = document.getElementById('pot-bubbles');
+        const potSteam = document.getElementById('pot-steam');
+        const hotPlate = document.getElementById('hot-plate');
+        const btnBoil = document.getElementById('btn-boil');
+        
+        const timeVal = document.getElementById('boil-time-val');
+        const expectedVal = document.getElementById('boil-expected-val');
+
+        let isBoiling = false;
+        let boilInterval;
+        let boilTime = 0;
+        let expectedTime = 0;
+        
+        const L_f = 2256000; // J/kg
+
+        function updateBoilUI() {
+            if(isBoiling) return;
+            const m = parseFloat(boilMassSlider.value);
+            const p = parseInt(boilPowerSlider.value);
+            
+            boilMassVal.innerText = m.toFixed(1) + " kg";
+            boilPowerVal.innerText = p + " W";
+            
+            // t = m * Lf / P
+            expectedTime = (m * L_f) / p;
+            expectedVal.innerText = expectedTime.toFixed(0) + " s";
+            
+            potWater.style.height = (m / 1.0 * 80) + "%";
+            timeVal.innerText = "0 s";
+        }
+        
+        // Kald opdatering ved start
+        updateBoilUI();
+
+        function createSteam() {
+            const s = document.createElement('div');
+            s.className = 'absolute bottom-0 w-8 h-8 rounded-full bg-white/20 blur-md';
+            s.style.left = Math.random() * 80 + 10 + '%';
+            
+            s.animate([
+                { bottom: '0px', opacity: 0.5, transform: 'scale(1)' },
+                { bottom: '100px', opacity: 0, transform: 'scale(3)' }
+            ], {
+                duration: 1500 + Math.random()*500,
+                easing: 'ease-out'
+            });
+            
+            potSteam.appendChild(s);
+            setTimeout(() => { if(potSteam.contains(s)) potSteam.removeChild(s); }, 2000);
+        }
+
+        function createBoilBubble() {
+            const b = document.createElement('div');
+            b.className = 'absolute bottom-0 rounded-full border border-white/50 bg-white/20';
+            const size = Math.random() * 12 + 6;
+            b.style.width = size + 'px';
+            b.style.height = size + 'px';
+            b.style.left = Math.random() * 100 + '%';
+            
+            b.animate([
+                { bottom: '0px', opacity: 0.8 },
+                { bottom: '100%', opacity: 0 }
+            ], { duration: 400 + Math.random()*200, easing: 'ease-in' });
+            
+            potBubbles.appendChild(b);
+            setTimeout(() => { if(potBubbles.contains(b)) potBubbles.removeChild(b); }, 600);
+        }
+
+        function startBoiling() {
+            if(isBoiling) return;
+            isBoiling = true;
+            
+            const mass_start = parseFloat(boilMassSlider.value);
+            const power = parseInt(boilPowerSlider.value);
+            
+            btnBoil.innerText = "KOGER (FORDAMPER)...";
+            btnBoil.classList.replace('bg-violet-600', 'bg-red-600');
+            btnBoil.classList.replace('hover:bg-violet-500', 'hover:bg-red-500');
+            btnBoil.classList.replace('shadow-[0_0_15px_rgba(139,92,246,0.4)]', 'shadow-[0_0_20px_rgba(239,68,68,0.6)]');
+            
+            hotPlate.style.opacity = "1";
+            potSteam.style.opacity = "1";
+            potBubbles.style.opacity = "1";
+            
+            boilTime = 0;
+            let currentMass = mass_start;
+
+            boilInterval = setInterval(() => {
+                // Simuleret tidsgang (100ms = 5 sekunder i sim for hurtigt forsøg)
+                const dt_sim = 5; 
+                boilTime += dt_sim;
+                
+                // Hvor meget masse fordamper på dt_sim sekunder? 
+                // E = P*dt. m_fordampet = E / Lf = P*dt / Lf.
+                const m_fordampet = (power * dt_sim) / L_f;
+                currentMass -= m_fordampet;
+                
+                timeVal.innerText = Math.floor(boilTime) + " s";
+                
+                // Opdater vandstand visuelt
+                if (currentMass < 0) currentMass = 0;
+                potWater.style.height = (currentMass / 1.0 * 80) + "%";
+
+                // Viser damp
+                for(let i=0; i<3; i++) { createBoilBubble(); createSteam(); }
+
+                if (currentMass <= 0) {
+                    clearInterval(boilInterval);
+                    btnBoil.innerText = "GRYDEN ER KOGT TØR!";
+                    potBubbles.style.opacity = "0";
+                    potSteam.style.opacity = "0";
+                    
+                    setTimeout(() => {
+                        isBoiling = false;
+                        hotPlate.style.opacity = "0";
+                        btnBoil.classList.replace('bg-red-600', 'bg-violet-600');
+                        btnBoil.classList.replace('hover:bg-red-500', 'hover:bg-violet-500');
+                        btnBoil.classList.replace('shadow-[0_0_20px_rgba(239,68,68,0.6)]', 'shadow-[0_0_15px_rgba(139,92,246,0.4)]');
+                        btnBoil.innerText = "Start Fordampning";
+                        updateBoilUI(); // Nulstiller vandstanden
+                    }, 3000);
+                }
+            }, 100);
+        }
+
+        // --- BACKGROUND DAMP PARTICLES ---
+        const bgCanvas = document.getElementById('particle-canvas');
+        const bgCtx = bgCanvas.getContext('2d');
+        let bgParticles = [];
+        
+        function initBg() {
+            bgCanvas.width = window.innerWidth; 
+            bgCanvas.height = window.innerHeight;
+            bgParticles = [];
+            for (let i = 0; i < 40; i++) {
+                bgParticles.push({
+                    x: Math.random() * bgCanvas.width, 
+                    y: Math.random() * bgCanvas.height,
+                    size: Math.random() * 4 + 2, // Lidt større (damp)
+                    vx: (Math.random() - 0.5) * 0.2, 
+                    vy: -Math.random() * 0.5 - 0.2, // Stiger langsomt opad
+                    opacity: Math.random() * 0.5 + 0.1
+                });
+            }
+        }
+        
+        function animateBg() {
+            bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
+            bgParticles.forEach(p => {
+                p.x += p.vx; 
+                p.y += p.vy;
+                
+                // Svajer lidt
+                p.x += Math.sin(p.y * 0.01) * 0.3;
+
+                // Fades out as it goes up
+                p.opacity -= 0.001;
+
+                if (p.y < -10 || p.opacity <= 0) {
+                    p.y = bgCanvas.height + 10;
+                    p.x = Math.random() * bgCanvas.width;
+                    p.opacity = Math.random() * 0.5 + 0.1;
+                }
+                
+                bgCtx.fillStyle = `rgba(139, 92, 246, ${p.opacity})`; // Violet damp farve
+                bgCtx.beginPath(); 
+                bgCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2); 
+                bgCtx.fill();
+                
+                // Glow on particles
+                bgCtx.shadowBlur = 10;
+                bgCtx.shadowColor = `rgba(6, 182, 212, ${p.opacity})`; // Cyan glow
+                bgCtx.fill();
+                bgCtx.shadowBlur = 0;
+            });
+            requestAnimationFrame(animateBg);
+        }
+
+        window.addEventListener('resize', initBg);
+        
+        window.onload = () => { 
+            initBg(); animateBg(); 
+            updateSVGGraph(); 
+            setInterval(() => {
+                // Sørger for pulsen på SVG marker opdateres selv hvis slideren står stille
+                updateSVGGraph();
+            }, 50);
+        };
+    </script>
+</body>
+</html>

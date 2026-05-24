@@ -1,0 +1,874 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Opgavebank - Sankt Annæ 2.a</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap');
+        
+        :root {
+            --primary: #6366f1;
+            --secondary: #a855f7;
+            --bg: #020617;
+            --glass: rgba(15, 23, 42, 0.7);
+            --glass-hover: rgba(30, 41, 59, 0.8);
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg);
+            color: #f1f5f9;
+            background-image: 
+                radial-gradient(circle at 10% 10%, rgba(99, 102, 241, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 90% 90%, rgba(168, 85, 247, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 50% 50%, rgba(14, 165, 233, 0.05) 0%, transparent 60%);
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+
+        .glass-panel {
+            background: var(--glass);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .filter-btn {
+            transition: all 0.2s ease;
+        }
+        
+        .filter-btn.active {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border-color: transparent;
+            box-shadow: 0 4px 15px rgba(168, 85, 247, 0.3);
+        }
+
+        code {
+            font-family: 'Fira Code', monospace;
+            color: #a5b4fc;
+            background: rgba(0, 0, 0, 0.4);
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 0.9em;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            letter-spacing: -0.5px;
+        }
+
+        /* Animations */
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .animate-slide {
+            animation: slideIn 0.4s ease forwards;
+        }
+
+        .animate-shake {
+            animation: shake 0.4s ease;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: rgba(99, 102, 241, 0.5); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(99, 102, 241, 0.8); }
+    </style>
+</head>
+<body class="pb-20">
+
+    <!-- Header Navigation -->
+    <nav class="sticky top-0 z-50 glass-panel border-b border-white/10">
+        <div class="max-w-4xl mx-auto px-6 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="w-9 h-9 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl flex items-center justify-center shadow-lg">
+                    <i class="fas fa-gamepad text-white text-sm"></i>
+                </div>
+                <div>
+                    <span class="font-bold tracking-tight block leading-none text-lg">Opgavebank</span>
+                    <span class="text-[10px] text-slate-400 font-bold uppercase tracking-widest">STX Mat B • Træning</span>
+                </div>
+            </div>
+            
+            <div class="flex items-center space-x-3">
+                <a href="matematik-skriftlig.html" class="px-4 py-2 rounded-lg text-xs font-black transition-all text-slate-400 hover:text-white flex items-center">
+                    <i class="fas fa-home md:mr-2"></i><span class="hidden md:inline">HJEM</span>
+                </a>
+                <a href="maple.html" class="px-4 py-2 rounded-lg text-xs font-black transition-all text-indigo-400 hover:bg-indigo-500/20 flex items-center border border-indigo-500/30">
+                    <i class="fas fa-terminal md:mr-2"></i><span class="hidden md:inline">MAPLE-GUIDE</span>
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-4xl mx-auto px-6 py-10">
+        
+        <!-- Hero Section & Progress Bar -->
+        <div class="mb-10 text-center md:text-left">
+            <h1 class="text-4xl md:text-5xl font-extrabold tracking-tight mb-3 bg-clip-text text-transparent bg-gradient-to-r from-indigo-400 to-purple-400">
+                Interaktiv Eksamens-Træning
+            </h1>
+            <p class="text-slate-400 text-lg mb-8 max-w-2xl">
+                Vælg et emne og løs opgaverne. Få direkte feedback på dine svar og se den korrekte Maple-metode, når du svarer rigtigt.
+            </p>
+
+            <!-- Progress Bar UI -->
+            <div class="glass-panel p-5 rounded-2xl border border-indigo-500/20 relative overflow-hidden">
+                <div class="absolute inset-0 bg-gradient-to-r from-indigo-500/5 to-emerald-500/5"></div>
+                <div class="relative z-10">
+                    <div class="flex justify-between items-end mb-2">
+                        <div>
+                            <span class="text-xs text-slate-400 font-bold uppercase tracking-wider">Din fremgang</span>
+                            <h3 id="progress-text" class="text-xl font-bold text-white leading-none mt-1">0 / 0 løst</h3>
+                        </div>
+                        <span id="progress-percent" class="text-emerald-400 font-black text-2xl">0%</span>
+                    </div>
+                    <div class="w-full h-3 bg-slate-900 rounded-full overflow-hidden border border-white/5">
+                        <div id="progress-bar-fill" class="h-full bg-gradient-to-r from-indigo-500 to-emerald-400 transition-all duration-700 ease-out" style="width: 0%"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="flex flex-wrap gap-2 mb-8" id="filter-container">
+            <button class="filter-btn active px-5 py-2.5 rounded-xl text-sm font-bold border border-white/10 text-slate-300" data-filter="all">
+                Alle Emner
+            </button>
+            <button class="filter-btn px-5 py-2.5 rounded-xl text-sm font-bold border border-white/10 text-slate-300 hover:bg-white/5" data-filter="diff">
+                <i class="fas fa-level-up-alt mr-2 text-amber-400"></i>Differentialregning
+            </button>
+            <button class="filter-btn px-5 py-2.5 rounded-xl text-sm font-bold border border-white/10 text-slate-300 hover:bg-white/5" data-filter="sandsynlighed">
+                <i class="fas fa-dice mr-2 text-cyan-400"></i>Sandsynlighed
+            </button>
+            <button class="filter-btn px-5 py-2.5 rounded-xl text-sm font-bold border border-white/10 text-slate-300 hover:bg-white/5" data-filter="funktioner">
+                <i class="fas fa-chart-pie mr-2 text-fuchsia-400"></i>Funktioner
+            </button>
+            <button class="filter-btn px-5 py-2.5 rounded-xl text-sm font-bold border border-white/10 text-slate-300 hover:bg-white/5" data-filter="regression">
+                <i class="fas fa-chart-line mr-2 text-emerald-400"></i>Regression
+            </button>
+        </div>
+
+        <!-- Opgave Container (Flashcard style) -->
+        <div id="exercise-container" class="glass-panel p-8 md:p-10 rounded-[2rem] border border-white/10 relative min-h-[400px] flex flex-col transition-all">
+            <!-- Indhold genereres via JS her -->
+        </div>
+
+    </main>
+
+    <script>
+        // --- OPGAVEDATA ---
+        const allExercises = [
+            {
+                id: 'opg-1',
+                category: 'diff',
+                categoryName: 'Differentialregning',
+                badgeColor: 'text-amber-300 bg-amber-500/20 border-amber-500/30',
+                title: 'Tangentens ligning',
+                text: 'En funktion er givet ved forskriften:',
+                code: 'f(x) := -x^2 + 4*x + 1',
+                question: 'Bestem en ligning for tangenten til grafen for f i x = 3. (Skriv på formen y=ax+b, f.eks. y=2x+5 uden mellemrum)',
+                expectedAnswer: 'y=-2x+10',
+                method: "Brug Gym-pakkens tangentkommando: <br><code>tangent(f(x), x = 3)</code>"
+            },
+            {
+                id: 'opg-2',
+                category: 'diff',
+                categoryName: 'Differentialregning',
+                badgeColor: 'text-amber-300 bg-amber-500/20 border-amber-500/30',
+                title: 'Monotoniforhold',
+                text: 'En funktion f er bestemt ved:',
+                code: 'f(x) := x^3 - 6*x^2 + 9*x + 2',
+                question: 'Funktionen har et lokalt maksimum. Hvad er x-værdien for dette maksimum?',
+                expectedAnswer: '1',
+                method: "Løs ligningen f'(x)=0 i Maple med: <br><code>solve(f'(x)=0, x)</code><br>Dette giver x=1 og x=3. Tester man fortegn, vil man se at grafen vokser frem mod x=1, og derfor er der maksimum der."
+            },
+            {
+                id: 'opg-3',
+                category: 'diff',
+                categoryName: 'Optimering',
+                badgeColor: 'text-emerald-300 bg-emerald-500/20 border-emerald-500/30',
+                title: 'Optimering af Overskud',
+                text: 'En virksomheds overskud ved salg af x enheder er givet ved modellen:',
+                code: 'O(x) := -0.5*x^2 + 120*x - 1500',
+                question: 'Bestem det maksimale overskud (angiv kun tallet).',
+                expectedAnswer: '5700',
+                method: "Brug maksimeringskommandoen: <br><code>maximize(O(x), x = 0..200, location)</code><br>Svaret bliver 5700 (som opnås ved x=120)."
+            },
+            {
+                id: 'opg-4',
+                category: 'sandsynlighed',
+                categoryName: 'Sandsynlighed',
+                badgeColor: 'text-cyan-300 bg-cyan-500/20 border-cyan-500/30',
+                title: 'Binomialfordeling (X = r)',
+                text: 'I et lotteri er vinderchancen på et lod 15%. Du køber 20 lodder.',
+                question: 'Hvad er sandsynligheden for, at du vinder på præcis 4 lodder? (Angiv som kommatal med 3 decimaler, f.eks. 0.182)',
+                expectedAnswer: '0.182',
+                method: "Da det er en præcis værdi, bruger vi binpdf. n = 20 og p = 0.15.<br>Kommando: <code>binpdf(20, 0.15, 4)</code>"
+            },
+            {
+                id: 'opg-5',
+                category: 'sandsynlighed',
+                categoryName: 'Sandsynlighed',
+                badgeColor: 'text-cyan-300 bg-cyan-500/20 border-cyan-500/30',
+                title: 'Binomialfordeling (Kumuleret)',
+                text: 'En basketballspiller rammer på 80% af sine straffekast. Han skyder 15 straffekast i en kamp.',
+                question: 'Hvad er sandsynligheden for, at han rammer på mindst 10 af kastene? (Angiv som kommatal med 3 decimaler)',
+                expectedAnswer: '0.939',
+                method: "Intervallet er fra 10 til 15. Brug bincdf med 4 parametre: <br><code>bincdf(15, 0.80, 10, 15)</code>"
+            },
+            {
+                id: 'opg-6',
+                category: 'regression',
+                categoryName: 'Regression',
+                badgeColor: 'text-pink-300 bg-pink-500/20 border-pink-500/30',
+                title: 'Eksponentiel Regression',
+                text: 'Tabellen viser antallet af syge (y) efter x dage.\nX := [1, 2, 3, 4, 5]\nY := [12, 18, 27, 40, 61]\nUdviklingen kan beskrives ved en eksponentiel funktion f(x) = b * a^x.',
+                question: 'Bestem fremskrivningsfaktoren a (Angiv med 2 decimaler, f.eks. 1.50)',
+                expectedAnswer: '1.50',
+                method: "Opret listerne X og Y, og kør: <br><code>ExpReg(X, Y)</code><br>Forskriften bliver f(x) = 7.97 * 1.50^x. Tallet a er grundtallet for x."
+            },
+            {
+                id: 'opg-7',
+                category: 'funktioner',
+                categoryName: 'Funktioner',
+                badgeColor: 'text-fuchsia-300 bg-fuchsia-500/20 border-fuchsia-500/30',
+                title: 'Skæring mellem to grafer',
+                text: 'To funktioner er givet ved:',
+                code: 'f(x) := 2*x^2 - 4*x + 1 \ng(x) := x + 4',
+                question: 'Graferne for f og g skærer hinanden i to punkter. Hvad er den største x-værdi for disse skæringspunkter?',
+                expectedAnswer: '3',
+                method: "Sæt funktionerne lig hinanden i Maple: <br><code>solve(f(x) = g(x), x)</code><br>Du får resultaterne x = -0.5 og x = 3. Den største er 3."
+            },
+            {
+                id: 'opg-8',
+                category: 'sandsynlighed',
+                categoryName: 'Sandsynlighed (Test)',
+                badgeColor: 'text-cyan-300 bg-cyan-500/20 border-cyan-500/30',
+                title: 'Binomialtest',
+                text: 'En producent påstår at mindst 20% af knapperne i en pose er røde. Du tager en stikprøve på 150 knapper. 18 er røde. Vi tester på 5% niveau.',
+                question: 'Kan producentens påstand forkastes? (Svar med Ja eller Nej)',
+                expectedAnswer: 'ja',
+                method: "Kør en binomialtest i Maple: <br><code>binomialTest(150, 0.20, 0.05, tosidet)</code><br>Acceptmængden er [21; 40]. Da vi fik 18, ligger det udenfor acceptmængden, og nulhypotesen forkastes."
+            },
+            {
+                id: 'opg-9',
+                category: 'funktioner',
+                categoryName: 'Funktioner',
+                badgeColor: 'text-fuchsia-300 bg-fuchsia-500/20 border-fuchsia-500/30',
+                title: 'Rødder i polynomium',
+                text: 'Et andengradspolynomium er givet ved:',
+                code: 'f(x) := x^2 - 8*x + 15',
+                question: 'Polynomiet har to rødder. Hvad er den mindste rod?',
+                expectedAnswer: '3',
+                method: "Find nulpunkterne med: <br><code>solve(f(x) = 0, x)</code><br>Du får løsningerne x = 3 og x = 5."
+            },
+            {
+                id: 'opg-10',
+                category: 'funktioner',
+                categoryName: 'Funktioner',
+                badgeColor: 'text-fuchsia-300 bg-fuchsia-500/20 border-fuchsia-500/30',
+                title: 'Toppunktets placering',
+                text: 'Et andengradspolynomium er givet ved:',
+                code: 'f(x) := -x^2 + 6*x + 1',
+                question: 'Grafen for f er en parabel. Hvad er y-værdien for parablens toppunkt?',
+                expectedAnswer: '10',
+                method: "Brug maximize: <br><code>maximize(f(x), x, location)</code><br>Svaret viser 10 (ved x = 3)."
+            },
+            {
+                id: 'opg-11',
+                category: 'funktioner',
+                categoryName: 'Funktioner',
+                badgeColor: 'text-fuchsia-300 bg-fuchsia-500/20 border-fuchsia-500/30',
+                title: 'Eksponentiel model',
+                text: 'Befolkningstallet i en by vokser med 5% om året. Startværdien er 200.',
+                question: 'Hvad er fremskrivningsfaktoren a i modellen f(x) = b * a^x?',
+                expectedAnswer: '1.05',
+                method: "Fremskrivningsfaktoren beregnes som 1 + r (hvor r er renten som decimaltal). Altså 1 + 0.05 = 1.05."
+            },
+            {
+                id: 'opg-12',
+                category: 'funktioner',
+                categoryName: 'Funktioner',
+                badgeColor: 'text-fuchsia-300 bg-fuchsia-500/20 border-fuchsia-500/30',
+                title: 'Fordoblingskonstant',
+                text: 'En funktion er givet ved:',
+                code: 'f(x) := 10 * 1.12^x',
+                question: 'Bestem fordoblingskonstanten (Angiv med 3 decimaler)',
+                expectedAnswer: '6.116',
+                method: "Brug formlen T2 = ln(2) / ln(a). I Maple: <code>evalf(ln(2) / ln(1.12))</code>"
+            },
+            {
+                id: 'opg-13',
+                category: 'funktioner',
+                categoryName: 'Funktioner',
+                badgeColor: 'text-fuchsia-300 bg-fuchsia-500/20 border-fuchsia-500/30',
+                title: 'Halveringskonstant',
+                text: 'En funktion er givet ved:',
+                code: 'f(x) := 50 * 0.85^x',
+                question: 'Bestem halveringskonstanten (Angiv med 3 decimaler)',
+                expectedAnswer: '4.265',
+                method: "Brug formlen T1/2 = ln(0.5) / ln(a). I Maple: <code>evalf(ln(0.5) / ln(0.85))</code>"
+            },
+            {
+                id: 'opg-14',
+                category: 'funktioner',
+                categoryName: 'Funktioner',
+                badgeColor: 'text-fuchsia-300 bg-fuchsia-500/20 border-fuchsia-500/30',
+                title: 'Potensvækst (Absolut)',
+                text: 'En potensfunktion er givet ved:',
+                code: 'f(x) := 4 * x^2',
+                question: 'Hvis x ganges med 3, hvad ganges f(x) så med?',
+                expectedAnswer: '9',
+                method: "Når x ganges med et tal k, ganges f(x) med k^a. Her er k=3 og a=2, så f(x) ganges med 3^2 = 9."
+            },
+            {
+                id: 'opg-15',
+                category: 'funktioner',
+                categoryName: 'Funktioner',
+                badgeColor: 'text-fuchsia-300 bg-fuchsia-500/20 border-fuchsia-500/30',
+                title: 'Potensvækst (Procent)',
+                text: 'For en potensfunktion med a = 1.5 oplyses det, at x vokser med 20%.',
+                question: 'Hvor mange procent vokser f(x) med? (Angiv som kommatal med 1 decimal)',
+                expectedAnswer: '31.5',
+                method: "Fremskrivningsfaktoren for x er 1.20. For y bliver den 1.20^1.5 = 1.3145. Det svarer til en vækst på ca. 31.5%."
+            },
+            {
+                id: 'opg-16',
+                category: 'funktioner',
+                categoryName: 'Funktioner',
+                badgeColor: 'text-fuchsia-300 bg-fuchsia-500/20 border-fuchsia-500/30',
+                title: 'Lineær skæring',
+                text: 'En linje har ligningen:',
+                code: 'y = -4x + 7',
+                question: 'Hvad er y-koordinaten til linjens skæring med y-aksen?',
+                expectedAnswer: '7',
+                method: "I ligningen y = ax + b er skæringen med y-aksen altid b-værdien. Her er b = 7."
+            },
+            {
+                id: 'opg-17',
+                category: 'funktioner',
+                categoryName: 'Funktioner',
+                badgeColor: 'text-fuchsia-300 bg-fuchsia-500/20 border-fuchsia-500/30',
+                title: 'Simpel Ligning',
+                text: 'Du har givet ligningen:',
+                code: '2*x + 5 = 11',
+                question: 'Løs ligningen og angiv x.',
+                expectedAnswer: '3',
+                method: "I Maple: <code>solve(2*x + 5 = 11, x)</code>. Eller i hovedet: 2x = 6, så x = 3."
+            },
+            {
+                id: 'opg-18',
+                category: 'funktioner',
+                categoryName: 'Funktioner',
+                badgeColor: 'text-fuchsia-300 bg-fuchsia-500/20 border-fuchsia-500/30',
+                title: 'Diskriminanten',
+                text: 'Et andengradspolynomium er givet ved f(x) = 2x^2 + 3x - 5.',
+                question: 'Hvad er diskriminanten d?',
+                expectedAnswer: '49',
+                method: "Diskriminanten d = b^2 - 4ac. Her er a=2, b=3, c=-5. d = 3^2 - 4*2*(-5) = 9 - (-40) = 49."
+            },
+            {
+                id: 'opg-19',
+                category: 'diff',
+                categoryName: 'Differentialregning',
+                badgeColor: 'text-amber-300 bg-amber-500/20 border-amber-500/30',
+                title: 'Værdien af f\'(x)',
+                text: 'En funktion er givet ved:',
+                code: 'f(x) := x^3 + 2*x',
+                question: 'Bestem f\'(1). (Hældningen i x=1)',
+                expectedAnswer: '5',
+                method: "Definér funktionen i Maple og beregn den afledte ved at skrive: <code>f'(1)</code>. Det giver 3*1^2 + 2 = 5."
+            },
+            {
+                id: 'opg-20',
+                category: 'diff',
+                categoryName: 'Differentialregning',
+                badgeColor: 'text-amber-300 bg-amber-500/20 border-amber-500/30',
+                title: 'Vandret Tangent',
+                text: 'En funktion er givet ved f(x) = x^2 - 10x.',
+                question: 'For hvilken x-værdi har grafen en vandret tangent?',
+                expectedAnswer: '5',
+                method: "Vandret tangent betyder at f'(x) = 0. Løs: <code>solve(f'(x) = 0, x)</code> for at finde x = 5."
+            },
+            {
+                id: 'opg-21',
+                category: 'diff',
+                categoryName: 'Differentialregning',
+                badgeColor: 'text-amber-300 bg-amber-500/20 border-amber-500/30',
+                title: 'Tangentligning i origo',
+                text: 'f(x) = x^2.',
+                question: 'Hvad er tangentens ligning i x = 1? (Skriv som y=ax+b uden mellemrum)',
+                expectedAnswer: 'y=2x-1',
+                method: "Brug: <code>tangent(x^2, x=1)</code>. Det returnerer y = 2x - 1."
+            },
+            {
+                id: 'opg-22',
+                category: 'diff',
+                categoryName: 'Differentialregning',
+                badgeColor: 'text-amber-300 bg-amber-500/20 border-amber-500/30',
+                title: 'Aflæsning af monotoni',
+                text: 'For funktionen f gælder, at f\'(x) = -x^2 + 8x.',
+                question: 'Er funktionen voksende i x = 2? (Svar Ja eller Nej)',
+                expectedAnswer: 'ja',
+                method: "Indsæt x=2 i f'(x): f'(2) = -2^2 + 8*2 = -4 + 16 = 12. Da f'(2) er positiv, er funktionen voksende."
+            },
+            {
+                id: 'opg-23',
+                category: 'diff',
+                categoryName: 'Differentialregning',
+                badgeColor: 'text-amber-300 bg-amber-500/20 border-amber-500/30',
+                title: 'Lokalt Minimum',
+                text: 'En funktion er givet ved f(x) = x^3 - 3x.',
+                question: 'Hvad er x-værdien for funktionens lokale minimum?',
+                expectedAnswer: '1',
+                method: "Løs f'(x) = 0. Du får x = -1 og x = 1. Lav et fortegnsskema. Grafen aftager fra -1 til 1, og vokser derefter. Derfor er minimum i x = 1."
+            },
+            {
+                id: 'opg-24',
+                category: 'diff',
+                categoryName: 'Differentialregning',
+                badgeColor: 'text-amber-300 bg-amber-500/20 border-amber-500/30',
+                title: 'Kendes f\'(x)?',
+                text: 'Tangenten til grafen for f i punktet P(4, 14) har ligningen y = 3x + 2.',
+                question: 'Hvad er værdien af f\'(4)?',
+                expectedAnswer: '3',
+                method: "f'(4) angiver tangentens hældning i x=4. I ligningen y = 3x + 2 er hældningen a = 3."
+            },
+            {
+                id: 'opg-25',
+                category: 'diff',
+                categoryName: 'Differentialregning',
+                badgeColor: 'text-amber-300 bg-amber-500/20 border-amber-500/30',
+                title: 'Tangent på en ret linje',
+                text: 'En funktion er givet ved f(x) = 2x + 5.',
+                question: 'Hvad er tangentens ligning i x = 10? (Skriv y=ax+b uden mellemrum)',
+                expectedAnswer: 'y=2x+5',
+                method: "Da funktionen i forvejen er en ret linje, vil tangenten til linjen bare være linjen selv. <code>tangent(2x+5, x=10)</code> giver y = 2x + 5."
+            },
+            {
+                id: 'opg-26',
+                category: 'diff',
+                categoryName: 'Differentialregning',
+                badgeColor: 'text-amber-300 bg-amber-500/20 border-amber-500/30',
+                title: 'Bestemt hældning',
+                text: 'En funktion er givet ved f(x) = x^2.',
+                question: 'Find den x-værdi, hvor tangenthældningen er præcis 4.',
+                expectedAnswer: '2',
+                method: "Sæt f'(x) lig hældningen: <code>solve(f'(x) = 4, x)</code>. f'(x) er 2x, så 2x = 4 medfører x = 2."
+            },
+            {
+                id: 'opg-27',
+                category: 'diff',
+                categoryName: 'Differentialregning',
+                badgeColor: 'text-amber-300 bg-amber-500/20 border-amber-500/30',
+                title: 'Differentiationsregel',
+                text: 'En funktion er givet ved f(x) = ln(x).',
+                question: 'Hvad er f\'(2)? (Angiv som kommatal)',
+                expectedAnswer: '0.5',
+                method: "Den afledte af ln(x) er 1/x. Sætter vi x=2 ind, får vi 1/2 = 0.5."
+            },
+            {
+                id: 'opg-28',
+                category: 'diff',
+                categoryName: 'Differentialregning',
+                badgeColor: 'text-amber-300 bg-amber-500/20 border-amber-500/30',
+                title: 'Hastighed',
+                text: 'En bils position i meter til tiden t sekunder er givet ved s(t) = t^2 + 3t.',
+                question: 'Hvad er bilens hastighed til tiden t=2? (Hastigheden er s\'(t))',
+                expectedAnswer: '7',
+                method: "Hastigheden er s'(t) = 2t + 3. Indsæt t=2: 2*2 + 3 = 7."
+            },
+            {
+                id: 'opg-29',
+                category: 'diff',
+                categoryName: 'Optimering',
+                badgeColor: 'text-emerald-300 bg-emerald-500/20 border-emerald-500/30',
+                title: 'Simpel Optimering',
+                text: 'Overskuddet er givet ved O(x) = -x^2 + 40x.',
+                question: 'Hvad er det maksimalt mulige overskud?',
+                expectedAnswer: '400',
+                method: "Brug <code>maximize(-x^2+40x, x)</code>. Maksimum opnås ved x=20 og giver O(20) = 400."
+            },
+            {
+                id: 'opg-30',
+                category: 'diff',
+                categoryName: 'Optimering',
+                badgeColor: 'text-emerald-300 bg-emerald-500/20 border-emerald-500/30',
+                title: 'Indhegning areal',
+                text: 'Et rektangels areal kan beskrives som funktionen A(x) = -x^2 + 50x.',
+                question: 'Hvad er det maksimale areal rektanglet kan have?',
+                expectedAnswer: '625',
+                method: "Kør <code>maximize(-x^2+50x, x)</code>. Du finder at x=25 giver det maksimale areal på 625."
+            },
+            {
+                id: 'opg-31',
+                category: 'diff',
+                categoryName: 'Optimering',
+                badgeColor: 'text-emerald-300 bg-emerald-500/20 border-emerald-500/30',
+                title: 'Trekantens Areal',
+                text: 'Arealet for en bestemt figur afhænger af x via T(x) = -2x^2 + 12x.',
+                question: 'Hvad er det maksimale areal for figuren?',
+                expectedAnswer: '18',
+                method: "<code>maximize(-2x^2+12x, x)</code>. Toppunktet er ved x=3, og arealet er 18."
+            },
+            {
+                id: 'opg-32',
+                category: 'diff',
+                categoryName: 'Optimering',
+                badgeColor: 'text-emerald-300 bg-emerald-500/20 border-emerald-500/30',
+                title: 'Mindste omkostning',
+                text: 'Omkostningerne ved produktion er givet ved C(x) = 0.1x^2 - 20x + 1500.',
+                question: 'Hvor mange enheder (x) skal produceres for at få de MINDSTE omkostninger?',
+                expectedAnswer: '100',
+                method: "Da du skal finde det mindste x, bruges <code>minimize(C(x), x, location)</code>. Dette giver at mindsteværdien opnås i x = 100."
+            },
+            {
+                id: 'opg-33',
+                category: 'sandsynlighed',
+                categoryName: 'Sandsynlighed',
+                badgeColor: 'text-cyan-300 bg-cyan-500/20 border-cyan-500/30',
+                title: 'Binomial (n=12)',
+                text: 'En binomialfordelt stokastisk variabel X har antalsparameter n=12 og sandsynlighedsparameter p=0.2.',
+                question: 'Bestem P(X=3). (Angiv med 3 decimaler)',
+                expectedAnswer: '0.236',
+                method: "Brug <code>binpdf(12, 0.2, 3)</code>."
+            },
+            {
+                id: 'opg-34',
+                category: 'sandsynlighed',
+                categoryName: 'Sandsynlighed',
+                badgeColor: 'text-cyan-300 bg-cyan-500/20 border-cyan-500/30',
+                title: 'Binomial Højst',
+                text: 'I et spil kastes der en mønt 8 gange (p=0.5).',
+                question: 'Hvad er sandsynligheden for HØJST 2 plat? (Angiv med 3 decimaler)',
+                expectedAnswer: '0.145',
+                method: "Højst 2 betyder intervallet 0 til 2. Brug <code>bincdf(8, 0.5, 2)</code>."
+            },
+            {
+                id: 'opg-35',
+                category: 'sandsynlighed',
+                categoryName: 'Sandsynlighed',
+                badgeColor: 'text-cyan-300 bg-cyan-500/20 border-cyan-500/30',
+                title: 'Binomial Mindst',
+                text: 'En ekspert rammer plet med 80% sandsynlighed. Han skyder 20 gange.',
+                question: 'Hvad er sandsynligheden for at han rammer plet MINDST 18 gange? (Angiv med 3 decimaler)',
+                expectedAnswer: '0.206',
+                method: "Mindst 18 betyder fra 18 til 20. Brug <code>bincdf(20, 0.8, 18, 20)</code>."
+            },
+            {
+                id: 'opg-36',
+                category: 'sandsynlighed',
+                categoryName: 'Sandsynlighed',
+                badgeColor: 'text-cyan-300 bg-cyan-500/20 border-cyan-500/30',
+                title: 'Middelværdi',
+                text: 'Du har et binomialfordelt eksperiment med n=40 og p=0.3.',
+                question: 'Hvad er middelværdien E(X) for eksperimentet?',
+                expectedAnswer: '12',
+                method: "Middelværdien for en binomialfordeling er simpelthen E(X) = n * p. Altså 40 * 0.3 = 12."
+            },
+            {
+                id: 'opg-37',
+                category: 'sandsynlighed',
+                categoryName: 'Sandsynlighed',
+                badgeColor: 'text-cyan-300 bg-cyan-500/20 border-cyan-500/30',
+                title: 'Spredning',
+                text: 'Et eksperiment har n=100 og p=0.2. Variansen (Var) beregnes med n*p*(1-p) og er 16.',
+                question: 'Hvad er spredningen?',
+                expectedAnswer: '4',
+                method: "Spredningen er kvadratroden af variansen. Kvadratroden af 16 er 4."
+            },
+            {
+                id: 'opg-38',
+                category: 'sandsynlighed',
+                categoryName: 'Sandsynlighed (Test)',
+                badgeColor: 'text-cyan-300 bg-cyan-500/20 border-cyan-500/30',
+                title: 'Signifikansniveau',
+                text: 'En p-værdi i en binomialtest beregnes i Maple til at være 0.04 (altså 4%). Testen udføres med et 5% signifikansniveau.',
+                question: 'Skal nulhypotesen forkastes? (Ja/Nej)',
+                expectedAnswer: 'ja',
+                method: "Ja! Nulhypotesen forkastes altid, hvis p-værdien er MUNDRE end eller LIG MED signifikansniveauet. Her er 4% < 5%."
+            },
+            {
+                id: 'opg-39',
+                category: 'sandsynlighed',
+                categoryName: 'Sandsynlighed',
+                badgeColor: 'text-cyan-300 bg-cyan-500/20 border-cyan-500/30',
+                title: 'Binomial Nul succes',
+                text: 'Sandsynligheden for et hændeligt uheld på en maskine er p=0.1. Maskinen kører n=15 gange.',
+                question: 'Hvad er sandsynligheden for at der slet IKKE sker nogen uheld (X=0)? (Angiv med 3 decimaler)',
+                expectedAnswer: '0.206',
+                method: "Kør: <code>binpdf(15, 0.1, 0)</code>."
+            },
+            {
+                id: 'opg-40',
+                category: 'regression',
+                categoryName: 'Regression',
+                badgeColor: 'text-pink-300 bg-pink-500/20 border-pink-500/30',
+                title: 'Manuel Lineær: a',
+                text: 'En lineær model y = ax + b går gennem punkterne (0, 5) og (2, 11).',
+                question: 'Hvad er hældningen a?',
+                expectedAnswer: '3',
+                method: "a = (y2 - y1) / (x2 - x1) = (11 - 5) / (2 - 0) = 6 / 2 = 3."
+            },
+            {
+                id: 'opg-41',
+                category: 'regression',
+                categoryName: 'Regression',
+                badgeColor: 'text-pink-300 bg-pink-500/20 border-pink-500/30',
+                title: 'Manuel Lineær: b',
+                text: 'En lineær model y = ax + b går gennem punkterne (0, 5) og (2, 11).',
+                question: 'Hvad er skæringen b med y-aksen?',
+                expectedAnswer: '5',
+                method: "Skæringen b aflæses direkte fra punktet, hvor x er 0. Altså er b = 5."
+            },
+            {
+                id: 'opg-42',
+                category: 'regression',
+                categoryName: 'Regression',
+                badgeColor: 'text-pink-300 bg-pink-500/20 border-pink-500/30',
+                title: 'Manuel Eksponentiel: a',
+                text: 'En eksponentiel model f(x) = b * a^x går gennem punkterne (1, 6) og (2, 18).',
+                question: 'Hvad er fremskrivningsfaktoren a?',
+                expectedAnswer: '3',
+                method: "For hver gang x stiger med 1, ganges y med a. Fra x=1 til x=2 går y fra 6 til 18. a = 18/6 = 3."
+            },
+            {
+                id: 'opg-43',
+                category: 'regression',
+                categoryName: 'Regression',
+                badgeColor: 'text-pink-300 bg-pink-500/20 border-pink-500/30',
+                title: 'Manuel Eksponentiel: b',
+                text: 'En eksponentiel model f(x) = b * a^x går gennem punkterne (0, 4) og (1, 8).',
+                question: 'Hvad er begyndelsesværdien b?',
+                expectedAnswer: '4',
+                method: "Begyndelsesværdien b er præcis y-værdien når x = 0. Punktet (0,4) giver direkte b = 4."
+            },
+            {
+                id: 'opg-44',
+                category: 'regression',
+                categoryName: 'Regression',
+                badgeColor: 'text-pink-300 bg-pink-500/20 border-pink-500/30',
+                title: 'Brug af potensmodel',
+                text: 'Ved potensregression for sammenhængen mellem vægt og længde på en fisk findes modellen f(x) = 2 * x^3.',
+                question: 'Hvis x = 4, hvad er så den forventede vægt f(4)?',
+                expectedAnswer: '128',
+                method: "Indsæt x=4 i modellen: f(4) = 2 * 4^3 = 2 * 64 = 128."
+            },
+            {
+                id: 'opg-45',
+                category: 'regression',
+                categoryName: 'Regression',
+                badgeColor: 'text-pink-300 bg-pink-500/20 border-pink-500/30',
+                title: 'Residual (afvigelse)',
+                text: 'Du har lavet lineær regression. En af dine oprindelige datamålinger var (x=3, y=10). Regressionsmodellen forudsiger, at for x=3 burde y være 8.',
+                question: 'Hvad er residualet for dette punkt? (Residual = observeret y - forventet y)',
+                expectedAnswer: '2',
+                method: "Residualet beregnes som den virkelige måling minus modellens måling: 10 - 8 = 2."
+            }
+        ];
+
+        // --- STATE & LOGIK ---
+        let currentFilter = 'all';
+        let activeQuestions = [];
+        let currentQuestionObj = null;
+        let solvedIds = JSON.parse(localStorage.getItem('mapleQuizDone')) || [];
+
+        const container = document.getElementById('exercise-container');
+        const filterBtns = document.querySelectorAll('.filter-btn');
+
+        // Initialisering
+        function init() {
+            setFilter('all');
+            updateProgressUI();
+            
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    filterBtns.forEach(b => {
+                        b.classList.remove('active');
+                        b.classList.replace('text-white', 'text-slate-300');
+                    });
+                    btn.classList.add('active');
+                    btn.classList.replace('text-slate-300', 'text-white');
+                    
+                    setFilter(btn.getAttribute('data-filter'));
+                });
+            });
+        }
+
+        // Sæt kategori og find ny opgave
+        function setFilter(category) {
+            currentFilter = category;
+            
+            if (category === 'all') {
+                activeQuestions = [...allExercises];
+            } else {
+                activeQuestions = allExercises.filter(q => q.category === category || (category === 'diff' && q.categoryName === 'Optimering'));
+            }
+            
+            pickNextQuestion();
+        }
+
+        // Vælg næste uløste opgave i den aktuelle kategori
+        function pickNextQuestion() {
+            const unsolved = activeQuestions.filter(q => !solvedIds.includes(q.id));
+            
+            if (unsolved.length === 0) {
+                renderAllDoneMessage();
+            } else {
+                // Vælg den første uløste (man kunne også gøre det tilfældigt)
+                currentQuestionObj = unsolved[0];
+                renderQuestion(currentQuestionObj);
+            }
+        }
+
+        // Opdater Progress Bar
+        function updateProgressUI() {
+            const total = allExercises.length;
+            const solved = solvedIds.length;
+            const pct = Math.round((solved / total) * 100);
+
+            document.getElementById('progress-text').innerText = `${solved} / ${total} løst`;
+            document.getElementById('progress-percent').innerText = `${pct}%`;
+            document.getElementById('progress-bar-fill').style.width = `${pct}%`;
+
+            if (pct === 100) {
+                document.getElementById('progress-bar-fill').classList.replace('from-indigo-500', 'from-emerald-400');
+                document.getElementById('progress-bar-fill').classList.add('shadow-[0_0_15px_rgba(16,185,129,0.5)]');
+            }
+        }
+
+        // Rengør brugerens input for at tjekke svaret (fjerner mellemrum, sætter til små bogstaver, ændrer komma til punktum)
+        function normalizeAnswer(ans) {
+            return ans.toLowerCase().replace(/ /g, '').replace(/,/g, '.');
+        }
+
+        // Tjek svar når knappen trykkes
+        function checkAnswer() {
+            const inputField = document.getElementById('answer-input');
+            const feedbackBox = document.getElementById('feedback-box');
+            
+            const userAnswer = normalizeAnswer(inputField.value);
+            const correctAnswer = normalizeAnswer(currentQuestionObj.expectedAnswer);
+
+            if (userAnswer === '') return;
+
+            if (userAnswer === correctAnswer) {
+                // RIGTIGT SVAR
+                inputField.disabled = true;
+                
+                // Gem progress
+                if (!solvedIds.includes(currentQuestionObj.id)) {
+                    solvedIds.push(currentQuestionObj.id);
+                    localStorage.setItem('mapleQuizDone', JSON.stringify(solvedIds));
+                    updateProgressUI();
+                }
+
+                feedbackBox.innerHTML = `
+                    <div class="p-5 bg-emerald-500/10 border border-emerald-500/40 rounded-xl animate-slide">
+                        <div class="flex items-center text-emerald-400 font-bold text-lg mb-2">
+                            <i class="fas fa-check-circle mr-2 text-xl"></i> Rigtigt! Super godt gået.
+                        </div>
+                        <p class="text-sm text-slate-300 mb-4">${currentQuestionObj.method}</p>
+                        <button onclick="pickNextQuestion()" class="px-5 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-900 font-black rounded-lg transition-colors">
+                            Næste Opgave <i class="fas fa-arrow-right ml-2"></i>
+                        </button>
+                    </div>
+                `;
+            } else {
+                // FORKERT SVAR
+                container.classList.remove('animate-shake');
+                void container.offsetWidth; // Trigger reflow for animation
+                container.classList.add('animate-shake');
+                
+                feedbackBox.innerHTML = `
+                    <div class="p-4 bg-rose-500/10 border border-rose-500/40 rounded-xl text-rose-300 flex items-center animate-slide">
+                        <i class="fas fa-times-circle mr-3 text-xl"></i> 
+                        <span>Ikke helt rigtigt. Prøv at tjekke dine beregninger igen. Husk formatet (f.eks. y=ax+b uden mellemrum, eller punktum i stedet for komma).</span>
+                    </div>
+                `;
+            }
+        }
+
+        // Håndter "Enter" knap i inputfelt
+        function handleEnter(e) {
+            if (e.key === 'Enter') {
+                checkAnswer();
+            }
+        }
+
+        // Render selve opgave-kortet
+        function renderQuestion(q) {
+            container.classList.remove('animate-slide');
+            void container.offsetWidth;
+            container.classList.add('animate-slide');
+
+            let codeHtml = '';
+            if (q.code) {
+                const codeLines = q.code.split('\n');
+                codeHtml = `<div class="mb-5">` + codeLines.map(line => `<code class="block mb-1">${line}</code>`).join('') + `</div>`;
+            }
+
+            container.innerHTML = `
+                <div class="flex justify-between items-start mb-6">
+                    <span class="px-3 py-1 text-xs font-bold rounded-lg border ${q.badgeColor}">${q.categoryName}</span>
+                    <span class="text-slate-500 font-mono text-sm">#${q.id.replace('opg-', '')}</span>
+                </div>
+                
+                <h2 class="text-2xl md:text-3xl font-bold text-white mb-4">${q.title}</h2>
+                <p class="text-slate-300 text-base md:text-lg mb-4 leading-relaxed">${q.text}</p>
+                
+                ${codeHtml}
+                
+                <div class="bg-indigo-900/20 border-l-4 border-indigo-500 p-4 rounded-r-xl mb-8">
+                    <p class="font-bold text-indigo-100">${q.question}</p>
+                </div>
+
+                <div class="mt-auto">
+                    <div class="flex flex-col md:flex-row gap-3 mb-4">
+                        <input type="text" id="answer-input" onkeypress="handleEnter(event)" placeholder="Indtast dit svar her..." autocomplete="off"
+                            class="flex-1 bg-slate-900/80 border border-white/10 px-5 py-4 rounded-xl text-white font-mono text-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all shadow-inner">
+                        <button onclick="checkAnswer()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold px-8 py-4 rounded-xl transition-colors shadow-lg shadow-indigo-500/20 flex items-center justify-center">
+                            Tjek Svar <i class="fas fa-check ml-2"></i>
+                        </button>
+                    </div>
+                    <div id="feedback-box"></div>
+                </div>
+            `;
+            
+            // Sæt fokus på input med det samme
+            setTimeout(() => document.getElementById('answer-input').focus(), 100);
+        }
+
+        // Render besked når alt er løst
+        function renderAllDoneMessage() {
+            container.innerHTML = `
+                <div class="flex flex-col items-center justify-center h-full text-center py-10 animate-slide">
+                    <div class="w-20 h-20 bg-emerald-500/20 rounded-full flex items-center justify-center mb-6 border border-emerald-500/40">
+                        <i class="fas fa-trophy text-4xl text-emerald-400"></i>
+                    </div>
+                    <h2 class="text-3xl font-black text-white mb-3">Stærkt gået!</h2>
+                    <p class="text-slate-300 max-w-md mx-auto mb-8">Du har løst alle de tilgængelige opgaver i denne kategori. Du er mere end klar til eksamen.</p>
+                    <button onclick="setFilter('all')" class="px-6 py-3 bg-white/10 hover:bg-white/20 rounded-xl font-bold transition-colors">
+                        Se alle opgaver
+                    </button>
+                </div>
+            `;
+        }
+
+        // Start!
+        init();
+
+    </script>
+</body>
+</html>

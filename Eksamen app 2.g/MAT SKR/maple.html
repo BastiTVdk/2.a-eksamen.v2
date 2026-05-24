@@ -162,7 +162,7 @@
         <!-- Interactive Search -->
         <div class="mb-12 relative no-print">
             <div class="absolute inset-0 bg-indigo-500/10 blur-3xl -z-10 rounded-full"></div>
-            <input type="text" id="searchInput" placeholder="Søg (fx 'reg', 'tangent', 'ligning', 'areal')..." 
+            <input type="text" id="searchInput" placeholder="Søg (fx 'reg', 'tangent', 'binomial', 'optimering')..." 
                 class="w-full pl-14 pr-6 py-5 bg-slate-900/60 border border-white/10 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:outline-none text-white transition-all shadow-2xl text-lg">
             <i class="fas fa-search absolute left-6 top-1/2 -translate-y-1/2 text-slate-500"></i>
         </div>
@@ -378,55 +378,17 @@
                             </div>
                         </details>
                     </div>
-                </div>
-            </details>
 
-            <!-- Category: Integralregning -->
-            <details class="glass rounded-3xl overflow-hidden group">
-                <summary class="category-summary px-8 py-5 flex items-center justify-between cursor-pointer font-extrabold text-rose-300">
-                    <span class="flex items-center"><i class="fas fa-chart-area mr-4 opacity-40"></i> 05. INTEGRALREGNING</span>
-                    <i class="fas fa-chevron-down text-xs transition-transform group-open:rotate-180"></i>
-                </summary>
-                <div class="p-4 space-y-2">
-                    
-                    <div class="command-row p-5 flex flex-col gap-3 rounded-2xl" data-tags="integral ubestemt stamfunktion">
+                    <div class="command-row p-5 flex flex-col gap-3 rounded-2xl" data-tags="maximize minimize optimering største mindste maks min">
                         <div class="flex items-center justify-between">
-                            <h4 class="font-bold text-slate-200">Ubestemt Integral (Stamfunktion)</h4>
-                            <button onclick="copy('int(f(x), x)', this)" class="copy-btn text-slate-500 hover:text-indigo-400 p-2"><i class="far fa-copy"></i></button>
+                            <h4 class="font-bold text-slate-200">Find Maksimum / Minimum (Optimering)</h4>
+                            <button onclick="copy('maximize(f(x), x = a..b, location)', this)" class="copy-btn text-slate-500 hover:text-indigo-400 p-2"><i class="far fa-copy"></i></button>
                         </div>
-                        <code>int(f(x), x)</code>
+                        <code>maximize(f(x), x = a..b, location)</code>
                         <details class="mt-1 no-print-details">
                             <summary class="read-more-summary"><i class="fas fa-chevron-right"></i> Læs mere</summary>
-                            <div class="text-xs text-slate-400 mt-2 pl-4 border-l-2 border-rose-500/30 py-1 space-y-2">
-                                <p><strong>Hvorfor?</strong> Finder stamfunktionen F(x) til f(x). Husk at Maple ikke automatisk tilføjer konstanten k!</p>
-                            </div>
-                        </details>
-                    </div>
-
-                    <div class="command-row p-5 flex flex-col gap-3 rounded-2xl" data-tags="integral bestemt areal under kurve evalf kommatal">
-                        <div class="flex items-center justify-between">
-                            <h4 class="font-bold text-slate-200">Bestemt Integral (Areal)</h4>
-                            <button onclick="copy('evalf(int(f(x), x = a..b))', this)" class="copy-btn text-slate-500 hover:text-indigo-400 p-2"><i class="far fa-copy"></i></button>
-                        </div>
-                        <code>evalf(int(f(x), x = a..b))</code>
-                        <details class="mt-1 no-print-details">
-                            <summary class="read-more-summary"><i class="fas fa-chevron-right"></i> Læs mere</summary>
-                            <div class="text-xs text-slate-400 mt-2 pl-4 border-l-2 border-rose-500/30 py-1 space-y-2">
-                                <p><strong>Hvorfor?</strong> Beregner arealet under grafen i intervallet [a; b]. `evalf` sørger for at du får et almindeligt kommatal fremfor brøker/pi.</p>
-                            </div>
-                        </details>
-                    </div>
-
-                    <div class="command-row p-5 flex flex-col gap-3 rounded-2xl" data-tags="integral areal mellem to grafer funktioner positiv">
-                        <div class="flex items-center justify-between">
-                            <h4 class="font-bold text-slate-200">Areal mellem to grafer</h4>
-                            <button onclick="copy('evalf(int(f(x) - g(x), x = a..b))', this)" class="copy-btn text-slate-500 hover:text-indigo-400 p-2"><i class="far fa-copy"></i></button>
-                        </div>
-                        <code>evalf(int(f(x) - g(x), x = a..b))</code>
-                        <details class="mt-1 no-print-details">
-                            <summary class="read-more-summary"><i class="fas fa-chevron-right"></i> Læs mere</summary>
-                            <div class="text-xs text-slate-400 mt-2 pl-4 border-l-2 border-rose-500/30 py-1 space-y-2">
-                                <p><strong>Vigtigt:</strong> f(x) SKAL være den graf, der ligger øverst. Hvis du får et negativt resultat, har du byttet om på f(x) og g(x).</p>
+                            <div class="text-xs text-slate-400 mt-2 pl-4 border-l-2 border-amber-500/30 py-1 space-y-2">
+                                <p><strong>Hvorfor?</strong> Lynhurtig måde at finde den maksimale/minimale y-værdi og tilhørende x-værdi (location). Kan også bruges med <code>minimize()</code>.</p>
                             </div>
                         </details>
                     </div>
@@ -436,10 +398,40 @@
             <!-- Category: Sandsynlighed -->
             <details class="glass rounded-3xl overflow-hidden group">
                 <summary class="category-summary px-8 py-5 flex items-center justify-between cursor-pointer font-extrabold text-cyan-300">
-                    <span class="flex items-center"><i class="fas fa-dice mr-4 opacity-40"></i> 06. SANDSYNLIGHED</span>
+                    <span class="flex items-center"><i class="fas fa-dice mr-4 opacity-40"></i> 05. SANDSYNLIGHED</span>
                     <i class="fas fa-chevron-down text-xs transition-transform group-open:rotate-180"></i>
                 </summary>
-                <div class="p-2 space-y-2">
+                <div class="p-4 space-y-2">
+                    
+                    <div class="command-row p-5 flex flex-col gap-3 rounded-2xl" data-tags="binpdf præcis sandsynlighed binomial">
+                        <div class="flex items-center justify-between">
+                            <h4 class="font-bold text-slate-200">Binomial: Præcis (X = r)</h4>
+                            <button onclick="copy('binpdf(n, p, r)', this)" class="copy-btn text-slate-500 hover:text-indigo-400 p-2"><i class="far fa-copy"></i></button>
+                        </div>
+                        <code>binpdf(n, p, r)</code>
+                        <details class="mt-1 no-print-details">
+                            <summary class="read-more-summary"><i class="fas fa-chevron-right"></i> Læs mere</summary>
+                            <div class="text-xs text-slate-400 mt-2 pl-4 border-l-2 border-cyan-500/30 py-1 space-y-2">
+                                <p><strong>Hvorfor?</strong> Finder sandsynligheden for PRÆCIS r succeser ud af n forsøg. p er chancen for succes (som kommatal).</p>
+                            </div>
+                        </details>
+                    </div>
+
+                    <div class="command-row p-5 flex flex-col gap-3 rounded-2xl" data-tags="bincdf højst mindst interval sandsynlighed binomial kumuleret">
+                        <div class="flex items-center justify-between">
+                            <h4 class="font-bold text-slate-200">Binomial: Højst / Mellem (Kumuleret)</h4>
+                            <button onclick="copy('bincdf(n, p, r)', this)" class="copy-btn text-slate-500 hover:text-indigo-400 p-2"><i class="far fa-copy"></i></button>
+                        </div>
+                        <code>bincdf(n, p, r)  eller  bincdf(n, p, r1, r2)</code>
+                        <details class="mt-1 no-print-details">
+                            <summary class="read-more-summary"><i class="fas fa-chevron-right"></i> Læs mere</summary>
+                            <div class="text-xs text-slate-400 mt-2 pl-4 border-l-2 border-cyan-500/30 py-1 space-y-2">
+                                <p><strong>Hvorfor?</strong> Brug <code>bincdf(n, p, r)</code> for "højst r succeser" (X ≤ r).</p>
+                                <p>Brug <code>bincdf(n, p, r1, r2)</code> for intervallet "mellem r1 og r2 succeser" (r1 ≤ X ≤ r2).</p>
+                            </div>
+                        </details>
+                    </div>
+
                     <div class="command-row p-5 flex flex-col gap-3 rounded-2xl" data-tags="binomialtest test nulhypotese stikprøve p-værdi">
                         <div class="flex items-center justify-between">
                             <h4 class="font-bold text-slate-200">Binomialtest (Tosidet)</h4>
@@ -498,33 +490,32 @@
                         </div>
                     </div>
 
-                    <!-- Workflow: Areal mellem grafer -->
-                    <div class="relative pl-8 border-l border-rose-500/40">
-                        <div class="absolute -left-[5px] top-0 w-2.5 h-2.5 rounded-full bg-rose-500"></div>
-                        <h3 class="font-bold text-lg mb-2 text-rose-200">Find Areal mellem f(x) og g(x) (Punktmængde)</h3>
-                        <p class="text-sm text-slate-400 mb-4 leading-relaxed">Brug dette når du skal finde et areal M afgrænset af to grafer.</p>
+                    <!-- Workflow: Optimering -->
+                    <div class="relative pl-8 border-l border-emerald-500/40">
+                        <div class="absolute -left-[5px] top-0 w-2.5 h-2.5 rounded-full bg-emerald-500"></div>
+                        <h3 class="font-bold text-lg mb-2 text-emerald-200">Optimering (Find det største/mindste)</h3>
+                        <p class="text-sm text-slate-400 mb-4 leading-relaxed">Brug dette når opgaven beder dig finde det x, der giver det største overskud, rumfang, eller mindste overfladeareal.</p>
                         <div class="bg-black/40 p-5 rounded-2xl border border-white/5 space-y-3">
                             <div class="flex items-start space-x-3">
-                                <span class="text-xs font-black text-rose-500 mt-1">1</span>
+                                <span class="text-xs font-black text-emerald-500 mt-1">1</span>
                                 <div>
-                                    <p class="text-xs text-slate-300 font-bold mb-1">Definér f(x) og g(x) og plot dem for at se hvem der er øverst:</p>
-                                    <code class="text-xs text-rose-300 block">plot([f(x), g(x)], x=-5..5, color=[blue, red])</code>
+                                    <p class="text-xs text-slate-300 font-bold mb-1">Definér din funktion (fx Overskud eller Areal):</p>
+                                    <code class="text-xs text-emerald-300 block">O(x) := -2*x^2 + 100*x + 500</code>
                                 </div>
                             </div>
                             <div class="flex items-start space-x-3">
-                                <span class="text-xs font-black text-rose-500 mt-1">2</span>
+                                <span class="text-xs font-black text-emerald-500 mt-1">2</span>
                                 <div>
-                                    <p class="text-xs text-slate-300 font-bold mb-1">Find skæringspunkter (integrationsgrænserne):</p>
-                                    <code class="text-xs text-rose-300 block">solve(f(x) = g(x), x)</code>
-                                    <p class="text-xs text-slate-400 mt-1">Brug `fsolve`, hvis almindelig solve driller. Du får f.eks. x = 1 og x = 4.</p>
+                                    <p class="text-xs text-slate-300 font-bold mb-1">Brug maximize med location:</p>
+                                    <code class="text-xs text-emerald-300 block">maximize(O(x), x = 0..100, location)</code>
+                                    <p class="text-xs text-slate-400 mt-1">Tip: Sæt x = a..b til at passe med din definitionsmængde (f.eks. x = 0..100). Du kan også bruge <code>minimize(...)</code> hvis du skal finde det mindste.</p>
                                 </div>
                             </div>
                             <div class="flex items-start space-x-3">
-                                <span class="text-xs font-black text-rose-500 mt-1">3</span>
+                                <span class="text-xs font-black text-emerald-500 mt-1">3</span>
                                 <div>
-                                    <p class="text-xs text-slate-300 font-bold mb-1">Beregn arealet med integralet:</p>
-                                    <p class="text-xs text-slate-400 mb-1">Træk den nederste graf fra den øverste (i dette eksempel f øverst).</p>
-                                    <code class="text-xs text-rose-300 block">evalf(int(f(x) - g(x), x = 1 .. 4))</code>
+                                    <p class="text-xs text-slate-300 font-bold mb-1">Aflæs resultatet (Pas på formatet!):</p>
+                                    <p class="text-xs text-slate-400">Maple giver fx svaret <code>1750, {[x = 25]}</code>. Her er <strong class="text-emerald-400">x = 25 selve løsningen</strong> (fx antal solgte varer), og <strong class="text-emerald-400">1750 er den maksimale y-værdi</strong> (fx overskuddet i kr.).</p>
                                 </div>
                             </div>
                         </div>

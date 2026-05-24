@@ -86,6 +86,7 @@
             border-radius: 8px;
             font-size: 0.85rem;
             border: 1px solid rgba(255, 255, 255, 0.05);
+            word-break: break-all;
         }
 
         .nav-active {
@@ -98,13 +99,13 @@
         @media print {
             body { background: white !important; color: black !important; background-image: none !important; }
             nav, .no-print, #searchInput, .copy-btn, .read-more-summary { display: none !important; }
-            .glass { background: transparent !important; border: none !important; box-shadow: none !important; backdrop-filter: none !important; }
+            .glass { background: transparent !important; border: none !important; box-shadow: none !important; backdrop-filter: none !important; margin-bottom: 20px; }
             details { display: block !important; margin-bottom: 20px; page-break-inside: avoid; }
             details[open] > div { display: block !important; }
             .command-row { border-bottom: 1px solid #eee !important; page-break-inside: avoid; }
             code { background: #f4f4f4 !important; color: #333 !important; border: 1px solid #ddd !important; }
             .category-summary { color: #333 !important; font-size: 1.2rem !important; border-bottom: 2px solid #333 !important; padding-bottom: 5px !important; }
-            .text-indigo-300, .text-rose-300, .text-emerald-300, .text-amber-300, .text-cyan-300 { color: black !important; }
+            .text-indigo-300, .text-rose-300, .text-emerald-300, .text-amber-300, .text-cyan-300, .text-fuchsia-300 { color: black !important; }
             details div[class*="pl-4"] { display: block !important; opacity: 1 !important; color: #444 !important; font-size: 0.9rem !important; }
         }
 
@@ -138,14 +139,14 @@
             <div class="flex items-center space-x-4">
                 <div class="hidden md:flex space-x-1 bg-slate-900/80 p-1 rounded-xl border border-white/5">
                     <!-- Hjem knap -->
-                    <a href="matematik-skriftlig.html" class="px-4 py-2 rounded-lg text-xs font-black transition-all text-slate-400 hover:text-white flex items-center">
+                    <a href="#" class="px-4 py-2 rounded-lg text-xs font-black transition-all text-slate-400 hover:text-white flex items-center">
                         <i class="fas fa-home mr-2"></i>HJEM
                     </a>
                     <button onclick="switchTab('commands')" id="btn-commands" class="px-5 py-2 rounded-lg text-xs font-black transition-all nav-active">KOMMANDOER</button>
                     <button onclick="switchTab('help')" id="btn-help" class="px-5 py-2 rounded-lg text-xs font-black transition-all text-slate-500 hover:text-white">METODE-HJÆLP</button>
                 </div>
                 <!-- Mobil Hjem Ikon -->
-                <a href="Matematik-skriftlig.html" class="md:hidden no-print text-slate-400 hover:text-white p-2">
+                <a href="#" class="md:hidden no-print text-slate-400 hover:text-white p-2">
                     <i class="fas fa-home"></i>
                 </a>
                 <!-- PDF Knap -->
@@ -161,7 +162,7 @@
         <!-- Interactive Search -->
         <div class="mb-12 relative no-print">
             <div class="absolute inset-0 bg-indigo-500/10 blur-3xl -z-10 rounded-full"></div>
-            <input type="text" id="searchInput" placeholder="Søg (fx 'reg', 'tangent', 'ligning')..." 
+            <input type="text" id="searchInput" placeholder="Søg (fx 'reg', 'tangent', 'ligning', 'areal')..." 
                 class="w-full pl-14 pr-6 py-5 bg-slate-900/60 border border-white/10 rounded-2xl focus:ring-2 focus:ring-indigo-500 focus:outline-none text-white transition-all shadow-2xl text-lg">
             <i class="fas fa-search absolute left-6 top-1/2 -translate-y-1/2 text-slate-500"></i>
         </div>
@@ -170,14 +171,13 @@
         <div id="tab-commands" class="space-y-6">
             
             <!-- Category: Fundamentet -->
-            <details class="glass rounded-3xl overflow-hidden group" open>
+            <details class="glass rounded-3xl overflow-hidden group">
                 <summary class="category-summary px-8 py-5 flex items-center justify-between cursor-pointer font-extrabold text-indigo-300">
                     <span class="flex items-center"><i class="fas fa-play mr-4 opacity-40"></i> 01. FUNDAMENTET</span>
                     <i class="fas fa-chevron-down text-xs transition-transform group-open:rotate-180"></i>
                 </summary>
                 <div class="p-4 space-y-2">
-                    <!-- Command: Restart -->
-                    <div class="command-row p-5 flex flex-col gap-3 rounded-2xl" data-tags="start restart gym intro">
+                    <div class="command-row p-5 flex flex-col gap-3 rounded-2xl" data-tags="start restart gym intro pakke">
                         <div class="flex items-center justify-between">
                             <h4 class="font-bold text-slate-200">Start dokumentet korrekt</h4>
                             <button onclick="copy('restart; with(Gym):', this)" class="copy-btn text-slate-500 hover:text-indigo-400 p-2"><i class="far fa-copy"></i></button>
@@ -186,14 +186,13 @@
                         <details class="mt-1 no-print-details">
                             <summary class="read-more-summary"><i class="fas fa-chevron-right"></i> Læs mere</summary>
                             <div class="text-xs text-slate-400 mt-2 pl-4 border-l-2 border-indigo-500/30 py-1 space-y-2">
-                                <p><strong>Hvorfor?</strong> 'restart' rydder hukommelsen, så gamle udregninger ikke driller. 'with(Gym)' er et krav for at bruge de kommandoer, der gør STX-matematik lettere.</p>
-                                <p><strong>Hvordan?</strong> Skal altid stå øverst. Hvis du glemmer kolon (:), spytter Maple en lang liste af underkommandoer ud, som bare fylder.</p>
+                                <p><strong>Hvorfor?</strong> 'restart' rydder hukommelsen. 'with(Gym)' er et krav for at bruge de kommandoer, der gør STX-matematik lettere.</p>
+                                <p><strong>Hvordan?</strong> Skal ALTID stå øverst i opgaven. Husk kolon (:) for at undgå at Maple spytter en uendelig liste ud.</p>
                             </div>
                         </details>
                     </div>
 
-                    <!-- Command: Definér -->
-                    <div class="command-row p-5 flex flex-col gap-3 rounded-2xl" data-tags="definer funktion f(x) lighedstegn">
+                    <div class="command-row p-5 flex flex-col gap-3 rounded-2xl" data-tags="definer funktion f(x) lighedstegn variabel">
                         <div class="flex items-center justify-between">
                             <h4 class="font-bold text-slate-200">Definér en funktion</h4>
                             <button onclick="copy('f(x) := ', this)" class="copy-btn text-slate-500 hover:text-indigo-400 p-2"><i class="far fa-copy"></i></button>
@@ -202,8 +201,95 @@
                         <details class="mt-1 no-print-details">
                             <summary class="read-more-summary"><i class="fas fa-chevron-right"></i> Læs mere</summary>
                             <div class="text-xs text-slate-400 mt-2 pl-4 border-l-2 border-indigo-500/30 py-1 space-y-2">
-                                <p><strong>Hvorfor?</strong> Det er fundamentet for alt. Når funktionen er defineret, kan du hurtigt beregne y-værdier, nulpunkter og tegne grafer.</p>
-                                <p><strong>Hvordan?</strong> Husk KOLON før lighedstegnet. Hvis du glemmer det, "gemmer" Maple ikke funktionen rigtigt.</p>
+                                <p><strong>Hvorfor?</strong> Når funktionen er defineret, kan du bruge den til plot, ligninger, diff og integration uden at skrive den igen.</p>
+                                <p><strong>VIGTIGT:</strong> Husk kolon før lighedstegnet (`:=`). Ellers gemmer Maple den ikke rigtigt!</p>
+                            </div>
+                        </details>
+                    </div>
+                </div>
+            </details>
+
+            <!-- Category: Ligninger & Plot -->
+            <details class="glass rounded-3xl overflow-hidden group" open>
+                <summary class="category-summary px-8 py-5 flex items-center justify-between cursor-pointer font-extrabold text-fuchsia-300">
+                    <span class="flex items-center"><i class="fas fa-calculator mr-4 opacity-40"></i> 02. LIGNINGER & GRAFER</span>
+                    <i class="fas fa-chevron-down text-xs transition-transform group-open:rotate-180"></i>
+                </summary>
+                <div class="p-4 space-y-2">
+                    
+                    <!-- Løs Ligning Eksakt -->
+                    <div class="command-row p-5 flex flex-col gap-3 rounded-2xl" data-tags="ligning solve eksakt nulpunkt skæring">
+                        <div class="flex items-center justify-between">
+                            <h4 class="font-bold text-slate-200">Løs ligning (Eksakt)</h4>
+                            <button onclick="copy('solve(f(x) = 0, x)', this)" class="copy-btn text-slate-500 hover:text-indigo-400 p-2"><i class="far fa-copy"></i></button>
+                        </div>
+                        <code>solve(f(x) = 0, x)</code>
+                        <details class="mt-1 no-print-details">
+                            <summary class="read-more-summary"><i class="fas fa-chevron-right"></i> Læs mere</summary>
+                            <div class="text-xs text-slate-400 mt-2 pl-4 border-l-2 border-fuchsia-500/30 py-1 space-y-2">
+                                <p><strong>Hvorfor?</strong> Find nulpunkter eller hvornår f(x) giver en bestemt y-værdi. Giver eksakte tal (brøker, kvadratrødder).</p>
+                                <p><strong>Tip:</strong> Sæt komma x (`, x`) til sidst, så fortæller du Maple, hvad der skal isoleres.</p>
+                            </div>
+                        </details>
+                    </div>
+
+                    <!-- Løs Ligning Numerisk -->
+                    <div class="command-row p-5 flex flex-col gap-3 rounded-2xl" data-tags="ligning fsolve numerisk kommatal skæring">
+                        <div class="flex items-center justify-between">
+                            <h4 class="font-bold text-slate-200">Løs ligning (Numerisk/Kommatal)</h4>
+                            <button onclick="copy('fsolve(f(x) = g(x), x)', this)" class="copy-btn text-slate-500 hover:text-indigo-400 p-2"><i class="far fa-copy"></i></button>
+                        </div>
+                        <code>fsolve(f(x) = g(x), x)</code>
+                        <details class="mt-1 no-print-details">
+                            <summary class="read-more-summary"><i class="fas fa-chevron-right"></i> Læs mere</summary>
+                            <div class="text-xs text-slate-400 mt-2 pl-4 border-l-2 border-fuchsia-500/30 py-1 space-y-2">
+                                <p><strong>Hvorfor?</strong> Hvis `solve` driller og giver underlige svar med `RootOf`, eller hvis du bare vil have et kommatal.</p>
+                                <p><strong>Tip:</strong> Ofte brugt til at finde skæring mellem to grafer.</p>
+                            </div>
+                        </details>
+                    </div>
+
+                    <!-- Intervalsolve -->
+                    <div class="command-row p-5 flex flex-col gap-3 rounded-2xl" data-tags="intervalsolve løsninger i interval trigonometri">
+                        <div class="flex items-center justify-between">
+                            <h4 class="font-bold text-slate-200">Løs ligning i interval (Gym)</h4>
+                            <button onclick="copy('intervalsolve(f(x) = 0, x = 0..10)', this)" class="copy-btn text-slate-500 hover:text-indigo-400 p-2"><i class="far fa-copy"></i></button>
+                        </div>
+                        <code>intervalsolve(f(x) = 0, x = 0..10)</code>
+                        <details class="mt-1 no-print-details">
+                            <summary class="read-more-summary"><i class="fas fa-chevron-right"></i> Læs mere</summary>
+                            <div class="text-xs text-slate-400 mt-2 pl-4 border-l-2 border-fuchsia-500/30 py-1 space-y-2">
+                                <p><strong>Hvorfor?</strong> Genial specielt til trigonometriske funktioner (sin/cos), hvor der er uendeligt mange løsninger, men opgaven beder dig kigge i et bestemt interval.</p>
+                            </div>
+                        </details>
+                    </div>
+
+                    <!-- Plot 1 graf -->
+                    <div class="command-row p-5 flex flex-col gap-3 rounded-2xl" data-tags="plot graf tegn funktion vindue">
+                        <div class="flex items-center justify-between">
+                            <h4 class="font-bold text-slate-200">Tegn én graf</h4>
+                            <button onclick="copy('plot(f(x), x = -5..5, view = [-5..5, -10..10])', this)" class="copy-btn text-slate-500 hover:text-indigo-400 p-2"><i class="far fa-copy"></i></button>
+                        </div>
+                        <code>plot(f(x), x = -5..5, view = [-5..5, -10..10])</code>
+                        <details class="mt-1 no-print-details">
+                            <summary class="read-more-summary"><i class="fas fa-chevron-right"></i> Læs mere</summary>
+                            <div class="text-xs text-slate-400 mt-2 pl-4 border-l-2 border-fuchsia-500/30 py-1 space-y-2">
+                                <p><strong>Hvorfor?</strong> Visuel forståelse af opgaven. `view` er super vigtig for at zoome ind på det rigtige udsnit.</p>
+                            </div>
+                        </details>
+                    </div>
+
+                    <!-- Plot 2 grafer -->
+                    <div class="command-row p-5 flex flex-col gap-3 rounded-2xl" data-tags="plot grafer tegn flere funktioner skæring">
+                        <div class="flex items-center justify-between">
+                            <h4 class="font-bold text-slate-200">Tegn to (eller flere) grafer</h4>
+                            <button onclick="copy('plot([f(x), g(x)], x = -5..5, color = [blue, red], legend = [f, g])', this)" class="copy-btn text-slate-500 hover:text-indigo-400 p-2"><i class="far fa-copy"></i></button>
+                        </div>
+                        <code>plot([f(x), g(x)], x = -5..5, color = [blue, red], legend = ["f(x)", "g(x)"])</code>
+                        <details class="mt-1 no-print-details">
+                            <summary class="read-more-summary"><i class="fas fa-chevron-right"></i> Læs mere</summary>
+                            <div class="text-xs text-slate-400 mt-2 pl-4 border-l-2 border-fuchsia-500/30 py-1 space-y-2">
+                                <p><strong>Hvorfor?</strong> For at vise f.eks. at arealet mellem f og g. Husk firkantede parenteser `[...]` når du samler flere ting!</p>
                             </div>
                         </details>
                     </div>
@@ -213,56 +299,32 @@
             <!-- Category: Regression -->
             <details class="glass rounded-3xl overflow-hidden group">
                 <summary class="category-summary px-8 py-5 flex items-center justify-between cursor-pointer font-extrabold text-emerald-300">
-                    <span class="flex items-center"><i class="fas fa-chart-line mr-4 opacity-40"></i> 02. REGRESSION</span>
+                    <span class="flex items-center"><i class="fas fa-chart-line mr-4 opacity-40"></i> 03. REGRESSION</span>
                     <i class="fas fa-chevron-down text-xs transition-transform group-open:rotate-180"></i>
                 </summary>
                 <div class="p-4 space-y-2">
-                    <!-- Command: LinReg -->
-                    <div class="command-row p-5 flex flex-col gap-3 rounded-2xl" data-tags="linreg lineær model statistik">
+                    <div class="command-row p-5 flex flex-col gap-3 rounded-2xl" data-tags="linreg lineær model statistik lister">
                         <div class="flex items-center justify-between">
                             <h4 class="font-bold text-slate-200">Lineær Regression</h4>
                             <button onclick="copy('LinReg(L1, L2)', this)" class="copy-btn text-slate-500 hover:text-indigo-400 p-2"><i class="far fa-copy"></i></button>
                         </div>
                         <code>LinReg(L1, L2)</code>
-                        <details class="mt-1 no-print-details">
-                            <summary class="read-more-summary"><i class="fas fa-chevron-right"></i> Læs mere</summary>
-                            <div class="text-xs text-slate-400 mt-2 pl-4 border-l-2 border-emerald-500/30 py-1 space-y-2">
-                                <p><strong>Hvorfor?</strong> Når data følger en ret linje. Maple beregner f(x) = ax + b og spytter graf og residualplot ud.</p>
-                                <p><strong>Hvordan?</strong> L1 er dine x-værdier, L2 er y-værdier. Husk at tjekke R^2 værdien – jo tættere på 1, jo bedre er modellen.</p>
-                            </div>
-                        </details>
                     </div>
 
-                    <!-- Command: ExpReg -->
-                    <div class="command-row p-5 flex flex-col gap-3 rounded-2xl" data-tags="expreg eksponentiel model vækst">
+                    <div class="command-row p-5 flex flex-col gap-3 rounded-2xl" data-tags="expreg eksponentiel model vækst rente">
                         <div class="flex items-center justify-between">
                             <h4 class="font-bold text-slate-200">Eksponentiel Regression</h4>
                             <button onclick="copy('ExpReg(L1, L2)', this)" class="copy-btn text-slate-500 hover:text-indigo-400 p-2"><i class="far fa-copy"></i></button>
                         </div>
                         <code>ExpReg(L1, L2)</code>
-                        <details class="mt-1 no-print-details">
-                            <summary class="read-more-summary"><i class="fas fa-chevron-right"></i> Læs mere</summary>
-                            <div class="text-xs text-slate-400 mt-2 pl-4 border-l-2 border-emerald-500/30 py-1 space-y-2">
-                                <p><strong>Hvorfor?</strong> Når noget vokser med en fast procent (vækstrate). Giver modellen f(x) = b * a^x.</p>
-                                <p><strong>Hvordan?</strong> Sørg for at dine tal passer til en eksponentiel udvikling (ingen negative y-værdier!).</p>
-                            </div>
-                        </details>
                     </div>
 
-                    <!-- Command: PowReg -->
-                    <div class="command-row p-5 flex flex-col gap-3 rounded-2xl" data-tags="powreg potens model musling">
+                    <div class="command-row p-5 flex flex-col gap-3 rounded-2xl" data-tags="powreg potens model musling fisk">
                         <div class="flex items-center justify-between">
                             <h4 class="font-bold text-slate-200">Potens Regression</h4>
                             <button onclick="copy('PowReg(L1, L2)', this)" class="copy-btn text-slate-500 hover:text-indigo-400 p-2"><i class="far fa-copy"></i></button>
                         </div>
                         <code>PowReg(L1, L2)</code>
-                        <details class="mt-1 no-print-details">
-                            <summary class="read-more-summary"><i class="fas fa-chevron-right"></i> Læs mere</summary>
-                            <div class="text-xs text-slate-400 mt-2 pl-4 border-l-2 border-emerald-500/30 py-1 space-y-2">
-                                <p><strong>Hvorfor?</strong> Bruges ofte til fysiske sammenhænge, som f.eks. sammenhængen mellem vægt og længde (som i dine muslingeopgaver). Giver f(x) = b * x^a.</p>
-                                <p><strong>Hvordan?</strong> Når x vokser med en procent, vokser y også med en bestemt procent.</p>
-                            </div>
-                        </details>
                     </div>
                 </div>
             </details>
@@ -270,11 +332,40 @@
             <!-- Category: Differentialregning -->
             <details class="glass rounded-3xl overflow-hidden group">
                 <summary class="category-summary px-8 py-5 flex items-center justify-between cursor-pointer font-extrabold text-amber-300">
-                    <span class="flex items-center"><i class="fas fa-draw-polygon mr-4 opacity-40"></i> 03. DIFFERENTIALREGNING</span>
+                    <span class="flex items-center"><i class="fas fa-level-up-alt mr-4 opacity-40"></i> 04. DIFFERENTIALREGNING</span>
                     <i class="fas fa-chevron-down text-xs transition-transform group-open:rotate-180"></i>
                 </summary>
                 <div class="p-4 space-y-2">
-                    <div class="command-row p-5 flex flex-col gap-3 rounded-2xl" data-tags="tangent differential afledt linje">
+                    
+                    <div class="command-row p-5 flex flex-col gap-3 rounded-2xl" data-tags="afledt diff differentialkvotient mærke f'(x)">
+                        <div class="flex items-center justify-between">
+                            <h4 class="font-bold text-slate-200">Den afledte funktion f'(x)</h4>
+                            <button onclick="copy('f\\'(x)', this)" class="copy-btn text-slate-500 hover:text-indigo-400 p-2"><i class="far fa-copy"></i></button>
+                        </div>
+                        <code>f'(x)</code>
+                        <details class="mt-1 no-print-details">
+                            <summary class="read-more-summary"><i class="fas fa-chevron-right"></i> Læs mere</summary>
+                            <div class="text-xs text-slate-400 mt-2 pl-4 border-l-2 border-amber-500/30 py-1 space-y-2">
+                                <p><strong>Hvorfor?</strong> Find hældningen (væksthastigheden). Kræver at du har defineret f(x) først!</p>
+                            </div>
+                        </details>
+                    </div>
+
+                    <div class="command-row p-5 flex flex-col gap-3 rounded-2xl" data-tags="ekstremum topunkt nulpunkt mærke monotoni">
+                        <div class="flex items-center justify-between">
+                            <h4 class="font-bold text-slate-200">Find mulige ekstremumspunkter</h4>
+                            <button onclick="copy('solve(f\\'(x) = 0, x)', this)" class="copy-btn text-slate-500 hover:text-indigo-400 p-2"><i class="far fa-copy"></i></button>
+                        </div>
+                        <code>solve(f'(x) = 0, x)</code>
+                        <details class="mt-1 no-print-details">
+                            <summary class="read-more-summary"><i class="fas fa-chevron-right"></i> Læs mere</summary>
+                            <div class="text-xs text-slate-400 mt-2 pl-4 border-l-2 border-amber-500/30 py-1 space-y-2">
+                                <p><strong>Hvorfor?</strong> For at finde x-værdierne for funktionens toppe og dale (lokalt maks/min). Dette er starten på en monotonianalyse.</p>
+                            </div>
+                        </details>
+                    </div>
+
+                    <div class="command-row p-5 flex flex-col gap-3 rounded-2xl" data-tags="tangent differential afledt linje røringspunkt">
                         <div class="flex items-center justify-between">
                             <h4 class="font-bold text-slate-200">Tangentens ligning</h4>
                             <button onclick="copy('tangent(f(x), x = )', this)" class="copy-btn text-slate-500 hover:text-indigo-400 p-2"><i class="far fa-copy"></i></button>
@@ -283,23 +374,59 @@
                         <details class="mt-1 no-print-details">
                             <summary class="read-more-summary"><i class="fas fa-chevron-right"></i> Læs mere</summary>
                             <div class="text-xs text-slate-400 mt-2 pl-4 border-l-2 border-amber-500/30 py-1 space-y-2">
-                                <p><strong>Hvorfor?</strong> Finder automatisk den rette linjes ligning (y = ax + b) i et specifikt punkt x0.</p>
-                                <p><strong>Hvordan?</strong> Indsæt x-værdien for punktet. Meget mere præcist end at tegne den manuelt.</p>
+                                <p><strong>Hvorfor?</strong> Finder den rette linjes ligning (y = ax + b) der rører kurven i punktet x0.</p>
+                            </div>
+                        </details>
+                    </div>
+                </div>
+            </details>
+
+            <!-- Category: Integralregning -->
+            <details class="glass rounded-3xl overflow-hidden group">
+                <summary class="category-summary px-8 py-5 flex items-center justify-between cursor-pointer font-extrabold text-rose-300">
+                    <span class="flex items-center"><i class="fas fa-chart-area mr-4 opacity-40"></i> 05. INTEGRALREGNING</span>
+                    <i class="fas fa-chevron-down text-xs transition-transform group-open:rotate-180"></i>
+                </summary>
+                <div class="p-4 space-y-2">
+                    
+                    <div class="command-row p-5 flex flex-col gap-3 rounded-2xl" data-tags="integral ubestemt stamfunktion">
+                        <div class="flex items-center justify-between">
+                            <h4 class="font-bold text-slate-200">Ubestemt Integral (Stamfunktion)</h4>
+                            <button onclick="copy('int(f(x), x)', this)" class="copy-btn text-slate-500 hover:text-indigo-400 p-2"><i class="far fa-copy"></i></button>
+                        </div>
+                        <code>int(f(x), x)</code>
+                        <details class="mt-1 no-print-details">
+                            <summary class="read-more-summary"><i class="fas fa-chevron-right"></i> Læs mere</summary>
+                            <div class="text-xs text-slate-400 mt-2 pl-4 border-l-2 border-rose-500/30 py-1 space-y-2">
+                                <p><strong>Hvorfor?</strong> Finder stamfunktionen F(x) til f(x). Husk at Maple ikke automatisk tilføjer konstanten k!</p>
                             </div>
                         </details>
                     </div>
 
-                    <div class="command-row p-5 flex flex-col gap-3 rounded-2xl" data-tags="maximize optimering ekstremum">
+                    <div class="command-row p-5 flex flex-col gap-3 rounded-2xl" data-tags="integral bestemt areal under kurve evalf kommatal">
                         <div class="flex items-center justify-between">
-                            <h4 class="font-bold text-slate-200">Bestem Maks/Min</h4>
-                            <button onclick="copy('maximize(f(x), x = .. , location)', this)" class="copy-btn text-slate-500 hover:text-indigo-400 p-2"><i class="far fa-copy"></i></button>
+                            <h4 class="font-bold text-slate-200">Bestemt Integral (Areal)</h4>
+                            <button onclick="copy('evalf(int(f(x), x = a..b))', this)" class="copy-btn text-slate-500 hover:text-indigo-400 p-2"><i class="far fa-copy"></i></button>
                         </div>
-                        <code>maximize(f(x), x = a..b, location)</code>
+                        <code>evalf(int(f(x), x = a..b))</code>
                         <details class="mt-1 no-print-details">
                             <summary class="read-more-summary"><i class="fas fa-chevron-right"></i> Læs mere</summary>
-                            <div class="text-xs text-slate-400 mt-2 pl-4 border-l-2 border-amber-500/30 py-1 space-y-2">
-                                <p><strong>Hvorfor?</strong> Bruges i optimeringsopgaver. 'location' parameteren er vigtig, da den giver dig x-værdien for toppunktet.</p>
-                                <p><strong>Hvordan?</strong> Indtast funktionens definitionsmængde (f.eks. 0..100) for at finde det globale maksimum i intervallet.</p>
+                            <div class="text-xs text-slate-400 mt-2 pl-4 border-l-2 border-rose-500/30 py-1 space-y-2">
+                                <p><strong>Hvorfor?</strong> Beregner arealet under grafen i intervallet [a; b]. `evalf` sørger for at du får et almindeligt kommatal fremfor brøker/pi.</p>
+                            </div>
+                        </details>
+                    </div>
+
+                    <div class="command-row p-5 flex flex-col gap-3 rounded-2xl" data-tags="integral areal mellem to grafer funktioner positiv">
+                        <div class="flex items-center justify-between">
+                            <h4 class="font-bold text-slate-200">Areal mellem to grafer</h4>
+                            <button onclick="copy('evalf(int(f(x) - g(x), x = a..b))', this)" class="copy-btn text-slate-500 hover:text-indigo-400 p-2"><i class="far fa-copy"></i></button>
+                        </div>
+                        <code>evalf(int(f(x) - g(x), x = a..b))</code>
+                        <details class="mt-1 no-print-details">
+                            <summary class="read-more-summary"><i class="fas fa-chevron-right"></i> Læs mere</summary>
+                            <div class="text-xs text-slate-400 mt-2 pl-4 border-l-2 border-rose-500/30 py-1 space-y-2">
+                                <p><strong>Vigtigt:</strong> f(x) SKAL være den graf, der ligger øverst. Hvis du får et negativt resultat, har du byttet om på f(x) og g(x).</p>
                             </div>
                         </details>
                     </div>
@@ -309,23 +436,16 @@
             <!-- Category: Sandsynlighed -->
             <details class="glass rounded-3xl overflow-hidden group">
                 <summary class="category-summary px-8 py-5 flex items-center justify-between cursor-pointer font-extrabold text-cyan-300">
-                    <span class="flex items-center"><i class="fas fa-dice mr-4 opacity-40"></i> 04. SANDSYNLIGHED</span>
+                    <span class="flex items-center"><i class="fas fa-dice mr-4 opacity-40"></i> 06. SANDSYNLIGHED</span>
                     <i class="fas fa-chevron-down text-xs transition-transform group-open:rotate-180"></i>
                 </summary>
                 <div class="p-2 space-y-2">
-                    <div class="command-row p-5 flex flex-col gap-3 rounded-2xl" data-tags="binomialtest test nulhypotese stikprøve">
+                    <div class="command-row p-5 flex flex-col gap-3 rounded-2xl" data-tags="binomialtest test nulhypotese stikprøve p-værdi">
                         <div class="flex items-center justify-between">
                             <h4 class="font-bold text-slate-200">Binomialtest (Tosidet)</h4>
                             <button onclick="copy('binomialTest(n, p, 0.05, tosidet)', this)" class="copy-btn text-slate-500 hover:text-indigo-400 p-2"><i class="far fa-copy"></i></button>
                         </div>
                         <code>binomialTest(n, p, alfa, tosidet)</code>
-                        <details class="mt-1 no-print-details">
-                            <summary class="read-more-summary"><i class="fas fa-chevron-right"></i> Læs mere</summary>
-                            <div class="text-xs text-slate-400 mt-2 pl-4 border-l-2 border-cyan-500/30 py-1 space-y-2">
-                                <p><strong>Hvorfor?</strong> Afgør om en stikprøve ligger inden for det forventede (acceptområdet) med et givet signifikansniveau.</p>
-                                <p><strong>Hvordan?</strong> n er antal forsøg, p er sandsynligheden. Husk at tjekke om din observerede værdi ligger i det kritiske område.</p>
-                            </div>
-                        </details>
                     </div>
                 </div>
             </details>
@@ -336,37 +456,90 @@
             <div class="glass p-10 rounded-[2.5rem] relative overflow-hidden">
                 <div class="absolute -top-10 -right-10 w-40 h-40 bg-indigo-500/10 blur-[60px]"></div>
                 <h2 class="text-2xl font-black mb-6 text-white flex items-center tracking-tight">
-                    <i class="fas fa-graduation-cap mr-4 text-indigo-400"></i> Metodeguiden til Eksamen
+                    <i class="fas fa-graduation-cap mr-4 text-indigo-400"></i> Metodeguiden (Eksamensopskrifter)
                 </h2>
                 
                 <div class="space-y-10">
-                    <!-- Workflow: Cirkler -->
-                    <div class="relative pl-8 border-l border-indigo-500/20">
-                        <div class="absolute -left-[5px] top-0 w-2.5 h-2.5 rounded-full bg-indigo-500"></div>
-                        <h3 class="font-bold text-lg mb-4 text-slate-200">Cirkler (Kvadratkomplementering)</h3>
-                        <p class="text-sm text-slate-400 mb-4 leading-relaxed">Finder centrum og radius fra ligninger som x^2 + ax + y^2 + by = c:</p>
+                    
+                    <!-- Workflow: Monotoniforhold -->
+                    <div class="relative pl-8 border-l border-amber-500/40">
+                        <div class="absolute -left-[5px] top-0 w-2.5 h-2.5 rounded-full bg-amber-500"></div>
+                        <h3 class="font-bold text-lg mb-2 text-amber-200">Find Monotoniforhold (Klassiker!)</h3>
+                        <p class="text-sm text-slate-400 mb-4 leading-relaxed">Når opgaven beder om, hvor funktionen vokser, aftager eller har maks/min.</p>
                         <div class="bg-black/40 p-5 rounded-2xl border border-white/5 space-y-3">
-                            <div class="flex items-center space-x-3">
-                                <span class="text-xs font-black text-indigo-500">1</span>
-                                <code class="text-xs text-indigo-300">lign := x^2 - 6*x + y^2 + 4*y = 3</code>
+                            <div class="flex items-start space-x-3">
+                                <span class="text-xs font-black text-amber-500 mt-1">1</span>
+                                <div>
+                                    <p class="text-xs text-slate-300 font-bold mb-1">Definér f(x) og tegn den:</p>
+                                    <code class="text-xs text-amber-300 block">f(x) := ... derefter plot(f(x), x=-10..10)</code>
+                                </div>
                             </div>
-                            <div class="flex items-center space-x-3">
-                                <span class="text-xs font-black text-indigo-500">2</span>
-                                <code class="text-xs text-indigo-300">Student[Precalculus][CompleteSquare](lign)</code>
+                            <div class="flex items-start space-x-3">
+                                <span class="text-xs font-black text-amber-500 mt-1">2</span>
+                                <div>
+                                    <p class="text-xs text-slate-300 font-bold mb-1">Find mulige ekstremumspunkter:</p>
+                                    <code class="text-xs text-amber-300 block">solve(f'(x) = 0, x)</code>
+                                </div>
+                            </div>
+                            <div class="flex items-start space-x-3">
+                                <span class="text-xs font-black text-amber-500 mt-1">3</span>
+                                <div>
+                                    <p class="text-xs text-slate-300 font-bold mb-1">Tjek fortegn for f'(x) mellem punkterne:</p>
+                                    <p class="text-xs text-slate-400">Indsæt en x-værdi før, imellem og efter løsningerne. F.eks. <code class="bg-transparent border-none p-0 text-amber-200">f'(0)</code>. Er resultatet positivt = voksende. Negativt = aftagende.</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start space-x-3">
+                                <span class="text-xs font-black text-amber-500 mt-1">4</span>
+                                <div>
+                                    <p class="text-xs text-slate-300 font-bold mb-1">Konklusion i tekst:</p>
+                                    <p class="text-xs text-slate-400 italic">"f(x) er voksende i intervallet ]-∞; -2] og [4; ∞[ samt aftagende i intervallet [-2; 4]. Der er lokalt maksimum i x = -2 og lokalt minimum i x = 4."</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Workflow: Areal mellem grafer -->
+                    <div class="relative pl-8 border-l border-rose-500/40">
+                        <div class="absolute -left-[5px] top-0 w-2.5 h-2.5 rounded-full bg-rose-500"></div>
+                        <h3 class="font-bold text-lg mb-2 text-rose-200">Find Areal mellem f(x) og g(x) (Punktmængde)</h3>
+                        <p class="text-sm text-slate-400 mb-4 leading-relaxed">Brug dette når du skal finde et areal M afgrænset af to grafer.</p>
+                        <div class="bg-black/40 p-5 rounded-2xl border border-white/5 space-y-3">
+                            <div class="flex items-start space-x-3">
+                                <span class="text-xs font-black text-rose-500 mt-1">1</span>
+                                <div>
+                                    <p class="text-xs text-slate-300 font-bold mb-1">Definér f(x) og g(x) og plot dem for at se hvem der er øverst:</p>
+                                    <code class="text-xs text-rose-300 block">plot([f(x), g(x)], x=-5..5, color=[blue, red])</code>
+                                </div>
+                            </div>
+                            <div class="flex items-start space-x-3">
+                                <span class="text-xs font-black text-rose-500 mt-1">2</span>
+                                <div>
+                                    <p class="text-xs text-slate-300 font-bold mb-1">Find skæringspunkter (integrationsgrænserne):</p>
+                                    <code class="text-xs text-rose-300 block">solve(f(x) = g(x), x)</code>
+                                    <p class="text-xs text-slate-400 mt-1">Brug `fsolve`, hvis almindelig solve driller. Du får f.eks. x = 1 og x = 4.</p>
+                                </div>
+                            </div>
+                            <div class="flex items-start space-x-3">
+                                <span class="text-xs font-black text-rose-500 mt-1">3</span>
+                                <div>
+                                    <p class="text-xs text-slate-300 font-bold mb-1">Beregn arealet med integralet:</p>
+                                    <p class="text-xs text-slate-400 mb-1">Træk den nederste graf fra den øverste (i dette eksempel f øverst).</p>
+                                    <code class="text-xs text-rose-300 block">evalf(int(f(x) - g(x), x = 1 .. 4))</code>
+                                </div>
                             </div>
                         </div>
                     </div>
 
                     <!-- Workflow: Eksamenstips -->
-                    <div class="relative pl-8 border-l border-rose-500/20">
-                        <div class="absolute -left-[5px] top-0 w-2.5 h-2.5 rounded-full bg-rose-500"></div>
-                        <h3 class="font-bold text-lg mb-4 text-slate-200">Den gode besvarelse</h3>
+                    <div class="relative pl-8 border-l border-indigo-500/20">
+                        <div class="absolute -left-[5px] top-0 w-2.5 h-2.5 rounded-full bg-indigo-500"></div>
+                        <h3 class="font-bold text-lg mb-4 text-slate-200">Den gyldne regel til B-niveau eksamen</h3>
                         <div class="space-y-4 text-sm text-slate-400">
-                            <p>For at sikre topkarakter skal du altid følge disse tre trin:</p>
+                            <p>For at sikre topkarakter skal du altid følge disse tre trin i HVER opgave:</p>
                             <ul class="list-disc list-inside space-y-2">
-                                <li><strong>Beskrivelse:</strong> Forklar med tekst hvad du gør før du beregner.</li>
-                                <li><strong>Maple-felter:</strong> Brug Alt+Enter for at beregne i selve tekstlinjen eller Ctrl+M for matematikfelt.</li>
-                                <li><strong>Svar:</strong> Husk altid en tydelig konklusion med hel sætning og enheder (m, kr, kg, etc.).</li>
+                                <li><strong>Beskrivelse (Pølsesnak):</strong> Forklar med tekst hvad du gør før du beregner. F.eks. <i>"For at finde skæringen mellem graferne, sætter jeg dem lig hinanden og løser ligningen for x."</i></li>
+                                <li><strong>Maple-felter:</strong> Brug Alt+Enter for at beregne i selve tekstlinjen eller Ctrl+M for et rødt matematikfelt.</li>
+                                <li><strong>Svar/Konklusion:</strong> Afslut altid med en fed/understreget tekst og enheder. F.eks. <i>"<b>Det betyder at overskuddet efter 5 år er 12.500 kr.</b>"</i></li>
                             </ul>
                         </div>
                     </div>

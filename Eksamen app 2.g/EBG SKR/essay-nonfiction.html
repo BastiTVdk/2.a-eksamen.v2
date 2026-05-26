@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Non-Fiction Analysis | 2.a SAG</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #0ea5e9; /* Sky 500 */
+            --accent: #8b5cf6;  /* Violet 500 */
+            --bg: #f8fafc;      /* Slate 50 (Meget lys baggrund) */
+            --text-main: #334155; /* Slate 700 */
+            --text-heading: #0f172a; /* Slate 900 */
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        /* Scroll Progress Bar */
+        #scroll-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 0%;
+            height: 4px;
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            z-index: 1000;
+            transition: width 0.1s ease-out;
+            box-shadow: 0 0 10px rgba(14, 165, 233, 0.5);
+        }
+
+        /* LIGHT GLASSMORPHISM */
+        .glass-light {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 10px 30px -10px rgba(15, 23, 42, 0.05);
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+        }
+
+        .glass-card:hover {
+            border-color: rgba(14, 165, 233, 0.3);
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px -10px rgba(14, 165, 233, 0.15);
+            background: rgba(255, 255, 255, 0.8);
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .btn-copy {
+            @apply px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 border;
+            background: rgba(255, 255, 255, 0.9);
+            border-color: rgba(14, 165, 233, 0.2);
+            color: var(--primary);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+        .btn-copy:hover {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(14, 165, 233, 0.2);
+        }
+
+        /* Svævende animationer */
+        .floating { animation: float 6s ease-in-out infinite; }
+        .floating-delayed { animation: float 8s ease-in-out infinite; animation-delay: 2s; }
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-15px) rotate(3deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
+        }
+
+        /* Eksempel/Citat Boks - Lys udgave */
+        .example-box {
+            font-family: 'Fira Code', monospace;
+            background: #f1f5f9; /* Slate 100 */
+            border-left: 4px solid var(--primary);
+            padding: 1.25rem 1.5rem;
+            border-radius: 0 1rem 1rem 0;
+            color: #475569; /* Slate 600 */
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .highlight-word {
+            color: var(--primary);
+            font-weight: 600;
+            background: rgba(14, 165, 233, 0.1);
+            padding: 0 4px;
+            border-radius: 4px;
+        }
+
+        .badge {
+            @apply inline-flex items-center px-3 py-1 text-xs font-bold rounded-full border bg-white shadow-sm;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+    </style>
+</head>
+<body class="min-h-screen relative">
+
+    <div id="scroll-progress"></div>
+
+    <!-- Parallax Blobs (Lyse pasteller - Sky & Violet) -->
+    <div class="blob-1 fixed top-[5%] left-[-10%] w-[45%] h-[45%] bg-sky-300/30 blur-[120px] rounded-full pointer-events-none transition-transform duration-700 ease-out"></div>
+    <div class="blob-2 fixed bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-violet-300/30 blur-[120px] rounded-full pointer-events-none transition-transform duration-700 ease-out"></div>
+
+    <!-- Floating Shapes (Lyse outline) -->
+    <div class="absolute top-40 left-[15%] w-16 h-16 border-4 border-sky-400/20 rounded-full floating pointer-events-none"></div>
+    <div class="absolute top-80 right-[10%] w-20 h-20 border-2 border-violet-400/20 rotate-45 floating-delayed pointer-events-none"></div>
+
+    <nav class="sticky top-0 z-50 px-6 py-4 glass-light border-b border-white/40">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <a href="eng-essay.html" class="w-10 h-10 rounded-xl bg-white hover:bg-slate-50 flex items-center justify-center transition border border-slate-200 shadow-sm text-slate-600">
+                    <i class="fas fa-arrow-left"></i>
+                </a>
+                <span class="text-xl font-bold tracking-tight text-slate-800">Non-Fiction <span class="text-sky-500">Analysis</span></span>
+            </div>
+            <div class="hidden md:flex gap-6 text-xs font-bold uppercase tracking-widest text-slate-500">
+                <a href="#pentagram" class="hover:text-sky-600 transition">Pentagrammet</a>
+                <a href="#persuasion" class="hover:text-sky-600 transition">Appelformer</a>
+                <a href="#devices" class="hover:text-sky-600 transition">Retoriske Virkemidler</a>
+                <a href="#toulmin" class="hover:text-sky-600 transition">Argumentation</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-5xl mx-auto px-6 pt-20 pb-32 relative z-10">
+        
+        <!-- Hero Section -->
+        <header class="text-center mb-24 reveal-item">
+            <div class="inline-block mb-4 px-4 py-1.5 rounded-full bg-sky-50 border border-sky-100 text-sky-600 font-bold text-xs tracking-widest uppercase shadow-sm">
+                Speeches, Articles & Essays
+            </div>
+            <h1 class="text-5xl md:text-7xl font-extrabold mb-6 tracking-tight text-slate-900">
+                How to Analyse <span class="gradient-text">Non-Fiction</span>
+            </h1>
+            <p class="text-slate-600 text-lg max-w-2xl mx-auto">
+                Lær kunsten at overbevise. Her er dit værktøjssæt til at dekonstruere taler og artikler gennem det retoriske pentagram, appelformerne og Toulmins argumentationsmodel.
+            </p>
+        </header>
+
+        <!-- Sektion 1: Det Retoriske Pentagram -->
+        <section id="pentagram" class="glass-light p-8 md:p-12 rounded-[2.5rem] mb-12 reveal-item">
+            <div class="flex items-center gap-4 mb-8 border-b border-slate-200 pb-6">
+                <div class="w-12 h-12 rounded-2xl bg-white flex items-center justify-center text-sky-500 text-xl border border-slate-200 shadow-sm"><i class="fas fa-draw-polygon"></i></div>
+                <h2 class="text-3xl font-bold text-slate-900">1. The Rhetorical Pentagram</h2>
+            </div>
+
+            <div class="bg-sky-50/50 border-l-4 border-sky-500 p-6 rounded-r-2xl mb-8">
+                <h4 class="font-bold text-sky-900 mb-2 flex items-center gap-2"><i class="fas fa-info-circle"></i> (i) Hvorfor bruge pentagrammet?</h4>
+                <p class="text-sm text-sky-800 leading-relaxed">
+                    Før du overhovedet kigger på ordvalget i en tale, skal du forstå <strong>kommunikationssituationen</strong>. Pentagrammet (bestående af 5 dele) sikrer, at du har styr på helikopterperspektivet. Hvis en direktør (Speaker) taler til sine fyrede medarbejdere (Audience), er konteksten (Circumstances) afgørende for, hvorfor talen er formuleret, som den er!
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                <div class="glass-card p-6 rounded-3xl">
+                    <span class="badge border-sky-200 text-sky-600 mb-4"><i class="fas fa-bullhorn mr-2"></i>1. Speaker/Writer</span>
+                    <p class="text-sm text-slate-600"><strong>Afsenderen.</strong> Hvem taler? Hvad er deres baggrund, autoritet og agenda? (Eks: En ekspert, en politiker, en aktivist).</p>
+                </div>
+                
+                <div class="glass-card p-6 rounded-3xl">
+                    <span class="badge border-sky-200 text-sky-600 mb-4"><i class="fas fa-users mr-2"></i>2. Audience/Reader</span>
+                    <p class="text-sm text-slate-600"><strong>Modtageren.</strong> Hvem tales der til? Er de enige på forhånd (<em>sympathetic audience</em>) eller fjendtlige (<em>hostile audience</em>)?</p>
+                </div>
+
+                <div class="glass-card p-6 rounded-3xl">
+                    <span class="badge border-sky-200 text-sky-600 mb-4"><i class="fas fa-comment-dots mr-2"></i>3. Topic</span>
+                    <p class="text-sm text-slate-600"><strong>Emnet.</strong> Hvad handler teksten om? Hvad er hovedbudskabet og det primære argument?</p>
+                </div>
+
+                <div class="glass-card p-6 rounded-3xl lg:col-span-2">
+                    <span class="badge border-sky-200 text-sky-600 mb-4"><i class="fas fa-globe-americas mr-2"></i>4. Circumstances (Context)</span>
+                    <p class="text-sm text-slate-600"><strong>Omstændighederne.</strong> Hvor og hvornår finder det sted? Er det en "Graduation Speech" (fokus på fremtid/håb), en krisetale eller en mindetale? Tiden (fx 1960'erne vs. i dag) er utrolig vigtig for sproget.</p>
+                </div>
+
+                <div class="glass-card p-6 rounded-3xl">
+                    <span class="badge border-sky-200 text-sky-600 mb-4"><i class="fas fa-language mr-2"></i>5. Language</span>
+                    <p class="text-sm text-slate-600"><strong>Sproget.</strong> Er det formelt, uformelt, aggressivt, inkluderende ("we") eller distancerende ("they")?</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sektion 2: Modes of Persuasion (Appelformer) -->
+        <section id="persuasion" class="glass-light p-8 md:p-12 rounded-[2.5rem] mb-12 reveal-item">
+            <div class="flex items-center gap-4 mb-8 border-b border-slate-200 pb-6">
+                <div class="w-12 h-12 rounded-2xl bg-white flex items-center justify-center text-violet-500 text-xl border border-slate-200 shadow-sm"><i class="fas fa-balance-scale"></i></div>
+                <h2 class="text-3xl font-bold text-slate-900">2. Modes of Persuasion (Appelformer)</h2>
+            </div>
+
+            <p class="text-slate-600 mb-8 leading-relaxed">
+                Appelformerne er kernen i enhver non-fiction analyse. Forfatteren bruger disse tre strategier til at overbevise sit publikum.
+            </p>
+
+            <div class="grid lg:grid-cols-3 gap-8 mb-8">
+                <!-- Ethos -->
+                <div class="glass-card p-6 rounded-3xl border-t-4 border-t-emerald-400">
+                    <h4 class="font-bold text-slate-800 mb-2 text-xl">Ethos</h4>
+                    <p class="text-sm text-slate-600 mb-4"><strong>Troværdighed & Karakter.</strong> Talerens forsøg på at vise, at de er til at stole på. Det opbygges gennem ekspertise, ærlighed eller ved at vise, at man deler værdier med publikum.</p>
+                    <div class="bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
+                        <strong class="text-emerald-600 text-xs uppercase tracking-widest block mb-1">Eksamenstip:</strong>
+                        <p class="text-xs text-slate-500">Kig efter brugen af <em>personal anecdotes</em> (personlige fortællinger) – de bruges ofte til at bygge bro (Ethos) mellem en ellers "ophøjet" taler og et almindeligt publikum.</p>
+                    </div>
+                </div>
+
+                <!-- Pathos -->
+                <div class="glass-card p-6 rounded-3xl border-t-4 border-t-rose-400">
+                    <h4 class="font-bold text-slate-800 mb-2 text-xl">Pathos</h4>
+                    <p class="text-sm text-slate-600 mb-4"><strong>Følelser.</strong> Appel til publikums sympati, frygt, vrede eller håb. Det gøres ofte gennem stærke adjektiver, billedsprog (imagery) og levende beskrivelser.</p>
+                    <div class="bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
+                        <strong class="text-rose-600 text-xs uppercase tracking-widest block mb-1">Eksamenstip:</strong>
+                        <p class="text-xs text-slate-500">Når du finder Pathos, så nævn altid <em>hvilken</em> følelse der appelleres til! (Fx "The speaker appeals to the audience's sense of guilt/patriotism/fear").</p>
+                    </div>
+                </div>
+
+                <!-- Logos -->
+                <div class="glass-card p-6 rounded-3xl border-t-4 border-t-blue-400">
+                    <h4 class="font-bold text-slate-800 mb-2 text-xl">Logos</h4>
+                    <p class="text-sm text-slate-600 mb-4"><strong>Logik & Fornuft.</strong> Appel til intellektet. Opbygges gennem hårde facts, statistikker, historiske data og logiske konklusioner ("if X, then Y").</p>
+                    <div class="bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
+                        <strong class="text-blue-600 text-xs uppercase tracking-widest block mb-1">Eksamenstip:</strong>
+                        <p class="text-xs text-slate-500">Logos er det tørreste bevis. Hvis en politiker siger "Økonomien voksede med 4% sidste år", er det rent logos.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hvordan bruges det i et essay? -->
+            <div class="bg-violet-50/50 border border-violet-100 rounded-2xl p-6">
+                <div class="flex justify-between items-center mb-3">
+                    <h4 class="font-bold text-violet-900">✏️ Sådan skriver du det (PEE med Melinda Gates eksempel):</h4>
+                    <button onclick="copyToClipboard('The speaker effectively utilizes personal anecdotes to establish ethos and build trust with the audience.')" class="btn-copy">
+                        <i class="far fa-copy"></i> Kopiér
+                    </button>
+                </div>
+                <div class="example-box !border-violet-500">
+                    "In her speech, Melinda French Gates effectively utilizes <span class="highlight-word">personal anecdotes</span> to establish <span class="highlight-word">ethos</span> and build trust with the audience. This is evident when she shares a story from her own past: '[Insert Quote]'. By showcasing her own vulnerabilities and experiences, she bridges the gap between herself and the graduates, making her overarching message far more persuasive."
+                </div>
+            </div>
+        </section>
+
+        <!-- Sektion 3: Retoriske Virkemidler (Devices) -->
+        <section id="devices" class="glass-light p-8 md:p-12 rounded-[2.5rem] mb-12 reveal-item">
+            <div class="flex items-center gap-4 mb-8 border-b border-slate-200 pb-6">
+                <div class="w-12 h-12 rounded-2xl bg-white flex items-center justify-center text-sky-500 text-xl border border-slate-200 shadow-sm"><i class="fas fa-bolt"></i></div>
+                <h2 class="text-3xl font-bold text-slate-900">3. Rhetorical Devices (Virkemidler)</h2>
+            </div>
+            
+            <p class="text-slate-600 mb-8 leading-relaxed">
+                Når du har styr på appelformerne, skal du dykke ned i selve teksten. <em>Hvordan</em> appellerer taleren til f.eks. Pathos? Det gør de ved at bruge retoriske virkemidler!
+            </p>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                
+                <!-- Anaphora -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
+                    <span class="text-sky-600 font-bold block mb-1 text-lg">Anaphora</span>
+                    <p class="text-sm text-slate-600 mb-2">Gentagelse af det samme ord/frase i <strong>starten</strong> af flere sætninger i træk. Skaber rytme og insisteren.</p>
+                    <code class="text-xs bg-slate-50 p-2 rounded block text-slate-500 italic">"I have a dream... I have a dream..."</code>
+                </div>
+
+                <!-- Epistrophe -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
+                    <span class="text-sky-600 font-bold block mb-1 text-lg">Epistrophe</span>
+                    <p class="text-sm text-slate-600 mb-2">Gentagelse i <strong>slutningen</strong> af flere sætninger. Skaber en stærk, hamrende afslutningseffekt.</p>
+                    <code class="text-xs bg-slate-50 p-2 rounded block text-slate-500 italic">"...by the people, for the people."</code>
+                </div>
+
+                <!-- Rule of Three -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
+                    <span class="text-sky-600 font-bold block mb-1 text-lg">Rule of Three</span>
+                    <p class="text-sm text-slate-600 mb-2">Ting nævnt i tretal (Tretalsreglen). Hjernen elsker mønstre på tre, det virker komplet og tilfredsstillende.</p>
+                    <code class="text-xs bg-slate-50 p-2 rounded block text-slate-500 italic">"Blood, sweat, and tears."</code>
+                </div>
+
+                <!-- Antithesis -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
+                    <span class="text-sky-600 font-bold block mb-1 text-lg">Antithesis</span>
+                    <p class="text-sm text-slate-600 mb-2">At sætte to stærke modsætninger over for hinanden for at skabe kontrast og understrege en pointe.</p>
+                    <code class="text-xs bg-slate-50 p-2 rounded block text-slate-500 italic">"Light and dark, rich and poor."</code>
+                </div>
+
+                <!-- Allusion -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
+                    <span class="text-sky-600 font-bold block mb-1 text-lg">Allusion</span>
+                    <p class="text-sm text-slate-600 mb-2">En skjult/indirekte reference til en kendt begivenhed, person eller bog (ofte Bibelen eller historiske taler).</p>
+                    <code class="text-xs bg-slate-50 p-2 rounded block text-slate-500 italic">"Five score years ago..." (Allusion til Lincoln)</code>
+                </div>
+
+                <!-- Rhetorical Question -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
+                    <span class="text-sky-600 font-bold block mb-1 text-lg">Rhetorical Question</span>
+                    <p class="text-sm text-slate-600 mb-2">Et spørgsmål hvor svaret er indlysende. Tvinger publikum til at tænke selv og engagere sig i talen.</p>
+                    <code class="text-xs bg-slate-50 p-2 rounded block text-slate-500 italic">"Are we just going to stand by?"</code>
+                </div>
+
+                <!-- Metaphors / Personification (Melinda Gates ex) -->
+                <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm lg:col-span-3 border-l-4 border-l-violet-500">
+                    <span class="text-violet-600 font-bold block mb-1 text-lg">Imagery / Personification (Melinda Gates eksempel)</span>
+                    <p class="text-sm text-slate-600 mb-2">At bruge billedsprog eller give døde ting liv. I dine noter beskriver Melinda Gates The Graduates (publikum) som dem, der skal <em>"make the broken things whole again"</em>, og hun bruger personificering af vand/bølger til at gøre komplekse problemer mere forståelige.</p>
+                </div>
+            </div>
+
+            <!-- PEE Eksempel Virkemidler -->
+            <div class="bg-sky-50/50 border border-sky-100 rounded-2xl p-6">
+                <h4 class="font-bold text-sky-900 mb-3">✏️ PEE Eksempel: Rule of Three & Anaphora</h4>
+                <div class="example-box !border-sky-500">
+                    "Furthermore, the speaker emphasizes the urgency of the situation through the use of <span class="highlight-word">anaphora</span> and the <span class="highlight-word">rule of three</span>. This is apparent in the lines: 'We must fight, we must adapt, we must overcome.' The repetition of 'we must' creates a rhythmic and forceful tone that appeals strongly to <span class="highlight-word">pathos</span>, uniting the audience under a shared sense of responsibility."
+                </div>
+            </div>
+        </section>
+
+        <!-- Sektion 4: Toulmin's Argumentationsmodel -->
+        <section id="toulmin" class="glass-light p-8 md:p-12 rounded-[2.5rem] reveal-item">
+            <div class="flex items-center gap-4 mb-8 border-b border-slate-200 pb-6">
+                <div class="w-12 h-12 rounded-2xl bg-white flex items-center justify-center text-emerald-500 text-xl border border-slate-200 shadow-sm"><i class="fas fa-project-diagram"></i></div>
+                <h2 class="text-3xl font-bold text-slate-900">4. Toulmin's Argumentation Model</h2>
+            </div>
+            
+            <div class="bg-emerald-50/50 border-l-4 border-emerald-500 p-6 rounded-r-2xl mb-8">
+                <h4 class="font-bold text-emerald-900 mb-2 flex items-center gap-2"><i class="fas fa-info-circle"></i> (i) At skille argumentet ad</h4>
+                <p class="text-sm text-emerald-800 leading-relaxed">
+                    Når opgaven beder dig om at vurdere afsenderens argumentation ("Discuss the writer's argumentation"), er det ikke nok at sige, "hun har gode argumenter". Du skal bruge Toulmins model til at skære argumentet ud i pap.
+                </p>
+            </div>
+
+            <div class="grid md:grid-cols-3 gap-6 mb-8">
+                <div class="glass-card p-6 rounded-3xl border-emerald-200 relative overflow-hidden">
+                    <div class="absolute -right-4 -top-4 text-5xl opacity-10 text-emerald-600"><i class="fas fa-flag"></i></div>
+                    <h4 class="font-bold text-emerald-600 mb-2 text-xl">1. Claim</h4>
+                    <span class="text-xs font-bold text-slate-400 uppercase tracking-widest block mb-2">(Påstanden)</span>
+                    <p class="text-sm text-slate-600">Hvad er det, forfatteren prøver at overbevise os om? Hvad er hovedpointen i argumentet?</p>
+                    <code class="block mt-4 text-xs bg-white p-2 border rounded shadow-sm text-slate-500">"Young people need to fix the broken world."</code>
+                </div>
+
+                <div class="glass-card p-6 rounded-3xl border-emerald-200 relative overflow-hidden">
+                    <div class="absolute -right-4 -top-4 text-5xl opacity-10 text-emerald-600"><i class="fas fa-database"></i></div>
+                    <h4 class="font-bold text-emerald-600 mb-2 text-xl">2. Grounds/Data</h4>
+                    <span class="text-xs font-bold text-slate-400 uppercase tracking-widest block mb-2">(Belægget)</span>
+                    <p class="text-sm text-slate-600">Hvad bygger forfatteren sin påstand på? Hvilket bevis fremlægges der i teksten?</p>
+                    <code class="block mt-4 text-xs bg-white p-2 border rounded shadow-sm text-slate-500">"Because they are the future generation."</code>
+                </div>
+
+                <div class="glass-card p-6 rounded-3xl border-emerald-200 relative overflow-hidden">
+                    <div class="absolute -right-4 -top-4 text-5xl opacity-10 text-emerald-600"><i class="fas fa-link"></i></div>
+                    <h4 class="font-bold text-emerald-600 mb-2 text-xl">3. Warrant</h4>
+                    <span class="text-xs font-bold text-slate-400 uppercase tracking-widest block mb-2">(Hjemlen)</span>
+                    <p class="text-sm text-slate-600">Den underliggende, usagte præmis, der binder <em>Data</em> sammen med <em>Claim</em>. (Hvorfor gør belægget påstanden sand?)</p>
+                    <code class="block mt-4 text-xs bg-white p-2 border rounded shadow-sm text-slate-500">"The future generation has the most to lose/gain."</code>
+                </div>
+            </div>
+
+            <div class="bg-emerald-50/50 border border-emerald-100 rounded-2xl p-6">
+                <h4 class="font-bold text-emerald-900 mb-3">✏️ PEE Eksempel: Analyse af et argument (Toulmin)</h4>
+                <div class="example-box !border-emerald-500">
+                    "When analyzing the core argumentation, it is evident that the speaker's main <span class="highlight-word">claim</span> is that the youth must take action. The <span class="highlight-word">grounds</span> provided for this claim are the current failures of the older generation, stated in the line: '[Quote]'. However, the argument relies heavily on the unstated <span class="highlight-word">warrant</span> that the youth actually possess the power to invoke change. This makes the argument somewhat idealistic, yet emotionally compelling."
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-white py-12 border-t border-slate-200 text-center text-slate-500 text-sm relative z-10">
+        <p>&copy; 2026 Sankt Annæ Gymnasium - Non-Fiction Analysis Guide</p>
+    </footer>
+
+    <script>
+        // Progress Bar
+        window.addEventListener('scroll', () => {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            document.getElementById('scroll-progress').style.width = scrolled + '%';
+            
+            // Parallax Blobs
+            const y = window.scrollY;
+            document.querySelector('.blob-1').style.transform = `translateY(${y * 0.1}px)`;
+            document.querySelector('.blob-2').style.transform = `translateY(${y * -0.1}px)`;
+        });
+
+        // Muse Parallax
+        document.addEventListener('mousemove', (e) => {
+            const x = (e.clientX / window.innerWidth - 0.5) * 2;
+            const y = (e.clientY / window.innerHeight - 0.5) * 2;
+            const scrollY = window.scrollY;
+            document.querySelector('.blob-1').style.transform = `translate(${x * -20}px, ${(y * -20) + (scrollY * 0.1)}px)`;
+            document.querySelector('.blob-2').style.transform = `translate(${x * 20}px, ${(y * 20) + (scrollY * -0.1)}px)`;
+        });
+
+        // Kopier funktion
+        function copyToClipboard(text) {
+            const el = document.createElement('textarea');
+            el.value = text;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+
+            const btn = event.currentTarget;
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-check"></i> Kopieret!';
+            btn.classList.add('bg-sky-500', 'text-white', 'border-sky-500');
+            
+            setTimeout(() => {
+                btn.innerHTML = originalHTML;
+                btn.classList.remove('bg-sky-500', 'text-white', 'border-sky-500');
+            }, 2000);
+        }
+
+        // Scroll Reveal Animation
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('opacity-100', 'translate-y-0');
+                    entry.target.classList.remove('opacity-0', 'translate-y-10');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.reveal-item').forEach(el => {
+            el.classList.add('opacity-0', 'translate-y-10', 'transition-all', 'duration-700', 'ease-out');
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>

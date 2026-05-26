@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deskriptiv Statistik | Sankt Annæ 2.a</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #0d9488; /* Teal farve til statistik */
+            --primary-glow: rgba(13, 148, 136, 0.15);
+            --slate-bg: #f8fafc;
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--slate-bg);
+            color: #0f172a;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        /* Math Particle Canvas */
+        #particle-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            pointer-events: none;
+            opacity: 0.5;
+        }
+
+        /* Dynamiske Baggrunds-blobs */
+        .bg-blob {
+            position: fixed;
+            z-index: -1;
+            filter: blur(120px);
+            opacity: 0.15;
+            pointer-events: none;
+            border-radius: 50%;
+            animation: drift 25s infinite alternate ease-in-out;
+        }
+
+        @keyframes drift {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(60px, -60px) scale(1.1); }
+        }
+
+        .content-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            border: 1px solid #e2e8f0;
+            border-radius: 2rem;
+            padding: 2.5rem;
+            margin-bottom: 2rem;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.05);
+        }
+
+        .math-block {
+            font-family: 'Fira Code', monospace;
+            background: #0f172a;
+            color: #2dd4bf; /* Teal-400 */
+            padding: 1rem 1.5rem;
+            border-radius: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            margin: 1rem 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .rule-box {
+            background: rgba(13, 148, 136, 0.05);
+            border-left: 4px solid var(--primary);
+            padding: 1.5rem;
+            border-radius: 0 1rem 1rem 0;
+            margin: 1.5rem 0;
+        }
+
+        .btn-copy {
+            background: rgba(255, 255, 255, 0.1);
+            color: #cbd5e1;
+            padding: 0.5rem 1rem;
+            border-radius: 0.5rem;
+            font-size: 0.8rem;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            transition: all 0.2s;
+        }
+
+        .btn-copy:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--slate-bg); }
+        ::-webkit-scrollbar-thumb { background: rgba(13, 148, 136, 0.3); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(13, 148, 136, 0.6); }
+    </style>
+</head>
+<body class="min-h-screen pb-20">
+
+    <!-- Animeret Partikel System -->
+    <canvas id="particle-canvas"></canvas>
+
+    <!-- Background Blobs -->
+    <div class="bg-blob w-[600px] h-[600px] bg-teal-300 top-[-10%] left-[10%]"></div>
+    <div class="bg-blob w-[500px] h-[500px] bg-emerald-300 bottom-[10%] right-[-10%]"></div>
+
+    <!-- Navigation Bar -->
+    <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-teal-100 shadow-sm">
+        <div class="max-w-5xl mx-auto px-6 h-20 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <a href="matematik-skriftlig.html" class="w-10 h-10 bg-slate-100 hover:bg-slate-200 rounded-full flex items-center justify-center transition-colors text-slate-600">
+                    <i class="fas fa-arrow-left"></i>
+                </a>
+                <div>
+                    <span class="text-xl font-black tracking-tight block leading-none text-slate-900 uppercase">Deskriptiv <span class="text-teal-500">Statistik</span></span>
+                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">Sankt Annæ Gymnasium 2.a</span>
+                </div>
+            </div>
+            <div class="flex items-center gap-4 hidden sm:flex">
+                <a href="opgavebank.html" class="text-xs font-black text-slate-500 hover:text-teal-600 transition uppercase tracking-widest flex items-center gap-2">
+                    <i class="fas fa-dumbbell"></i> Træn Emnet
+                </a>
+                <a href="maple.html" class="px-5 py-2 bg-teal-50 text-teal-600 rounded-full text-xs font-bold hover:bg-teal-600 hover:text-white transition-all active:scale-95 uppercase tracking-wider border border-teal-200">
+                    Maple Guide
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header Section -->
+    <header class="max-w-4xl mx-auto px-6 pt-16 pb-12 text-center relative">
+        <div class="inline-block mb-4 px-4 py-1.5 rounded-full bg-teal-50 border border-teal-100 text-teal-600 font-bold text-xs tracking-widest uppercase shadow-sm">
+            Emne 08
+        </div>
+        <h1 class="text-4xl md:text-5xl font-black tracking-tighter text-slate-900 mb-6 uppercase">
+            Data & <span class="text-transparent bg-clip-text bg-gradient-to-r from-teal-500 to-emerald-500 italic">Grafer</span>
+        </h1>
+        <p class="text-slate-500 text-lg max-w-2xl mx-auto font-medium">
+            Få overblik over datasæt. Her lærer du forskellen på ugrupperede og grupperede observationer, kvartilsæt, boksplot, histogrammer og sumkurver.
+        </p>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-4xl mx-auto px-6">
+        
+        <!-- Sektion 1: Ugrupperede vs. Grupperede -->
+        <section class="content-card border-t-4 border-t-teal-500">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-10 h-10 rounded-lg bg-teal-100 text-teal-600 flex items-center justify-center">
+                    <i class="fas fa-filter text-xl"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-slate-800">1. Hvilken type data?</h2>
+            </div>
+            
+            <p class="text-slate-600 leading-relaxed mb-4">
+                Før du gør noget som helst, skal du vide, om dit datasæt er ugrupperet eller grupperet. Dette afgør hvilke formler og grafer du skal bruge!
+            </p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+                <div class="bg-slate-50 p-5 rounded-2xl border border-slate-100 border-t-4 border-t-emerald-400">
+                    <h4 class="font-bold text-emerald-600 mb-2">Ugrupperede (Enkelte tal)</h4>
+                    <p class="text-sm text-slate-600 mb-3">Hver observation står for sig selv. F.eks. skostørrelser i klassen: 38, 41, 42, 42, 45.</p>
+                    <ul class="text-sm text-slate-500 list-disc list-inside">
+                        <li>Bruges til: <strong>Boksplot</strong>, prikdiagram.</li>
+                        <li>Nøgletal: Gennemsnit, Kvartilsæt.</li>
+                    </ul>
+                </div>
+                <div class="bg-slate-50 p-5 rounded-2xl border border-slate-100 border-t-4 border-t-cyan-400">
+                    <h4 class="font-bold text-cyan-600 mb-2">Grupperede (Intervaller)</h4>
+                    <p class="text-sm text-slate-600 mb-3">Data er samlet i kasser (intervaller). F.eks. højde: [160; 170[, [170; 180[ osv.</p>
+                    <ul class="text-sm text-slate-500 list-disc list-inside">
+                        <li>Bruges til: <strong>Histogram</strong>, <strong>Sumkurve</strong>.</li>
+                        <li>Nøgletal: Intervalmidtpunkt.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sektion 2: Ugrupperede observationer (Boksplot) -->
+        <section class="content-card border-t-4 border-t-emerald-500">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-10 h-10 rounded-lg bg-emerald-100 text-emerald-600 flex items-center justify-center">
+                    <i class="fas fa-box text-xl"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-slate-800">2. Kvartilsæt & Boksplot</h2>
+            </div>
+            
+            <p class="text-slate-600 leading-relaxed mb-4">
+                Når data er ugrupperet, beskriver vi det ofte med de fem magiske tal (udvidet kvartilsæt), som danner et boksplot.
+            </p>
+
+            <div class="rule-box !border-emerald-500 !bg-emerald-50/50 mb-6">
+                <h3 class="font-bold text-emerald-900 mb-2">De 5 observationer i et boksplot:</h3>
+                <ol class="list-decimal list-inside space-y-1 text-slate-700 text-sm">
+                    <li><strong>Minimum:</strong> Den mindste værdi.</li>
+                    <li><strong>Nedre kvartil (Q1):</strong> De første 25% af data.</li>
+                    <li><strong>Median (Q2):</strong> Midten af data (50%).</li>
+                    <li><strong>Øvre kvartil (Q3):</strong> De første 75% af data.</li>
+                    <li><strong>Maksimum:</strong> Den største værdi.</li>
+                </ol>
+            </div>
+
+            <div class="space-y-4">
+                <div class="flex items-center justify-between p-4 border border-slate-100 rounded-xl hover:bg-slate-50">
+                    <span class="font-bold text-slate-700">Find Kvartilsættet (Maple)</span>
+                    <button onclick="copyToClipboard('kvartiler(L)')" class="btn-copy !bg-slate-200 !text-slate-700 hover:!bg-emerald-500 hover:!text-white">kvartiler(L)</button>
+                </div>
+                <div class="flex items-center justify-between p-4 border border-slate-100 rounded-xl hover:bg-slate-50">
+                    <span class="font-bold text-slate-700">Tegn Boksplottet (Maple)</span>
+                    <button onclick="copyToClipboard('boksplot(L)')" class="btn-copy !bg-slate-200 !text-slate-700 hover:!bg-emerald-500 hover:!text-white">boksplot(L)</button>
+                </div>
+                <div class="flex items-center justify-between p-4 border border-slate-100 rounded-xl hover:bg-slate-50">
+                    <span class="font-bold text-slate-700">Tegn flere Boksplot sammen</span>
+                    <button onclick="copyToClipboard('boksplot([L1, L2], navne=[&quot;A&quot;, &quot;B&quot;])')" class="btn-copy !bg-slate-200 !text-slate-700 hover:!bg-emerald-500 hover:!text-white">boksplot([L1, L2])</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sektion 3: Grupperede observationer -->
+        <section class="content-card border-t-4 border-t-cyan-500">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-10 h-10 rounded-lg bg-cyan-100 text-cyan-600 flex items-center justify-center">
+                    <i class="fas fa-chart-area text-xl"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-slate-800">3. Histogram & Sumkurve</h2>
+            </div>
+            
+            <p class="text-slate-600 leading-relaxed mb-4">
+                Ved grupperede observationer skal du altid lave lister i Maple over dine <strong>intervaller (I)</strong> og dine <strong>hyppigheder (H)</strong>.
+            </p>
+
+            <div class="math-block block space-y-1 !bg-cyan-900/10 !border-cyan-500/30 text-sm">
+                <div class="text-cyan-600">I := [0..10, 10..20, 20..30]</div>
+                <div class="text-cyan-600">H := [5, 12, 8]</div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+                <!-- Histogram -->
+                <div class="bg-slate-50 p-5 rounded-2xl border border-slate-100">
+                    <h4 class="font-bold text-cyan-600 mb-2">Histogram</h4>
+                    <p class="text-sm text-slate-600 mb-3">Viser fordelingen af data i kasser (arealet af en kasse svarer til frekvensen).</p>
+                    <div class="mt-3 flex">
+                        <button onclick="copyToClipboard('Histogram(I, H)')" class="btn-copy !bg-slate-200 !text-slate-700 hover:!bg-cyan-600 hover:!text-white w-full">Histogram(I, H)</button>
+                    </div>
+                </div>
+
+                <!-- Sumkurve -->
+                <div class="bg-slate-50 p-5 rounded-2xl border border-slate-100">
+                    <h4 class="font-bold text-cyan-600 mb-2">Sumkurve</h4>
+                    <p class="text-sm text-slate-600 mb-3">Bruges til at aflæse kvartilsættet for <em>grupperede</em> data. Går altid op til 100%.</p>
+                    <div class="mt-3 flex">
+                        <button onclick="copyToClipboard('Sumkurve(I, H)')" class="btn-copy !bg-slate-200 !text-slate-700 hover:!bg-cyan-600 hover:!text-white w-full">Sumkurve(I, H)</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-amber-50 border-l-4 border-amber-500 p-4 rounded-r-xl mt-6">
+                <h4 class="font-bold text-amber-900 mb-1"><i class="fas fa-search mr-2"></i>Aflæsning af Sumkurve</h4>
+                <p class="text-sm text-slate-700">
+                    Når opgaven beder dig aflæse medianen fra en sumkurve, går du ind på <strong>y-aksen ved 50% (eller 0.5)</strong>, går vandret ud til kurven, og ned på x-aksen for at aflæse resultatet.
+                </p>
+            </div>
+        </section>
+
+        <!-- Sektion 4: Nøgletal -->
+        <section class="content-card border-t-4 border-t-indigo-500">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-10 h-10 rounded-lg bg-indigo-100 text-indigo-600 flex items-center justify-center">
+                    <i class="fas fa-calculator text-xl"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-slate-800">4. Hurtige Nøgletal (Maple)</h2>
+            </div>
+            
+            <p class="text-slate-600 leading-relaxed mb-4">
+                Her er de vigtigste kommandoer til at udregne gennemsnit og spredning lynhurtigt via Gym-pakken.
+            </p>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+                <button onclick="copyToClipboard('gennemsnit(L)')" class="p-4 border border-slate-200 rounded-xl hover:bg-indigo-50 hover:border-indigo-300 transition text-center group">
+                    <div class="text-indigo-600 font-bold mb-1">Gennemsnit</div>
+                    <div class="text-xs text-slate-400 group-hover:text-indigo-500 font-mono">gennemsnit(L)</div>
+                </button>
+                <button onclick="copyToClipboard('median(L)')" class="p-4 border border-slate-200 rounded-xl hover:bg-indigo-50 hover:border-indigo-300 transition text-center group">
+                    <div class="text-indigo-600 font-bold mb-1">Median</div>
+                    <div class="text-xs text-slate-400 group-hover:text-indigo-500 font-mono">median(L)</div>
+                </button>
+                <button onclick="copyToClipboard('spredning(L)')" class="p-4 border border-slate-200 rounded-xl hover:bg-indigo-50 hover:border-indigo-300 transition text-center group">
+                    <div class="text-indigo-600 font-bold mb-1">Spredning</div>
+                    <div class="text-xs text-slate-400 group-hover:text-indigo-500 font-mono">spredning(L)</div>
+                </button>
+                <button onclick="copyToClipboard('hyppighed(L)')" class="p-4 border border-slate-200 rounded-xl hover:bg-indigo-50 hover:border-indigo-300 transition text-center group">
+                    <div class="text-indigo-600 font-bold mb-1">Tabel</div>
+                    <div class="text-xs text-slate-400 group-hover:text-indigo-500 font-mono">hyppighed(L)</div>
+                </button>
+            </div>
+        </section>
+
+        <!-- Navigation (Forrige / Næste) -->
+        <div class="flex flex-col sm:flex-row justify-between gap-4 mb-12">
+            <a href="mat-sandsynlighed.html" class="px-6 py-4 bg-white border border-slate-200 text-slate-600 rounded-2xl font-bold hover:bg-slate-50 transition-colors flex items-center justify-center gap-3">
+                <i class="fas fa-arrow-left"></i>
+                Forrige: Sandsynlighed
+            </a>
+            <a href="matematik-skriftlig.html" class="px-6 py-4 bg-slate-900 text-white rounded-2xl font-bold hover:bg-teal-600 transition-colors shadow-lg shadow-teal-500/20 flex items-center justify-center gap-3">
+                Tilbage til Forsiden
+                <i class="fas fa-home"></i>
+            </a>
+        </div>
+
+    </main>
+
+    <!-- Toast -->
+    <div id="toast" class="fixed bottom-10 left-1/2 -translate-x-1/2 bg-slate-900 text-white px-6 py-3 rounded-xl shadow-2xl opacity-0 transition-all pointer-events-none z-[100] flex items-center space-x-3 border border-slate-700">
+        <i class="fas fa-check text-teal-400"></i>
+        <span class="font-bold text-sm">Kopieret til udklipsholder!</span>
+    </div>
+
+    <script>
+        // Kopiér funktion
+        function copyToClipboard(text) {
+            const el = document.createElement('textarea');
+            el.value = text;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+
+            const toast = document.getElementById('toast');
+            toast.style.opacity = '1';
+            toast.style.transform = 'translate(-50%, -10px)';
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translate(-50%, 0)';
+            }, 2500);
+        }
+
+        // --- Math Particle Animation ---
+        const canvas = document.getElementById('particle-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        const mathSymbols = ['μ', 'σ', 'Q1', 'Q2', 'Q3', 'Σ', '%', 'f(x)', 'n'];
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        class MathParticle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.symbol = mathSymbols[Math.floor(Math.random() * mathSymbols.length)];
+                this.fontSize = Math.random() * 15 + 10;
+                this.speedX = (Math.random() - 0.5) * 0.3;
+                this.speedY = (Math.random() - 0.5) * 0.3;
+                const colors = ['rgba(13, 148, 136, 0.3)', 'rgba(6, 182, 212, 0.3)', 'rgba(16, 185, 129, 0.3)'];
+                this.color = colors[Math.floor(Math.random() * colors.length)];
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.x > canvas.width + 20) this.x = -20;
+                if (this.x < -20) this.x = canvas.width + 20;
+                if (this.y > canvas.height + 20) this.y = -20;
+                if (this.y < -20) this.y = canvas.height + 20;
+            }
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.font = `${this.fontSize}px 'Fira Code', monospace`;
+                ctx.fillText(this.symbol, this.x, this.y);
+            }
+        }
+
+        function initParticles() {
+            particles = [];
+            const particleCount = Math.floor(window.innerWidth / 30); 
+            for (let i = 0; i < Math.min(particleCount, 40); i++) {
+                particles.push(new MathParticle());
+            }
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animateParticles);
+        }
+
+        window.addEventListener('resize', () => {
+            resize();
+            initParticles();
+        });
+        
+        window.onload = () => {
+            resize();
+            initParticles();
+            animateParticles();
+        };
+    </script>
+</body>
+</html>

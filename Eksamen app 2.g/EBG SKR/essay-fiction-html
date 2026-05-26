@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fiction Analysis | 2.a SAG</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #6366f1; /* Indigo 500 */
+            --accent: #d946ef;  /* Fuchsia 500 */
+            --bg: #f8fafc;      /* Slate 50 (Meget lys baggrund) */
+            --text-main: #334155; /* Slate 700 */
+            --text-heading: #0f172a; /* Slate 900 */
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        /* Scroll Progress Bar */
+        #scroll-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 0%;
+            height: 4px;
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            z-index: 1000;
+            transition: width 0.1s ease-out;
+            box-shadow: 0 0 10px rgba(99, 102, 241, 0.5);
+        }
+
+        /* LIGHT GLASSMORPHISM */
+        .glass-light {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 10px 30px -10px rgba(15, 23, 42, 0.05);
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.5);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02);
+        }
+
+        .glass-card:hover {
+            border-color: rgba(99, 102, 241, 0.3);
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px -10px rgba(99, 102, 241, 0.15);
+            background: rgba(255, 255, 255, 0.8);
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .btn-copy {
+            @apply px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 border;
+            background: rgba(255, 255, 255, 0.9);
+            border-color: rgba(99, 102, 241, 0.2);
+            color: var(--primary);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+        .btn-copy:hover {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: #fff;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+        }
+
+        /* Svævende animationer */
+        .floating { animation: float 6s ease-in-out infinite; }
+        .floating-delayed { animation: float 8s ease-in-out infinite; animation-delay: 2s; }
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-15px) rotate(3deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
+        }
+
+        /* Eksempel/Citat Boks - Lys udgave */
+        .example-box {
+            font-family: 'Fira Code', monospace;
+            background: #f1f5f9; /* Slate 100 */
+            border-left: 4px solid var(--primary);
+            padding: 1.25rem 1.5rem;
+            border-radius: 0 1rem 1rem 0;
+            color: #475569; /* Slate 600 */
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        .highlight-word {
+            color: var(--primary);
+            font-weight: 600;
+            background: rgba(99, 102, 241, 0.1);
+            padding: 0 4px;
+            border-radius: 4px;
+        }
+
+        .badge {
+            @apply inline-flex items-center px-3 py-1 text-xs font-bold rounded-full border bg-white shadow-sm;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
+    </style>
+</head>
+<body class="min-h-screen relative">
+
+    <div id="scroll-progress"></div>
+
+    <!-- Parallax Blobs (Lyse pasteller) -->
+    <div class="blob-1 fixed top-[5%] left-[-10%] w-[45%] h-[45%] bg-indigo-300/30 blur-[120px] rounded-full pointer-events-none transition-transform duration-700 ease-out"></div>
+    <div class="blob-2 fixed bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-fuchsia-300/30 blur-[120px] rounded-full pointer-events-none transition-transform duration-700 ease-out"></div>
+
+    <!-- Floating Shapes (Lyse outline) -->
+    <div class="absolute top-40 left-[15%] w-16 h-16 border-4 border-indigo-400/20 rounded-full floating pointer-events-none"></div>
+    <div class="absolute top-80 right-[10%] w-20 h-20 border-2 border-fuchsia-400/20 rotate-45 floating-delayed pointer-events-none"></div>
+
+    <nav class="sticky top-0 z-50 px-6 py-4 glass-light border-b border-white/40">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <a href="eng-essay.html" class="w-10 h-10 rounded-xl bg-white hover:bg-slate-50 flex items-center justify-center transition border border-slate-200 shadow-sm text-slate-600">
+                    <i class="fas fa-arrow-left"></i>
+                </a>
+                <span class="text-xl font-bold tracking-tight text-slate-800">Fiction <span class="text-indigo-500">Analysis</span></span>
+            </div>
+            <div class="hidden md:flex gap-6 text-xs font-bold uppercase tracking-widest text-slate-500">
+                <a href="#narration" class="hover:text-indigo-600 transition">Point of View</a>
+                <a href="#character" class="hover:text-indigo-600 transition">Karakterer</a>
+                <a href="#setting" class="hover:text-indigo-600 transition">Setting & Symboler</a>
+                <a href="#devices" class="hover:text-indigo-600 transition">Litterære Virkemidler</a>
+            </div>
+        </div>
+    </nav>
+
+    <main class="max-w-5xl mx-auto px-6 pt-20 pb-32 relative z-10">
+        
+        <!-- Hero Section -->
+        <header class="text-center mb-24 reveal-item">
+            <div class="inline-block mb-4 px-4 py-1.5 rounded-full bg-indigo-50 border border-indigo-100 text-indigo-600 font-bold text-xs tracking-widest uppercase shadow-sm">
+                Short Stories & Novels
+            </div>
+            <h1 class="text-5xl md:text-7xl font-extrabold mb-6 tracking-tight text-slate-900">
+                How to Analyse <span class="gradient-text">Fiction</span>
+            </h1>
+            <p class="text-slate-600 text-lg max-w-2xl mx-auto">
+                Litterær analyse handler om at læse mellem linjerne. Her er dit framework til at afkode forfatterens intention gennem <em>Narration, Characterization, Setting</em> og <em>Symbols</em>.
+            </p>
+        </header>
+
+        <!-- Sektion 1: Narration / Point of View -->
+        <section id="narration" class="glass-light p-8 md:p-12 rounded-[2.5rem] mb-12 reveal-item">
+            <div class="flex items-center gap-4 mb-8 border-b border-slate-200 pb-6">
+                <div class="w-12 h-12 rounded-2xl bg-white flex items-center justify-center text-indigo-500 text-xl border border-slate-200 shadow-sm"><i class="fas fa-eye"></i></div>
+                <h2 class="text-3xl font-bold text-slate-900">1. Narration & Point of View</h2>
+            </div>
+
+            <p class="text-slate-600 mb-8 leading-relaxed">
+                Hvem fortæller historien, og hvor meget ved de? Fortællersynsvinklen er afgørende for, hvordan vi opfatter teksten. Er fortælleren til at stole på, eller bliver vi manipuleret?
+            </p>
+
+            <div class="grid md:grid-cols-2 gap-8 mb-8">
+                <!-- 1st Person -->
+                <div class="glass-card p-6 rounded-3xl">
+                    <span class="badge border-indigo-200 text-indigo-600 mb-4"><i class="fas fa-user mr-2"></i>1st Person Narrator</span>
+                    <p class="text-sm text-slate-600 mb-4">Fortælleren er en del af handlingen ("I"). Dette giver et intimt og subjektivt indblik i karakterens tanker.</p>
+                    <div class="bg-white p-4 rounded-xl border border-slate-100 shadow-sm">
+                        <strong class="text-slate-800 text-sm block mb-1">Kig efter: The Unreliable Narrator</strong>
+                        <p class="text-xs text-slate-500">Kan vi stole på fortælleren? Er de for unge, psykisk ustabile eller lyver de bevidst for at fremstille sig selv i et bedre lys?</p>
+                    </div>
+                </div>
+
+                <!-- 3rd Person -->
+                <div class="glass-card p-6 rounded-3xl">
+                    <span class="badge border-indigo-200 text-indigo-600 mb-4"><i class="fas fa-users mr-2"></i>3rd Person Narrator</span>
+                    <p class="text-sm text-slate-600 mb-4">Fortælleren står uden for historien ("He/She").</p>
+                    <ul class="text-sm text-slate-600 space-y-3">
+                        <li class="flex gap-2">
+                            <i class="fas fa-circle text-[8px] text-indigo-400 mt-1.5"></i>
+                            <div><strong>Omniscient (Alvidende):</strong> Har adgang til <em>alle</em> karakterers tanker og kender fremtiden.</div>
+                        </li>
+                        <li class="flex gap-2">
+                            <i class="fas fa-circle text-[8px] text-indigo-400 mt-1.5"></i>
+                            <div><strong>Limited (Begrænset):</strong> Følger kun én karakters tanker (ofte hovedpersonen).</div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Hvordan bruges det i et essay? -->
+            <div class="bg-indigo-50/50 border border-indigo-100 rounded-2xl p-6">
+                <div class="flex justify-between items-center mb-3">
+                    <h4 class="font-bold text-indigo-900">✏️ Sådan skriver du det i dit essay (PEE):</h4>
+                    <button onclick="copyToClipboard('By employing a first-person narrator, the author creates an intimate connection between the reader and the protagonist, allowing us to experience their inner turmoil firsthand.')" class="btn-copy">
+                        <i class="far fa-copy"></i> Kopiér
+                    </button>
+                </div>
+                <div class="example-box">
+                    "By employing a <span class="highlight-word">first-person limited narrator</span>, the author creates an intimate connection between the reader and the protagonist. This subjective point of view forces the reader to experience the protagonist's inner turmoil firsthand, which is evident when he states: '[Quote]'. The narration thus underlines the theme of isolation."
+                </div>
+            </div>
+        </section>
+
+        <!-- Sektion 2: Characterization -->
+        <section id="character" class="glass-light p-8 md:p-12 rounded-[2.5rem] mb-12 reveal-item">
+            <div class="flex items-center gap-4 mb-8 border-b border-slate-200 pb-6">
+                <div class="w-12 h-12 rounded-2xl bg-white flex items-center justify-center text-fuchsia-500 text-xl border border-slate-200 shadow-sm"><i class="fas fa-user-ninja"></i></div>
+                <h2 class="text-3xl font-bold text-slate-900">2. Characterization</h2>
+            </div>
+
+            <p class="text-slate-600 mb-8 leading-relaxed">
+                Hvordan lærer vi karaktererne at kende? Forfattere bruger to primære metoder. Din opgave i essayet er at analysere, <em>hvad</em> disse metoder fortæller os om personens sande natur.
+            </p>
+
+            <div class="grid md:grid-cols-2 gap-8 mb-8">
+                <!-- Direct -->
+                <div class="glass-card p-6 rounded-3xl border-l-4 border-l-slate-400">
+                    <h4 class="font-bold text-slate-800 mb-2">Direct Characterization (Tell)</h4>
+                    <p class="text-sm text-slate-600 mb-3">Forfatteren <em>fortæller</em> os direkte, hvordan karakteren er.</p>
+                    <code class="text-xs bg-white p-2 rounded block border border-slate-200 text-slate-500">"He was an angry and bitter old man."</code>
+                </div>
+
+                <!-- Indirect -->
+                <div class="glass-card p-6 rounded-3xl border-l-4 border-l-fuchsia-400">
+                    <h4 class="font-bold text-slate-800 mb-2">Indirect Characterization (Show)</h4>
+                    <p class="text-sm text-slate-600 mb-3">Vi skal selv udlede karaktertræk ud fra deres: <strong>S</strong>peech, <strong>T</strong>houghts, <strong>E</strong>ffect on others, <strong>A</strong>ctions, og <strong>L</strong>ooks (STEAL-metoden).</p>
+                    <code class="text-xs bg-white p-2 rounded block border border-slate-200 text-slate-500">"He clenched his fists and slammed the door, shattering the glass."</code>
+                </div>
+            </div>
+
+            <div class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm mb-8">
+                <h4 class="font-bold text-slate-800 mb-2"><i class="fas fa-crown text-amber-500 mr-2"></i>Archetypes & The Byronic Hero</h4>
+                <p class="text-sm text-slate-600 leading-relaxed">
+                    Nogle gange passer karakterer ind i faste kasser (arketyper). Et klassisk eksempel fra den engelske litteratur er <strong>The Byronic Hero</strong> (opkaldt efter Lord Byron). Det er en rebel – en antihelt, der er <em>"mad, bad, and dangerous to know"</em>, ofte arrogant og imod samfundets normer, men utrolig karismatisk. Analyserer du en oprørsk karakter, kan du med fordel trække tråde til denne arketype!
+                </p>
+            </div>
+
+            <!-- Hvordan bruges det i et essay? -->
+            <div class="bg-fuchsia-50/50 border border-fuchsia-100 rounded-2xl p-6">
+                <div class="flex justify-between items-center mb-3">
+                    <h4 class="font-bold text-fuchsia-900">✏️ Sådan skriver du det i dit essay (PEE):</h4>
+                </div>
+                <div class="example-box !border-fuchsia-500">
+                    "Through <span class="highlight-word">indirect characterization</span>, the author reveals the protagonist's underlying insecurities. Rather than stating her fear directly, the author shows it through her actions: '[Quote about her trembling hands]'. The use of the verb 'trembling' highlights her vulnerability, indicating that she is a <span class="highlight-word">round and dynamic character</span> who undergoes significant development."
+                </div>
+            </div>
+        </section>
+
+        <!-- Sektion 3: Setting & Symbols -->
+        <section id="setting" class="glass-light p-8 md:p-12 rounded-[2.5rem] mb-12 reveal-item">
+            <div class="flex items-center gap-4 mb-8 border-b border-slate-200 pb-6">
+                <div class="w-12 h-12 rounded-2xl bg-white flex items-center justify-center text-emerald-500 text-xl border border-slate-200 shadow-sm"><i class="fas fa-tree"></i></div>
+                <h2 class="text-3xl font-bold text-slate-900">3. Setting, Mood & Symbols</h2>
+            </div>
+
+            <div class="grid lg:grid-cols-2 gap-8 mb-8">
+                <div>
+                    <h3 class="text-xl font-bold text-slate-800 mb-3">Setting (Miljøet)</h3>
+                    <p class="text-sm text-slate-600 leading-relaxed mb-4">
+                        Setting er mere end bare tid og sted. I fiktion bruges miljøet ofte som et spejl for karakterens indre liv. Hvis det øser ned, er karakteren ofte deprimeret eller står overfor en krise. Dette kaldes <strong>Pathetic Fallacy</strong>.
+                    </p>
+                    <p class="text-sm text-slate-600 leading-relaxed">
+                        Setting er med til at etablere tekstens <strong>Mood</strong> (den stemning <em>læseren</em> føler, f.eks. <em>gloomy, tense, peaceful</em>).
+                    </p>
+                </div>
+
+                <div>
+                    <h3 class="text-xl font-bold text-slate-800 mb-3">Symbols & Patterns</h3>
+                    <p class="text-sm text-slate-600 leading-relaxed mb-4">
+                        Et symbol er et fysisk objekt, der repræsenterer en abstrakt idé (f.eks. en vissen rose = døende kærlighed). 
+                    </p>
+                    <div class="bg-emerald-50 p-4 rounded-xl border border-emerald-100">
+                        <strong class="text-emerald-800 text-sm"><i class="fas fa-search mr-2"></i>Tip fra noterne:</strong>
+                        <p class="text-xs text-emerald-700 mt-1">Læg mærke til mønstre og gentagelser! Ændrer symbolet sig fra start til slut? Et spejl, der bliver knust i slutningen af teksten, kan symbolisere et tab af identitet eller en pludselig erkendelse.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Hvordan bruges det i et essay? -->
+            <div class="bg-emerald-50/50 border border-emerald-100 rounded-2xl p-6">
+                <div class="flex justify-between items-center mb-3">
+                    <h4 class="font-bold text-emerald-900">✏️ Sådan skriver du det i dit essay (PEE):</h4>
+                </div>
+                <div class="example-box !border-emerald-500">
+                    "The <span class="highlight-word">setting</span> plays a crucial role in establishing a claustrophobic <span class="highlight-word">mood</span>. The author describes the room as '[Quote about dark/small room]'. Here, the physical confinement mirrors the protagonist's psychological entrapment. Furthermore, the recurring <span class="highlight-word">symbol</span> of the locked door represents his inability to move on from his past."
+                </div>
+            </div>
+        </section>
+
+        <!-- Sektion 4: Litterære Virkemidler -->
+        <section id="devices" class="glass-light p-8 md:p-12 rounded-[2.5rem] reveal-item">
+            <div class="flex items-center gap-4 mb-8 border-b border-slate-200 pb-6">
+                <div class="w-12 h-12 rounded-2xl bg-white flex items-center justify-center text-sky-500 text-xl border border-slate-200 shadow-sm"><i class="fas fa-magic"></i></div>
+                <h2 class="text-3xl font-bold text-slate-900">4. Literary Devices (Billedsprog)</h2>
+            </div>
+            
+            <p class="text-slate-600 mb-8 leading-relaxed">
+                For at hæve din karakter, skal du identificere og analysere forfatterens brug af billedsprog. Nøjes ikke med at sige "der er en metafor" – forklar altid <em>effekten</em> af den!
+            </p>
+
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+                <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
+                    <span class="text-sky-600 font-bold block mb-1">Metaphor</span>
+                    <p class="text-xs text-slate-500">Sammenligning uden "like" eller "as".<br><em>"He is a monster."</em></p>
+                </div>
+                <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
+                    <span class="text-sky-600 font-bold block mb-1">Simile</span>
+                    <p class="text-xs text-slate-500">Sammenligning med "like" eller "as".<br><em>"He fought like a monster."</em></p>
+                </div>
+                <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
+                    <span class="text-sky-600 font-bold block mb-1">Personification</span>
+                    <p class="text-xs text-slate-500">Døde ting får menneskelige træk.<br><em>"The wind howled."</em></p>
+                </div>
+                <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
+                    <span class="text-sky-600 font-bold block mb-1">Foreshadowing</span>
+                    <p class="text-xs text-slate-500">Små hints om hvad der vil ske senere i historien.</p>
+                </div>
+            </div>
+
+            <!-- Tone vs Mood -->
+            <div class="glass-card p-6 rounded-3xl border-sky-200">
+                <h4 class="font-bold text-slate-800 mb-4 text-lg border-b border-slate-200 pb-2">VIGTIGT: Tone vs. Mood</h4>
+                <div class="flex flex-col md:flex-row gap-6">
+                    <div class="flex-1">
+                        <strong class="text-sky-600">Tone:</strong> Er FORFATTERENS (eller fortællerens) holdning til emnet. Aflæses i ordvalget (<em>diction</em>). <br><span class="text-sm text-slate-500 italic">Eks: Sarcastic, humorous, critical, melancholic.</span>
+                    </div>
+                    <div class="flex-1">
+                        <strong class="text-sky-600">Mood:</strong> Er den følelse, der skabes hos LÆSEREN. Skabes primært af setting og imagery. <br><span class="text-sm text-slate-500 italic">Eks: Tense, romantic, spooky, peaceful.</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-white py-12 border-t border-slate-200 text-center text-slate-500 text-sm relative z-10">
+        <p>&copy; 2026 Sankt Annæ Gymnasium - Fiction Analysis Guide</p>
+    </footer>
+
+    <script>
+        // Progress Bar
+        window.addEventListener('scroll', () => {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            document.getElementById('scroll-progress').style.width = scrolled + '%';
+            
+            // Parallax Blobs
+            const y = window.scrollY;
+            document.querySelector('.blob-1').style.transform = `translateY(${y * 0.1}px)`;
+            document.querySelector('.blob-2').style.transform = `translateY(${y * -0.1}px)`;
+        });
+
+        // Muse Parallax
+        document.addEventListener('mousemove', (e) => {
+            const x = (e.clientX / window.innerWidth - 0.5) * 2;
+            const y = (e.clientY / window.innerHeight - 0.5) * 2;
+            const scrollY = window.scrollY;
+            document.querySelector('.blob-1').style.transform = `translate(${x * -20}px, ${(y * -20) + (scrollY * 0.1)}px)`;
+            document.querySelector('.blob-2').style.transform = `translate(${x * 20}px, ${(y * 20) + (scrollY * -0.1)}px)`;
+        });
+
+        // Kopier funktion
+        function copyToClipboard(text) {
+            const el = document.createElement('textarea');
+            el.value = text;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+
+            const btn = event.currentTarget;
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-check"></i> Kopieret!';
+            btn.classList.add('bg-indigo-500', 'text-white');
+            
+            setTimeout(() => {
+                btn.innerHTML = originalHTML;
+                btn.classList.remove('bg-indigo-500', 'text-white');
+            }, 2000);
+        }
+
+        // Scroll Reveal Animation
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('opacity-100', 'translate-y-0');
+                    entry.target.classList.remove('opacity-0', 'translate-y-10');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.reveal-item').forEach(el => {
+            el.classList.add('opacity-0', 'translate-y-10', 'transition-all', 'duration-700', 'ease-out');
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>

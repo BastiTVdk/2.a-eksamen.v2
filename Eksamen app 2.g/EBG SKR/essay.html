@@ -3,102 +3,525 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Essay Lab | English B-Mastery</title>
+    <title>Engelsk Essay | 2.a SAG</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;900&display=swap');
-        body { font-family: 'Inter', sans-serif; }
-        
-        .essay-bg {
-            background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 100%);
+        :root {
+            --primary: #e11d48; /* Rose 600 */
+            --accent: #db2777;  /* Pink 600 */
+            --bg: #0f172a;      /* Slate 900 */
         }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--bg);
+            color: #f8fafc;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        /* Scroll Progress Bar */
+        #scroll-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 0%;
+            height: 4px;
+            background: linear-gradient(to right, var(--primary), var(--accent));
+            z-index: 1000;
+            transition: width 0.1s ease-out;
+            box-shadow: 0 0 10px var(--primary);
+        }
+
+        .glass {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .glass-card {
+            background: rgba(30, 41, 59, 0.5);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-card:hover {
+            border-color: rgba(225, 29, 72, 0.3);
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px -10px rgba(225, 29, 72, 0.2);
+        }
+
+        .gradient-text {
+            background: linear-gradient(135deg, #fb7185 0%, #f472b6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .btn-copy {
+            @apply px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 border;
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.1);
+            color: #cbd5e1;
+        }
+        .btn-copy:hover {
+            background: rgba(225, 29, 72, 0.2);
+            border-color: rgba(225, 29, 72, 0.5);
+            color: #fff;
+        }
+
+        /* Svævende animationer */
+        .floating { animation: float 6s ease-in-out infinite; }
+        .floating-delayed { animation: float 8s ease-in-out infinite; animation-delay: 2s; }
+        @keyframes float {
+            0% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-15px) rotate(3deg); }
+            100% { transform: translateY(0px) rotate(0deg); }
+        }
+
+        /* Eksempel/Citat Boks */
+        .example-box {
+            font-family: 'Fira Code', monospace;
+            background: rgba(15, 23, 42, 0.6);
+            border-left: 4px solid var(--primary);
+            padding: 1rem 1.5rem;
+            border-radius: 0 1rem 1rem 0;
+            color: #f1f5f9;
+            font-size: 0.9rem;
+        }
+
+        .badge {
+            @apply inline-block px-3 py-1 text-xs font-bold rounded-full border bg-white/5 backdrop-blur-sm;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: var(--bg); }
+        ::-webkit-scrollbar-thumb { background: #475569; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--primary); }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col">
+<body class="min-h-screen">
 
-    <!-- Navigation -->
-    <nav class="bg-white border-b sticky top-0 z-50">
-        <div class="max-w-full mx-auto px-6">
-            <div class="flex justify-between h-20 items-center">
-                <div class="flex items-center gap-3">
-                    <div class="bg-blue-600 p-2 rounded-xl shadow-lg">
-                        <i class="fas fa-graduation-cap text-white text-xl"></i>
-                    </div>
-                    <span class="font-black text-2xl tracking-tighter uppercase">English<span class="text-blue-600">B</span> Master</span>
-                </div>
-                <div class="hidden lg:flex space-x-8 font-bold text-slate-600 uppercase text-xs tracking-widest">
-                    <a href="index.html" class="hover:text-blue-600 transition">Hjem</a>
-                    <a href="grammar.html" class="hover:text-blue-600 transition">Grammatik</a>
-                    <a href="essay.html" class="text-teal-600">Essay</a>
-                    <a href="quiz.html" class="hover:text-blue-600 transition">Quiz</a>
-                </div>
-                <a href="index.html" class="text-slate-500 hover:text-slate-800 transition">
-                    <i class="fas fa-times text-xl"></i>
+    <div id="scroll-progress"></div>
+
+    <!-- Parallax Blobs -->
+    <div class="blob-1 fixed top-[10%] left-[-10%] w-[40%] h-[40%] bg-rose-600/20 blur-[120px] rounded-full pointer-events-none transition-transform duration-700 ease-out"></div>
+    <div class="blob-2 fixed bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-pink-600/20 blur-[120px] rounded-full pointer-events-none transition-transform duration-700 ease-out"></div>
+
+    <!-- Floating Shapes -->
+    <div class="absolute top-40 left-[15%] w-16 h-16 border-4 border-rose-500/20 rounded-full floating pointer-events-none"></div>
+    <div class="absolute top-80 right-[10%] w-20 h-20 border-2 border-pink-500/20 rotate-45 floating-delayed pointer-events-none"></div>
+
+    <nav class="sticky top-0 z-50 px-6 py-4 glass border-b border-white/5">
+        <div class="max-w-7xl mx-auto flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <a href="../index.html" class="w-10 h-10 rounded-xl bg-white/5 hover:bg-white/10 flex items-center justify-center transition border border-white/10">
+                    <i class="fas fa-arrow-left text-slate-300"></i>
                 </a>
+                <span class="text-xl font-bold tracking-tight">Engelsk <span class="text-rose-400">Essay</span></span>
+            </div>
+            <div class="hidden md:flex gap-6 text-xs font-bold uppercase tracking-widest text-slate-400">
+                <a href="#prep" class="hover:text-rose-400 transition">Plan & Panik</a>
+                <a href="#structure" class="hover:text-rose-400 transition">Struktur (PEE)</a>
+                <a href="#analysis" class="hover:text-rose-400 transition">Analyse</a>
+                <a href="#toolkit" class="hover:text-rose-400 transition">Værktøjskasse</a>
             </div>
         </div>
     </nav>
 
-    <!-- Header Section -->
-    <header class="essay-bg py-20 border-b border-teal-200">
-        <div class="max-w-5xl mx-auto px-6 text-center lg:text-left">
-            <h1 class="text-5xl font-black mb-4 tracking-tighter">The Essay <span class="text-teal-600 italic">Lab</span></h1>
-            <p class="text-lg text-slate-700 max-w-2xl leading-relaxed">Her lærer du at bygge et essay, der imponerer censor. Vi dykker ned i struktur, analysemodeller og genrer.</p>
-        </div>
-    </header>
+    <main class="max-w-5xl mx-auto px-6 pt-20 pb-32">
+        
+        <!-- Hero Section -->
+        <header class="text-center mb-24 relative z-10 reveal-item">
+            <div class="inline-block mb-4 px-4 py-1.5 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-300 font-bold text-xs tracking-widest uppercase">
+                Skriftlig Eksamen 2026
+            </div>
+            <h1 class="text-5xl md:text-7xl font-extrabold mb-6 tracking-tight">
+                Det Perfekte <span class="gradient-text">Essay</span>
+            </h1>
+            <p class="text-slate-400 text-lg max-w-2xl mx-auto">
+                Din ultimative overlevelsesguide. Fra tragtmodellen og PEE-afsnit til Toulmins argumentationsmodel og avanceret ordforråd. Alt direkte fra noterne.
+            </p>
+        </header>
 
-    <!-- Content Grid -->
-    <main class="max-w-5xl mx-auto px-6 py-16 flex-grow">
-        <div class="grid md:grid-cols-1 lg:grid-cols-2 gap-8">
+        <!-- Sektion 0: Eksamensoverlevelse -->
+        <section id="prep" class="glass p-8 md:p-12 rounded-[2.5rem] mb-12 reveal-item">
+            <div class="flex items-center gap-4 mb-8 border-b border-white/10 pb-6">
+                <div class="w-12 h-12 rounded-2xl bg-slate-800 flex items-center justify-center text-rose-400 text-xl border border-white/5"><i class="fas fa-stopwatch"></i></div>
+                <h2 class="text-3xl font-bold">0. Eksamens-Survival</h2>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8">
+                <!-- Tidsplan -->
+                <div class="glass-card p-6 rounded-3xl">
+                    <h3 class="text-xl font-bold mb-4 text-slate-200">Tidsplan (5 timer)</h3>
+                    <ul class="space-y-3 text-sm text-slate-400">
+                        <li class="flex items-center gap-3"><span class="text-rose-400 font-black">1. time:</span> Grammatikopgaver.</li>
+                        <li class="flex items-center gap-3"><span class="text-rose-400 font-black">2. time:</span> Vælg, læs og forstå teksten. Brainstorm!</li>
+                        <li class="flex items-center gap-3"><span class="text-rose-400 font-black">3-4. time:</span> Skriv (Udkast summary ➔ PEE-afsnit ➔ Indledning & Konklusion).</li>
+                        <li class="flex items-center gap-3"><span class="text-rose-400 font-black">5. time:</span> Skriv færdig, læs igennem og ret fejl.</li>
+                    </ul>
+                </div>
+
+                <!-- Panik -->
+                <div class="glass-card p-6 rounded-3xl border-rose-500/30 relative overflow-hidden">
+                    <div class="absolute -right-4 -top-4 text-6xl opacity-5"><i class="fas fa-exclamation-triangle"></i></div>
+                    <h3 class="text-xl font-bold mb-4 text-rose-400">Hvis du går i panik / i stå</h3>
+                    <ul class="space-y-3 text-sm text-slate-400">
+                        <li>• Træk vejret. Gå på toilettet for at sætte opgaven på afstand. Spis snacks!</li>
+                        <li>• <strong>Flow writing:</strong> Skriv alt, hvad du tænker ned i et andet dokument uden at stoppe. Noget brugbart vil dukke op.</li>
+                        <li>• Skriv noget du ved er dårligt, og skynd dig videre. <em>Man kan ikke redigere i noget, der ikke er skrevet!</em></li>
+                        <li>• Spring afsnittet over (f.eks. indledningen) og start med analysen.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sektion 1: Summary -->
+        <section class="glass p-8 md:p-12 rounded-[2.5rem] mb-12 reveal-item">
+            <div class="flex items-center gap-4 mb-8 border-b border-white/10 pb-6">
+                <div class="w-12 h-12 rounded-2xl bg-slate-800 flex items-center justify-center text-rose-400 text-xl border border-white/5"><i class="fas fa-align-left"></i></div>
+                <h2 class="text-3xl font-bold">1. Summary</h2>
+            </div>
             
-            <!-- Overall Structure -->
-            <div class="bg-white p-10 rounded-[2.5rem] border border-slate-200 shadow-sm hover:shadow-xl transition-all group lg:col-span-2">
-                <div class="flex flex-col md:flex-row gap-8 items-center">
-                    <div class="w-20 h-20 bg-teal-100 text-teal-600 rounded-3xl flex items-center justify-center shrink-0 group-hover:bg-teal-600 group-hover:text-white transition-colors">
-                        <i class="fas fa-layer-group text-3xl"></i>
-                    </div>
+            <p class="text-slate-400 mb-6">Et summary gengiver kort og objektivt tekstens vigtigste indhold. Typisk ca. 125 ord på B-niveau.</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="glass-card p-6 rounded-3xl">
+                    <h4 class="font-bold text-emerald-400 mb-3 flex items-center gap-2"><i class="fas fa-check"></i> Krav til Summary</h4>
+                    <ul class="space-y-2 text-sm text-slate-300">
+                        <li>• Skal være skrevet i <strong>præsens (nutid)</strong>. Husk kongruens (fx he <em>goes</em>).</li>
+                        <li>• Præsenter altid tekstens titel, genre og forfatter i 1. sætning.</li>
+                        <li>• Skal være fuldstændig <strong>objektivt</strong> (ingen fortolkning/egne holdninger).</li>
+                        <li>• Byg det kronologisk op efter tekstens struktur.</li>
+                    </ul>
+                </div>
+                <div class="glass-card p-6 rounded-3xl border-rose-500/20">
+                    <h4 class="font-bold text-rose-400 mb-3 flex items-center gap-2"><i class="fas fa-times"></i> Forbudt i Summary</h4>
+                    <ul class="space-y-2 text-sm text-slate-300">
+                        <li>• Ingen direkte citater fra teksten! Brug dine egne ord.</li>
+                        <li>• Ingen detaljer, der ikke er strengt nødvendige.</li>
+                        <li>• "I think the story is about..." (Strengt forbudt).</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sektion 2: Essay Struktur (Tragt & Conclusion) -->
+        <section id="structure" class="glass p-8 md:p-12 rounded-[2.5rem] mb-12 reveal-item">
+            <div class="flex items-center gap-4 mb-8 border-b border-white/10 pb-6">
+                <div class="w-12 h-12 rounded-2xl bg-slate-800 flex items-center justify-center text-rose-400 text-xl border border-white/5"><i class="fas fa-filter"></i></div>
+                <h2 class="text-3xl font-bold">2. Indledning & Konklusion</h2>
+            </div>
+
+            <h3 class="text-2xl font-bold mb-4 text-slate-200">Indledningen (Tragtmodellen)</h3>
+            <p class="text-slate-400 mb-6">Tragtmodellen handler om at bevæge sig fra det brede til det smalle i tre trin. Indledningen må IKKE indeholde "I will write about".</p>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+                <div class="glass-card p-6 rounded-3xl relative">
+                    <div class="absolute -top-3 -left-3 w-8 h-8 bg-rose-500 rounded-full flex items-center justify-center font-bold shadow-lg">1</div>
+                    <h4 class="font-bold text-rose-400 mb-2 mt-2">The Hook</h4>
+                    <p class="text-sm text-slate-300">Start med en generel observation om opgavens tema (fx identitet, trauma, the American Dream). Nævn ikke teksten endnu.</p>
+                </div>
+                <div class="glass-card p-6 rounded-3xl relative">
+                    <div class="absolute -top-3 -left-3 w-8 h-8 bg-rose-500 rounded-full flex items-center justify-center font-bold shadow-lg">2</div>
+                    <h4 class="font-bold text-rose-400 mb-2 mt-2">The Bridge</h4>
+                    <p class="text-sm text-slate-300">Forsnævr emnet og led læseren mod den konkrete tekst. Forbind din generelle observation med forfatterens univers.</p>
+                </div>
+                <div class="glass-card p-6 rounded-3xl relative border-b-4 border-b-rose-500">
+                    <div class="absolute -top-3 -left-3 w-8 h-8 bg-rose-500 rounded-full flex items-center justify-center font-bold shadow-lg">3</div>
+                    <h4 class="font-bold text-rose-400 mb-2 mt-2">Thesis Statement</h4>
+                    <p class="text-sm text-slate-300">Introducér titel, forfatter og årstal. Afslut med en klar påstand (thesis), der svarer direkte på opgaveformuleringen.</p>
+                </div>
+            </div>
+
+            <!-- Indledning Skabelon -->
+            <div class="mb-12">
+                <div class="flex justify-between items-center mb-2">
+                    <span class="text-xs font-bold text-slate-500 uppercase tracking-widest">Template: Introduction</span>
+                    <button onclick="copyToClipboard('People are often faced with moments in life that force them to make difficult choices. Literature often explores such existential dilemmas. This is the case in the short story [Title] by [Author], where we follow [brief summary]. Through the story, [Author] explores the theme of [theme], offering insight into how [thesis statement].')" class="btn-copy">
+                        <i class="far fa-copy"></i> Kopiér
+                    </button>
+                </div>
+                <div class="example-box">
+                    People are often faced with moments in life that force them to make difficult choices.<br>
+                    Literature often explores such existential dilemmas. <br><br>
+                    This is the case in the short story <strong>[Title]</strong> by <strong>[Author]</strong>, where we follow [brief summary]. <br><br>
+                    Through the story, [Author] explores the theme of [theme], offering insight into how <strong>[your thesis/main argument]</strong>.
+                </div>
+            </div>
+
+            <!-- Conclusion -->
+            <h3 class="text-2xl font-bold mb-4 text-slate-200 border-t border-white/10 pt-8">Konklusionen</h3>
+            <div class="glass-card p-6 rounded-3xl mb-6">
+                <h4 class="font-bold text-rose-400 mb-2">NOTHING NEW!</h4>
+                <p class="text-sm text-slate-300 mb-4">
+                    Du må aldrig præsentere nye pointer i din konklusion. Saml op på analysen ved at opsummere dine vigtigste pointer, og giv et endeligt svar på din <em>Thesis Statement</em>.
+                </p>
+                <div class="example-box !bg-slate-900/80">
+                    In conclusion, [Author] effectively uses [technique 1] and [technique 2] to explore the theme of [theme]. Through the analysis, it becomes clear that the story presents a nuanced view of [restate your thesis].
+                </div>
+            </div>
+        </section>
+
+        <!-- Sektion 3: Hoveddel & PEE -->
+        <section class="glass p-8 md:p-12 rounded-[2.5rem] mb-12 reveal-item">
+            <div class="flex items-center gap-4 mb-8 border-b border-white/10 pb-6">
+                <div class="w-12 h-12 rounded-2xl bg-slate-800 flex items-center justify-center text-rose-400 text-xl border border-white/5"><i class="fas fa-layer-group"></i></div>
+                <h2 class="text-3xl font-bold">3. Hoveddelen (PEE-Modellen)</h2>
+            </div>
+
+            <p class="text-slate-400 mb-8">Selve analysen består normalt af 2-3 stærke afsnit (Body Paragraphs). Hvert afsnit undersøger én analytisk pointe ved hjælp af PEE.</p>
+
+            <div class="space-y-6 mb-12">
+                <!-- P -->
+                <div class="glass-card p-6 rounded-3xl flex flex-col md:flex-row gap-6 items-start">
+                    <div class="w-16 h-16 bg-rose-500/20 text-rose-400 rounded-2xl flex items-center justify-center font-black text-3xl flex-shrink-0 border border-rose-500/30">P</div>
                     <div>
-                        <h3 class="text-2xl font-bold mb-3">Overall Structure</h3>
-                        <p class="text-slate-500 text-sm mb-6 leading-relaxed">Få styr på den røde tråd. Her lærer du alt om tragtmodellen (indledning), PEE-modellen (kropsafsnit) og hvordan du runder dit essay af med en stærk konklusion.</p>
-                        <a href="essay-overall.html" class="inline-flex items-center gap-2 font-black text-teal-600 text-sm uppercase tracking-wider">
-                            Udforsk strukturen <i class="fas fa-arrow-right text-[10px]"></i>
-                        </a>
+                        <h4 class="text-xl font-bold text-slate-200 mb-2">Point (Topic Sentence)</h4>
+                        <p class="text-sm text-slate-400 mb-3">Første sætning i afsnittet. Præsenter din pointe. Fokusér på et tema, en karakter eller en teknik. Det skal være et analytisk statement, <em>ikke</em> et plot-referat.</p>
+                        <code class="text-xs bg-black/30 p-2 rounded text-rose-300 block">Eks: "The writer presents power as corrupting, showing how it changes the character's behaviour."</code>
+                    </div>
+                </div>
+
+                <!-- E -->
+                <div class="glass-card p-6 rounded-3xl flex flex-col md:flex-row gap-6 items-start">
+                    <div class="w-16 h-16 bg-rose-500/20 text-rose-400 rounded-2xl flex items-center justify-center font-black text-3xl flex-shrink-0 border border-rose-500/30">E</div>
+                    <div>
+                        <h4 class="text-xl font-bold text-slate-200 mb-2">Evidence (Citatet)</h4>
+                        <p class="text-sm text-slate-400 mb-3">Vælg et citat med "kød på" (metaforer, stærke adjektiver). Lad <strong>aldrig</strong> et citat stå alene – introducér det. Husk linjetal: <code>(l. 2)</code> eller <code>(ll. 4-6)</code>.</p>
+                        <code class="text-xs bg-black/30 p-2 rounded text-rose-300 block">Eks: This is shown when the character says: "[citat]" (ll. 12-14).</code>
+                    </div>
+                </div>
+
+                <!-- E -->
+                <div class="glass-card p-6 rounded-3xl flex flex-col md:flex-row gap-6 items-start border-l-4 border-l-rose-500">
+                    <div class="w-16 h-16 bg-rose-500/20 text-rose-400 rounded-2xl flex items-center justify-center font-black text-3xl flex-shrink-0 border border-rose-500/30">E</div>
+                    <div>
+                        <h4 class="text-xl font-bold text-slate-200 mb-2">Explanation (Analysen)</h4>
+                        <p class="text-sm text-slate-400 mb-3">Forklar, hvad citatet betyder, og hvordan det beviser din pointe. Her laver du din tekstnære analyse.</p>
+                        
+                        <div class="bg-white/5 p-4 rounded-xl border border-white/5 mt-4">
+                            <h5 class="font-bold text-rose-300 text-sm mb-2"><i class="fas fa-search-plus mr-2"></i>How to expand your Explanation:</h5>
+                            <ul class="text-sm text-slate-400 space-y-2 list-disc list-inside">
+                                <li>Zoom ind på 1-2 <strong>specifikke ord</strong> fra citatet (Hvorfor netop det ord?).</li>
+                                <li>Hvilken <strong>tone/mood</strong> skaber det?</li>
+                                <li>Hvad er forfatterens <strong>intention</strong> med dette billede?</li>
+                                <li><strong>Link back:</strong> Forbind analysen tilbage til afsnittets Topic Sentence.</li>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>
+        </section>
 
-            <!-- Fiction -->
-            <div class="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-sm hover:shadow-xl transition-all group">
-                <div class="w-12 h-12 bg-indigo-100 text-indigo-600 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-indigo-600 group-hover:text-white transition-colors">
-                    <i class="fas fa-book"></i>
-                </div>
-                <h3 class="text-2xl font-bold mb-3">Fiction Analysis</h3>
-                <p class="text-slate-500 text-sm mb-6">Noveller og romaner. Lær at analysere karakterer, miljø, symbolik og temaer i skønlitterære tekster.</p>
-                <a href="essay-fiction.html" class="inline-flex items-center gap-2 font-black text-indigo-600 text-sm uppercase tracking-wider">
-                    Lær fiktion <i class="fas fa-arrow-right text-[10px]"></i>
-                </a>
+        <!-- Sektion 4: Fiktion vs Non-Fiction Analyse -->
+        <section id="analysis" class="glass p-8 md:p-12 rounded-[2.5rem] mb-12 reveal-item">
+            <div class="flex items-center gap-4 mb-8 border-b border-white/10 pb-6">
+                <div class="w-12 h-12 rounded-2xl bg-slate-800 flex items-center justify-center text-rose-400 text-xl border border-white/5"><i class="fas fa-book-open"></i></div>
+                <h2 class="text-3xl font-bold">4. Fiktion vs. Non-Fiction</h2>
             </div>
 
-            <!-- Non-Fiction -->
-            <div class="bg-white p-8 rounded-[2.5rem] border border-slate-200 shadow-sm hover:shadow-xl transition-all group">
-                <div class="w-12 h-12 bg-emerald-100 text-emerald-600 rounded-2xl flex items-center justify-center mb-6 group-hover:bg-emerald-600 group-hover:text-white transition-colors">
-                    <i class="fas fa-bullhorn"></i>
+            <div class="grid lg:grid-cols-2 gap-8">
+                
+                <!-- FICTION -->
+                <div>
+                    <h3 class="text-2xl font-bold mb-4 text-slate-200">Fiction (Noveller m.m.)</h3>
+                    <div class="glass-card p-6 rounded-3xl space-y-4 h-full">
+                        <div>
+                            <span class="badge border-rose-500/30 text-rose-300">Setting</span>
+                            <p class="text-sm text-slate-400 mt-2">Hvor og hvornår? Setting reflekterer oftest karakterens følelser (fx mørkt vejr = depression).</p>
+                        </div>
+                        <div>
+                            <span class="badge border-rose-500/30 text-rose-300">Narration</span>
+                            <p class="text-sm text-slate-400 mt-2">Er det 1st person ("I") eller 3rd person? Er fortælleren <em>omniscient</em> (alvidende), <em>limited</em> (begrænset) eller <em>unreliable</em> (upålidelig)?</p>
+                        </div>
+                        <div>
+                            <span class="badge border-rose-500/30 text-rose-300">Characterization</span>
+                            <p class="text-sm text-slate-400 mt-2"><strong>Direct:</strong> Fortalt direkte (fx "He was angry").<br><strong>Indirect:</strong> Vist gennem handling/dialog (<em>Show, don't tell</em>).</p>
+                        </div>
+                        <div>
+                            <span class="badge border-rose-500/30 text-rose-300">Symbols & Patterns</span>
+                            <p class="text-sm text-slate-400 mt-2">Læg mærke til gentagelser. Ændrer symbolet sig fra start til slut? Fx et ødelagt objekt = tab eller erkendelse.</p>
+                        </div>
+                    </div>
                 </div>
-                <h3 class="text-2xl font-bold mb-3">Non-Fiction</h3>
-                <p class="text-slate-500 text-sm mb-6">Taler og artikler. Mestre retorikken, appelformerne og den retoriske pentagon til din næste analyse.</p>
-                <a href="essay-nonfiction.html" class="inline-flex items-center gap-2 font-black text-emerald-600 text-sm uppercase tracking-wider">
-                    Lær retorik <i class="fas fa-arrow-right text-[10px]"></i>
-                </a>
+
+                <!-- NON-FICTION -->
+                <div>
+                    <h3 class="text-2xl font-bold mb-4 text-slate-200">Non-Fiction (Taler, Artikler)</h3>
+                    <div class="glass-card p-6 rounded-3xl space-y-4 h-full border-indigo-500/20">
+                        <p class="text-sm text-slate-400 italic mb-2">Husk: Ved non-fiction forventes ofte en diskussion af afsenderens synspunkter.</p>
+                        
+                        <div>
+                            <span class="badge border-indigo-500/30 text-indigo-300">Modes of Persuasion</span>
+                            <ul class="text-sm text-slate-400 mt-2 list-disc list-inside">
+                                <li><strong>Logos:</strong> Logik, fakta, statistik.</li>
+                                <li><strong>Ethos:</strong> Troværdighed, ekspertise, erfaring.</li>
+                                <li><strong>Pathos:</strong> Følelsesmæssige argumenter, personlige historier (anecdotes).</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <span class="badge border-indigo-500/30 text-indigo-300">Toulmin's Model</span>
+                            <ul class="text-sm text-slate-400 mt-2 list-disc list-inside">
+                                <li><strong>Claim:</strong> Påstanden.</li>
+                                <li><strong>Grounds:</strong> Beviset (data).</li>
+                                <li><strong>Warrant:</strong> Den logiske bro (hjemmel).</li>
+                            </ul>
+                        </div>
+                        <div>
+                            <span class="badge border-indigo-500/30 text-indigo-300">Rhetorical Features</span>
+                            <p class="text-sm text-slate-400 mt-2">Kig efter: <em>Anaphora</em> (gentagelse af start-ord), <em>Alliteration</em> (bogstavrim), <em>Rule of Three</em>, og <em>Antithesis</em> (kontraster).</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sektion 5: Værktøjskassen -->
+        <section id="toolkit" class="glass p-8 md:p-12 rounded-[2.5rem] reveal-item">
+            <div class="flex items-center gap-4 mb-8 border-b border-white/10 pb-6">
+                <div class="w-12 h-12 rounded-2xl bg-slate-800 flex items-center justify-center text-rose-400 text-xl border border-white/5"><i class="fas fa-toolbox"></i></div>
+                <h2 class="text-3xl font-bold">5. Værktøjskassen</h2>
             </div>
 
-        </div>
+            <!-- Dos & Donts -->
+            <div class="grid md:grid-cols-2 gap-6 mb-12">
+                <div class="glass-card p-6 rounded-3xl border-emerald-500/30">
+                    <h4 class="font-bold text-emerald-400 mb-4 flex items-center gap-2"><i class="fas fa-check"></i> DO (Det skal du)</h4>
+                    <ul class="space-y-2 text-sm text-slate-300">
+                        <li>• Skriv formelt (<em>children</em>, ikke <em>kids</em>. <em>Many/much</em>, ikke <em>a lot of</em>).</li>
+                        <li>• Forbliv objektiv (undgå "I", "we", "you").</li>
+                        <li>• Brug topic sentences for at starte nye afsnit.</li>
+                        <li>• Tjek tegnsætning: Komma <strong>før</strong> FANBOYS (For, And, Nor, But, Or, Yet, So). Komma <strong>efter</strong> <em>However</em>, <em>Therefore</em>.</li>
+                    </ul>
+                </div>
+                <div class="glass-card p-6 rounded-3xl border-rose-500/30">
+                    <h4 class="font-bold text-rose-400 mb-4 flex items-center gap-2"><i class="fas fa-times"></i> DON'T (Det må du ikke)</h4>
+                    <ul class="space-y-2 text-sm text-slate-300">
+                        <li>• <strong>Ingen sammentrækninger!</strong> Skriv <em>do not</em> (ikke don't), <em>she is</em> (ikke she's).</li>
+                        <li>• Skriv <em>ikke</em> et summary inde i selve dit essay (PEE-afsnittet).</li>
+                        <li>• Brug <em>ikke</em> underoverskrifter i dit essay.</li>
+                        <li>• Spring ikke i tid mellem nutid og datid uden grund.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Leksikon / Lister -->
+            <div class="grid lg:grid-cols-3 gap-6">
+                
+                <!-- Linkers -->
+                <div class="glass-card p-6 rounded-3xl">
+                    <h4 class="font-bold text-slate-200 mb-3 border-b border-white/10 pb-2">Linkers (Flow)</h4>
+                    <div class="space-y-4 text-sm text-slate-400">
+                        <div>
+                            <strong class="text-rose-300">Tilføjelse:</strong>
+                            <p>Additionally, moreover, furthermore.</p>
+                        </div>
+                        <div>
+                            <strong class="text-rose-300">Kontrast:</strong>
+                            <p>However, nevertheless, despite, as opposed to.</p>
+                        </div>
+                        <div>
+                            <strong class="text-rose-300">Begrundelse:</strong>
+                            <p>Therefore, consequently, thus, as a result.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Analytical Verbs -->
+                <div class="glass-card p-6 rounded-3xl">
+                    <h4 class="font-bold text-slate-200 mb-3 border-b border-white/10 pb-2">Analytical Verbs</h4>
+                    <ul class="text-sm text-slate-400 space-y-1">
+                        <li>• <strong>Portray / Depict</strong> (skildrer)</li>
+                        <li>• <strong>Illustrate</strong> (illustrerer)</li>
+                        <li>• <strong>Emphasize / Highlight</strong> (understreger)</li>
+                        <li>• <strong>Suggest / Imply</strong> (antydes)</li>
+                        <li>• <strong>Reveal</strong> (afslører)</li>
+                        <li>• <strong>Challenge / Criticize</strong> (udfordrer/kritiserer)</li>
+                    </ul>
+                </div>
+
+                <!-- Sentence Starters -->
+                <div class="glass-card p-6 rounded-3xl">
+                    <h4 class="font-bold text-slate-200 mb-3 border-b border-white/10 pb-2">Sentence Starters</h4>
+                    <ul class="text-sm text-slate-400 space-y-3">
+                        <li>"The author portrays..."</li>
+                        <li>"This is evident when the narrator states..."</li>
+                        <li>"The use of [imagery] creates a sense of..."</li>
+                        <li>"The contrast between [A] and [B] reveals..."</li>
+                        <li>"This reinforces the idea that..."</li>
+                    </ul>
+                </div>
+
+            </div>
+        </section>
+
     </main>
 
-    <!-- Simple Footer -->
-    <footer class="bg-slate-900 text-slate-500 py-12 px-6 mt-auto text-center">
-        <p class="text-[10px] font-black tracking-widest uppercase">English Mastery Essay Section</p>
+    <footer class="bg-slate-900 py-12 border-t border-white/5 text-center text-slate-500 text-sm">
+        <p>&copy; 2026 Sankt Annæ Gymnasium - Indhold leveret af Sofia</p>
     </footer>
 
+    <script>
+        // Parallax Baggrund (Blobs & Scroll)
+        window.addEventListener('scroll', () => {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            document.getElementById('scroll-progress').style.width = scrolled + '%';
+
+            const y = window.scrollY;
+            document.querySelector('.blob-1').style.transform = `translateY(${y * 0.15}px)`;
+            document.querySelector('.blob-2').style.transform = `translateY(${y * -0.15}px)`;
+        });
+
+        // Muse parallax
+        document.addEventListener('mousemove', (e) => {
+            const x = (e.clientX / window.innerWidth - 0.5) * 2;
+            const y = (e.clientY / window.innerHeight - 0.5) * 2;
+            const scrollY = window.scrollY;
+            document.querySelector('.blob-1').style.transform = `translate(${x * -30}px, ${(y * -30) + (scrollY * 0.15)}px)`;
+            document.querySelector('.blob-2').style.transform = `translate(${x * 30}px, ${(y * 30) + (scrollY * -0.15)}px)`;
+        });
+
+        // Kopier funktion
+        function copyToClipboard(text) {
+            const el = document.createElement('textarea');
+            el.value = text;
+            document.body.appendChild(el);
+            el.select();
+            document.execCommand('copy');
+            document.body.removeChild(el);
+
+            const btn = event.currentTarget;
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = '<i class="fas fa-check"></i> Kopieret!';
+            btn.classList.add('border-emerald-500', 'text-emerald-400');
+            
+            setTimeout(() => {
+                btn.innerHTML = originalHTML;
+                btn.classList.remove('border-emerald-500', 'text-emerald-400');
+            }, 2000);
+        }
+
+        // Scroll Reveal Animation
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('opacity-100', 'translate-y-0');
+                    entry.target.classList.remove('opacity-0', 'translate-y-10');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.reveal-item').forEach(el => {
+            el.classList.add('opacity-0', 'translate-y-10', 'transition-all', 'duration-700', 'ease-out');
+            observer.observe(el);
+        });
+    </script>
 </body>
 </html>

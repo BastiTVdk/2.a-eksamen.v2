@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Deutschland ein buntes Land | Tysk Mundtlig 2.a</title>
+    <title>Deutschland ein buntes Land | Tysk Mundtlig STX B</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script>
@@ -46,6 +46,7 @@
         .tile:hover {
             transform: translateY(-5px);
             border-color: rgba(16, 185, 129, 0.3);
+            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.2);
         }
         .glass-nav {
             backdrop-filter: blur(16px);
@@ -60,215 +61,350 @@
             margin-bottom: 1rem;
             display: inline-block;
         }
-        .vs-divider {
-            display: flex;
-            align-items: center;
-            text-align: center;
-            margin: 1rem 0;
-        }
-        .vs-divider::before, .vs-divider::after {
-            content: '';
-            flex: 1;
-            border-bottom: 1px solid rgba(148, 163, 184, 0.2);
-        }
-        .vs-divider:not(:empty)::before { margin-right: .5em; }
-        .vs-divider:not(:empty)::after { margin-left: .5em; }
-        
         .quote-box {
-            border-left: 4px solid #10b981;
+            border-left: 4px solid currentColor;
             padding-left: 1rem;
             font-style: italic;
+            margin-top: 1rem;
+        }
+
+        /* Flashcard CSS */
+        .flashcard-container {
+            perspective: 1000px;
+            cursor: pointer;
+            height: 120px;
+        }
+        .flashcard {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+        }
+        .flashcard-container.flipped .flashcard {
+            transform: rotateY(180deg);
+        }
+        .flashcard-front, .flashcard-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .flashcard-front {
+            background-color: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+        }
+        .flashcard-back {
+            background-color: #10b981;
+            color: white;
+            transform: rotateY(180deg);
+            border: 1px solid #059669;
+        }
+        .dark .flashcard-front {
+            background-color: rgba(30, 41, 59, 0.8);
         }
     </style>
 </head>
 <body class="min-h-screen bg-lightBg text-slate-900 dark:bg-darkBg dark:text-slate-100">
 
     <!-- Navigation -->
-    <nav class="glass-nav sticky top-0 z-50 px-8 py-4 bg-white/80 dark:bg-darkBg/80 border-b border-slate-200 dark:border-white/5">
+    <nav class="glass-nav sticky top-0 z-50 px-4 md:px-8 py-4 bg-white/80 dark:bg-darkBg/80 border-b border-slate-200 dark:border-white/5">
         <div class="max-w-7xl mx-auto flex justify-between items-center">
             <div class="flex items-center gap-4">
-                <button onclick="window.location.href='Tysk-Index.html'" class="bg-blue-600 p-2.5 rounded-xl shadow-lg hover:bg-blue-700 transition flex items-center justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
-                </button>
+                <div class="bg-green-600 p-2.5 rounded-xl shadow-lg flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                </div>
                 <div>
                     <h1 class="text-xl font-black tracking-tighter uppercase">Ein buntes <span class="text-green-500">Land</span></h1>
+                    <p class="text-xs text-slate-500 font-bold tracking-widest uppercase">Eksamens-Dashboard</p>
                 </div>
             </div>
-            <button id="theme-toggle" class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-white/10 transition-transform hover:scale-110">
+            <button id="theme-toggle" class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-white/10 transition-transform hover:scale-110 focus:outline-none">
                 <svg id="sun-icon" class="hidden w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707m12.728 12.728L12 12l.01.01H12z"></path></svg>
                 <svg id="moon-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
             </button>
         </div>
     </nav>
 
-    <main class="max-w-7xl mx-auto px-8 mt-16 pb-20">
+    <main class="max-w-7xl mx-auto px-4 md:px-8 mt-12 pb-20">
         
         <!-- Hero Section -->
-        <div class="mb-16 border-l-8 border-green-600 pl-8 py-4">
-            <span class="badge bg-green-100 text-green-600 dark:bg-green-500/10 dark:text-green-500 border border-green-200 dark:border-green-500/20">Modul 5: Integration & Identitet</span>
-            <h2 class="text-6xl font-black mb-6 tracking-tight uppercase leading-none">Heimat ist <br><span class="text-green-600 italic">kein Ort, sondern ein Gefühl</span></h2>
-            <p class="text-slate-500 dark:text-slate-400 text-xl max-w-3xl font-medium leading-relaxed italic">
-                En undersøgelse af det moderne Tyskland gennem film, mad og menneskelige kontraster.
+        <div class="mb-12 border-l-8 border-green-600 pl-6 py-2">
+            <span class="badge bg-green-100 text-green-700 dark:bg-green-500/10 dark:text-green-400 border border-green-200 dark:border-green-500/20">Modul: Integration & Identitet</span>
+            <h2 class="text-4xl md:text-6xl font-black mb-4 tracking-tight uppercase leading-none">Deutschland ist <br><span class="text-green-600 italic">ein Einwanderungsland</span></h2>
+            <p class="text-slate-600 dark:text-slate-400 text-lg max-w-3xl font-medium leading-relaxed">
+                Fra Gastarbeiter i Wirtschaftswunder-tiden til nutidens multikulturelle samfund. Et komplet overblik over tekster, film og analytiske pointer til din mundtlige STX B eksamen.
             </p>
         </div>
 
-        <div class="dashboard-grid">
+        <div class="dashboard-grid mb-12">
             
-            <!-- Cennet vs. Antonella (Visuel sammenligning) -->
-            <div class="tile bg-white/80 dark:bg-slate-800/40 border border-slate-200 dark:border-white/5 shadow-sm md:col-span-2">
-                <h4 class="text-2xl font-black mb-6 uppercase italic text-green-500 flex items-center gap-2">
+            <!-- Das Wunder von Kreuzberg vs Antonella -->
+            <div class="tile bg-white/80 dark:bg-slate-800/40 border border-slate-200 dark:border-white/5 shadow-sm md:col-span-2 lg:col-span-3">
+                <h4 class="text-2xl font-black mb-6 uppercase italic text-blue-500 flex items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5"/><path d="M8 3H3v5"/><path d="M21 16v5h-5"/><path d="M3 16v5h5"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>
-                    Das Wunder von Kreuzberg: Cennet vs. Antonella
+                    Kontrasten: Gelungene vs. Misslungene Integration
                 </h4>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                    <!-- Succesen -->
                     <div class="space-y-4">
-                        <div class="flex items-center gap-2">
-                            <div class="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-500 font-bold">C</div>
-                            <h5 class="font-black uppercase text-sm">Cennet (Migranten)</h5>
+                        <div class="flex items-center gap-3 border-b border-slate-200 dark:border-white/10 pb-3">
+                            <div class="w-10 h-10 rounded-xl bg-green-500/20 flex items-center justify-center text-green-600 dark:text-green-400 font-bold text-xl">1</div>
+                            <div>
+                                <h5 class="font-black uppercase text-lg text-slate-800 dark:text-white">Das Wunder von Kreuzberg</h5>
+                                <p class="text-xs font-bold text-green-600 dark:text-green-400">Succeshistorien (Gelungene Integration)</p>
+                            </div>
                         </div>
-                        <ul class="space-y-2 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
-                            <li>• Repræsentere det "gamle" Kreuzberg.</li>
-                            <li>• Traditionel og religiøs (muslimsk baggrund).</li>
-                            <li>• Frygter forandring og tab af fællesskab.</li>
-                            <li>• Ser kvarteret som sit hjem (Heimat).</li>
+                        <ul class="space-y-3 text-sm leading-relaxed text-slate-700 dark:text-slate-300">
+                            <li><strong>1. Generation (Cennet & Hassan):</strong> Kommer fra Tyrkiet. Cennet insisterer på at lære tysk (skriver gloser på armen) for at opnå selvstændighed. De arbejder ekstremt hårdt for børnenes fremtid.</li>
+                            <li><strong>2. Generation (Hatice):</strong> Uddanner sig til læge. Føler sig tysk, men har den tyrkiske kultur som en "melankoli" i hjertet. Fokuserer på humanistiske værdier i opdragelsen.</li>
+                            <li><strong>3. Generation (Børnebørn):</strong> Taler perfekt tysk. Ser ikke deres identitet som et problem – de er simpelthen bare sig selv i et multikulturelt Tyskland.</li>
                         </ul>
+                        <div class="quote-box text-green-600 dark:text-green-400">
+                            "Nøglen til succes er sproget (Die Sprache) og tilliden til uddannelsessystemet (Bildung)."
+                        </div>
                     </div>
+                    
+                    <!-- Tragedien -->
                     <div class="space-y-4">
-                        <div class="flex items-center gap-2">
-                            <div class="w-8 h-8 rounded-full bg-pink-500/20 flex items-center justify-center text-pink-500 font-bold">A</div>
-                            <h5 class="font-black uppercase text-sm">Antonella (Gentrifieren)</h5>
+                        <div class="flex items-center gap-3 border-b border-slate-200 dark:border-white/10 pb-3">
+                            <div class="w-10 h-10 rounded-xl bg-red-500/20 flex items-center justify-center text-red-600 dark:text-red-400 font-bold text-xl">2</div>
+                            <div>
+                                <h5 class="font-black uppercase text-lg text-slate-800 dark:text-white">Antonella</h5>
+                                <p class="text-xs font-bold text-red-600 dark:text-red-400">Tragedien (Misslungene Integration)</p>
+                            </div>
                         </div>
-                        <ul class="space-y-2 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
-                            <li>• Repræsentere den moderne, vestlige livsstil.</li>
-                            <li>• Fokus på karriere, caféer og æstetik.</li>
-                            <li>• Ser Kreuzberg som et "cool" og hipt sted.</li>
-                            <li>• Forstår ikke nødvendigvis Cennet's bekymringer.</li>
+                        <ul class="space-y-3 text-sm leading-relaxed text-slate-700 dark:text-slate-300">
+                            <li><strong>Sprogbarrieren:</strong> Antonella (italiensk gæstearbejderbarn) forstår ikke tysk. Det ødelægger hendes skolegang, selv i matematik (tekstopgaver).</li>
+                            <li><strong>Isolation & Fordomme:</strong> Læreren opgiver hende. Børnene kalder hende racistiske skældsord ("Spaghettifresser", "Ithaker") og isolerer hende fuldstændigt.</li>
+                            <li><strong>Klimaks:</strong> Hun beskyldes falsk for at stjæle en fyldepen. I panik flygter hun og bliver kørt ned. Selv efter ulykken mødes hun med fordomme fra de voksne ("hvor de kommer fra, findes der kun æsler").</li>
                         </ul>
+                        <div class="quote-box text-red-600 dark:text-red-400">
+                            "Teksten viser, hvordan manglende sprogkundskaber og samfundets fordomme (Vorurteile) fører til total udstødelse (Ausgrenzung)."
+                        </div>
                     </div>
-                </div>
-                <div class="mt-8 p-4 bg-green-500/5 rounded-xl border border-green-500/10 text-sm italic text-center">
-                    "Teksten viser spændingen mellem tradition og gentrificering i Berlin."
                 </div>
             </div>
 
-            <!-- Film: Almanya - Willkommen in Deutschland -->
+            <!-- Drei Straßen weiter -->
             <div class="tile bg-white/80 dark:bg-slate-800/40 border border-slate-200 dark:border-white/5 shadow-sm">
-                <h4 class="text-xl font-black mb-6 uppercase italic text-blue-500 flex items-center gap-2">
+                <h4 class="text-xl font-black mb-4 uppercase italic text-purple-500 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                    Drei Straßen weiter
+                </h4>
+                <div class="space-y-3 text-sm text-slate-700 dark:text-slate-300">
+                    <p><strong>Tema: Social arv og klassediskrimination.</strong></p>
+                    <p>En familie flytter fra usle barakker til en rigtig 4-værelses lejlighed for at forbedre deres liv. Men de møder en massiv <strong>usynlig mur</strong> af fordomme fra naboerne og viceværten.</p>
+                    <ul class="list-disc pl-5 space-y-1">
+                        <li>De kaldes "Barackenpack".</li>
+                        <li>De forsøger desperat at tilpasse sig (køber tæpper for lånte penge, moderen tager natarbejde).</li>
+                        <li>Uanset hvad de gør, bliver de afvist. De flytter til sidst tilbage til barakkerne.</li>
+                    </ul>
+                    <div class="quote-box text-purple-500 mt-4">
+                        "Assimilation fejler, fordi majoritetssamfundet nægter at acceptere dem på grund af deres sociale klasse."
+                    </div>
+                </div>
+            </div>
+
+            <!-- Vietnamesen in Deutschland -->
+            <div class="tile bg-white/80 dark:bg-slate-800/40 border border-slate-200 dark:border-white/5 shadow-sm">
+                <h4 class="text-xl font-black mb-4 uppercase italic text-amber-500 flex items-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+                    Øst vs. Vest (Vietnamesen)
+                </h4>
+                <div class="space-y-3 text-sm text-slate-700 dark:text-slate-300">
+                    <p>Historien om vietnameserne i Tyskland er delt af den Kolde Krig:</p>
+                    <div class="mt-3 p-3 bg-slate-100 dark:bg-slate-700/50 rounded-lg border border-slate-200 dark:border-slate-600">
+                        <strong class="text-amber-600 dark:text-amber-400 uppercase text-xs block mb-1">DDR (Østtyskland): Vertragsarbeiter</strong>
+                        Kom fra 50'erne til 80'erne på tidsbegrænsede kontrakter. Levede ofte isoleret fra tyskerne.
+                    </div>
+                    <div class="mt-3 p-3 bg-slate-100 dark:bg-slate-700/50 rounded-lg border border-slate-200 dark:border-slate-600">
+                        <strong class="text-amber-600 dark:text-amber-400 uppercase text-xs block mb-1">BRD (Vesttyskland): Boat People</strong>
+                        Flygtede i 70'erne og 80'erne fra Vietnamkrigen. Blev anerkendt som asylansøgere.
+                    </div>
+                    <p class="mt-3 font-bold">Monsieur Vuong (Videoportræt/Tekst):</p>
+                    <p>Viser hvordan mad og gastronomi kan skabe kulturel brobygning. Den vietnamesiske restaurant bliver et symbol på succesfuld integration.</p>
+                </div>
+            </div>
+
+            <!-- Film: Almanya -->
+            <div class="tile bg-slate-900 text-white shadow-xl md:col-span-2">
+                <h4 class="text-2xl font-black mb-4 uppercase italic text-pink-500 flex items-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="7" x2="7" y2="7"/><line x1="2" y1="17" x2="7" y2="17"/><line x1="17" y1="17" x2="22" y2="17"/><line x1="17" y1="7" x2="22" y2="7"/></svg>
-                    Almanya: 3 Generationer
+                    Filmanalyse: Almanya – Willkommen in Deutschland
                 </h4>
-                <div class="space-y-6 text-sm">
-                    <div>
-                        <h6 class="font-bold uppercase text-xs text-blue-400">1. Generation (Hüseyin)</h6>
-                        <p class="text-slate-500 italic">"Wer bin ich? Türke oder Deutscher?"</p>
-                        <p class="mt-1">Kom som Gastarbeiter i 1960'erne. Han søger tilbage til sine rødder.</p>
+                <p class="text-slate-300 text-sm mb-6 max-w-2xl">En humoristisk og hjertevarm film, der spejler integrationsprocessen over tre generationer af den tyrkisk-tyske familie Yilmaz.</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm">
+                    <div class="bg-white/10 p-4 rounded-xl border border-white/20">
+                        <h6 class="font-bold uppercase text-pink-400 mb-2">1. Gen: Hüseyin</h6>
+                        <p class="text-slate-300 leading-relaxed">Kom i 1964 som gæstearbejder nr. 1.000.001. Oplever "Kulturschock" (kæmpe rotter, mærkelig mad, Jesus på korset). Nu, som ældre, køber han et hus i Tyrkiet for at finde tilbage til sine rødder.</p>
                     </div>
-                    <div>
-                        <h6 class="font-bold uppercase text-xs text-blue-400">2. Generation (Børnene)</h6>
-                        <p class="mt-1">Fanget mellem to kulturer. De taler tysk, men mærker stadig de tyrkiske rødder.</p>
+                    <div class="bg-white/10 p-4 rounded-xl border border-white/20">
+                        <h6 class="font-bold uppercase text-pink-400 mb-2">2. Gen: Børnene</h6>
+                        <p class="text-slate-300 leading-relaxed">Fanget mellem kulturer (Zerrissenheit). De vokser op i Tyskland, men opdrages med tyrkiske værdier. Eksempelvis bliver datteren gravid med en brite, hvilket udfordrer patriarkatet.</p>
                     </div>
-                    <div>
-                        <h6 class="font-bold uppercase text-xs text-blue-400">3. Generation (Cenk)</h6>
-                        <p class="mt-1">Den unge dreng, der spørger "Hvem er vi?". Han er fuldt integreret, men nysgerrig på historien.</p>
+                    <div class="bg-white/10 p-4 rounded-xl border border-white/20">
+                        <h6 class="font-bold uppercase text-pink-400 mb-2">3. Gen: Cenk</h6>
+                        <p class="text-slate-300 leading-relaxed">Seksårige Cenk bliver ikke valgt til hverken det tyrkiske eller tyske fodboldhold. Han spørger: <em>"Wer bin ich eigentlich? Türke oder Deutscher?"</em>. Filmen konkluderer, at man kan være begge dele.</p>
                     </div>
                 </div>
             </div>
-
-            <!-- Begreber og Definitioner -->
-            <div class="tile bg-white/80 dark:bg-slate-800/40 border border-slate-200 dark:border-white/5 shadow-sm">
-                <h4 class="text-xl font-black mb-6 uppercase italic text-red-500 flex items-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-                    Nøglebegreber
-                </h4>
-                <div class="space-y-4">
-                    <div class="flex items-start gap-3">
-                        <div class="w-2 h-2 mt-1.5 bg-red-500 rounded-full"></div>
-                        <div>
-                            <p class="font-bold text-sm">Gastarbeiter</p>
-                            <p class="text-xs text-slate-500">Gæstearbejdere, der kom for at hjælpe med Wirtschaftswunder.</p>
-                        </div>
-                    </div>
-                    <div class="flex items-start gap-3">
-                        <div class="w-2 h-2 mt-1.5 bg-red-500 rounded-full"></div>
-                        <div>
-                            <p class="font-bold text-sm">Integration vs. Assimilation</p>
-                            <p class="text-xs text-slate-500">Integration er at blive en del af samfundet; Assimilation er at opgive sin egen kultur.</p>
-                        </div>
-                    </div>
-                    <div class="flex items-start gap-3">
-                        <div class="w-2 h-2 mt-1.5 bg-red-500 rounded-full"></div>
-                        <div>
-                            <p class="font-bold text-sm">Kulturschock</p>
-                            <p class="text-xs text-slate-500">Følelsen af forvirring i mødet med en ny kultur (som Hüseyin i Tyskland).</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Monsieur Vuong (Kultur via mad) -->
-            <div class="tile bg-white/80 dark:bg-slate-800/40 border border-slate-200 dark:border-white/5 shadow-sm">
-                <h4 class="text-xl font-black mb-6 uppercase italic text-amber-500 flex items-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
-                    Monsieur Vuong
-                </h4>
-                <div class="text-sm space-y-4">
-                    <p class="leading-relaxed">
-                        Teksten om den vietnamesiske restaurant i Berlin viser, hvordan <strong>gastronomi</strong> er en vej til integration.
-                    </p>
-                    <div class="p-3 bg-amber-500/5 rounded-lg border border-amber-500/10">
-                        <p class="text-xs font-bold uppercase tracking-tighter">Vigtig pointe:</p>
-                        <p class="text-xs text-slate-500">Identitet er ikke kun sprog, men også smage, dufte og traditioner, man tager med sig.</p>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Guld-gloser til Eksamen -->
-            <div class="tile bg-slate-900 text-white dark:bg-slate-800/60 border border-slate-700 dark:border-white/10 shadow-xl md:col-span-2">
-                <h4 class="text-xl font-black mb-6 uppercase italic text-emerald-400 flex items-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                    Eksamens-træner
-                </h4>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
-                    <div class="space-y-4">
-                        <div class="quote-box">
-                            <p class="font-bold">"Deutschland ist heute ein Einwanderungsland."</p>
-                            <p class="text-emerald-400/80 text-xs mt-1">Tyskland er i dag et indvandringsland.</p>
-                        </div>
-                        <div class="quote-box">
-                            <p class="font-bold">"Es gibt oft Vorurteile zwischen den Kulturen."</p>
-                            <p class="text-emerald-400/80 text-xs mt-1">Der er ofte fordomme mellem kulturerne.</p>
-                        </div>
-                    </div>
-                    <div class="space-y-4">
-                        <div class="quote-box">
-                            <p class="font-bold">"Integration bedeutet, dass man Teil der Gesellschaft wird."</p>
-                            <p class="text-emerald-400/80 text-xs mt-1">Integration betyder, at man bliver en del af samfundet.</p>
-                        </div>
-                        <div class="quote-box">
-                            <p class="font-bold">"Cennet und Antonella haben verschiedene Weltbilder."</p>
-                            <p class="text-emerald-400/80 text-xs mt-1">Cennet og Antonella har forskellige verdensbilleder.</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
         </div>
 
-        <!-- Bonus Info -->
-        <div class="mt-12 p-8 bg-green-600/10 rounded-3xl border border-green-500/20">
-            <h5 class="font-black text-green-500 uppercase mb-2">Husk til perspektiveringen:</h5>
-            <p class="text-sm text-slate-500 leading-relaxed italic">
-                Sammenlign migrationen i 60'erne (Gastarbeiter) med flygtningestrømmen i 2015. Hvordan har Tyskland ændret sig? 
-                Brug udtrykket "Wir schaffen das" af Angela Merkel som et kontrastpunkt til Hüseyins oplevelser.
-            </p>
+        <!-- Interaktiv Eksamens-træner (Flashcards) -->
+        <div class="mb-12">
+            <h3 class="text-3xl font-black mb-6 uppercase tracking-tight flex items-center gap-3">
+                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                Interaktiv Eksamens-træner
+            </h3>
+            <p class="text-slate-600 dark:text-slate-400 mb-6">Klik på kortene for at øve vigtige begreber og formuleringer (Redemittel) til din fremlæggelse. Brug ledsætninger (weil/dass) til eksamen!</p>
+            
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <!-- Card 1 -->
+                <div class="flashcard-container" onclick="this.classList.toggle('flipped')">
+                    <div class="flashcard">
+                        <div class="flashcard-front">
+                            <span class="font-bold text-lg">Fordomme</span>
+                        </div>
+                        <div class="flashcard-back">
+                            <span class="font-bold text-lg">die Vorurteile</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Card 2 -->
+                <div class="flashcard-container" onclick="this.classList.toggle('flipped')">
+                    <div class="flashcard">
+                        <div class="flashcard-front">
+                            <span class="font-bold text-lg">Integrationen lykkes, fordi...</span>
+                        </div>
+                        <div class="flashcard-back flex-col">
+                            <span class="font-bold text-sm">Die Integration gelingt, weil...</span>
+                            <span class="text-xs mt-1 opacity-80">(Husk verbet til sidst!)</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Card 3 -->
+                <div class="flashcard-container" onclick="this.classList.toggle('flipped')">
+                    <div class="flashcard">
+                        <div class="flashcard-front">
+                            <span class="font-bold text-lg">Gæstearbejder</span>
+                        </div>
+                        <div class="flashcard-back">
+                            <span class="font-bold text-lg">der Gastarbeiter</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Card 4 -->
+                <div class="flashcard-container" onclick="this.classList.toggle('flipped')">
+                    <div class="flashcard">
+                        <div class="flashcard-front">
+                            <span class="font-bold text-lg">Jeg mener, at...</span>
+                        </div>
+                        <div class="flashcard-back flex-col">
+                            <span class="font-bold text-sm">Ich meine, dass...</span>
+                            <span class="text-xs mt-1 opacity-80">(Husk verbet til sidst!)</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Card 5 -->
+                <div class="flashcard-container" onclick="this.classList.toggle('flipped')">
+                    <div class="flashcard">
+                        <div class="flashcard-front">
+                            <span class="font-bold text-lg">Udstødelse</span>
+                        </div>
+                        <div class="flashcard-back">
+                            <span class="font-bold text-lg">die Ausgrenzung</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Card 6 -->
+                <div class="flashcard-container" onclick="this.classList.toggle('flipped')">
+                    <div class="flashcard">
+                        <div class="flashcard-front text-center">
+                            <span class="font-bold text-sm">Følelsen af at være splittet mellem kulturer</span>
+                        </div>
+                        <div class="flashcard-back">
+                            <span class="font-bold text-lg">die Zerrissenheit</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Card 7 -->
+                <div class="flashcard-container" onclick="this.classList.toggle('flipped')">
+                    <div class="flashcard">
+                        <div class="flashcard-front text-center">
+                            <span class="font-bold text-sm">Teksten handler om...</span>
+                        </div>
+                        <div class="flashcard-back">
+                            <span class="font-bold text-sm">Der Text handelt von (+ Dativ)</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Card 8 -->
+                <div class="flashcard-container" onclick="this.classList.toggle('flipped')">
+                    <div class="flashcard">
+                        <div class="flashcard-front">
+                            <span class="font-bold text-lg">Samfundet</span>
+                        </div>
+                        <div class="flashcard-back">
+                            <span class="font-bold text-lg">die Gesellschaft</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
+
     </main>
 
     <script>
-        const themeToggle = document.getElementById('theme-toggle');
+        const themeToggleBtn = document.getElementById('theme-toggle');
         const sunIcon = document.getElementById('sun-icon');
         const moonIcon = document.getElementById('moon-icon');
         const html = document.documentElement;
 
-        function updateIcons() {
-            if (html.classList
+        // Check for saved user preference, if any, on load of the website
+        if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            html.classList.add('dark');
+            sunIcon.classList.remove('hidden');
+            moonIcon.classList.add('hidden');
+        } else {
+            html.classList.remove('dark');
+            sunIcon.classList.add('hidden');
+            moonIcon.classList.remove('hidden');
+        }
+
+        themeToggleBtn.addEventListener('click', function() {
+            // Toggle icons
+            sunIcon.classList.toggle('hidden');
+            moonIcon.classList.toggle('hidden');
+
+            // If is set in localstorage
+            if (localStorage.getItem('color-theme')) {
+                if (localStorage.getItem('color-theme') === 'light') {
+                    html.classList.add('dark');
+                    localStorage.setItem('color-theme', 'dark');
+                } else {
+                    html.classList.remove('dark');
+                    localStorage.setItem('color-theme', 'light');
+                }
+            } else {
+                // If not set in localstorage
+                if (html.classList.contains('dark')) {
+                    html.classList.remove('dark');
+                    localStorage.setItem('color-theme', 'light');
+                } else {
+                    html.classList.add('dark');
+                    localStorage.setItem('color-theme', 'dark');
+                }
+            }
+        });
+    </script>
+</body>
+</html>

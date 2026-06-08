@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monsieur Vuong | Analyse</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #ec4899; /* Pink accent for gastronomi / kreativitet */
+            --primary-glow: rgba(236, 72, 153, 0.15);
+            --slate-bg: #fdf2f8; /* Lys pinktonet baggrund */
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--slate-bg);
+            color: #0f172a;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        .bg-blob {
+            position: fixed;
+            z-index: -1;
+            filter: blur(120px);
+            opacity: 0.15;
+            pointer-events: none;
+            border-radius: 50%;
+            animation: drift 25s infinite alternate ease-in-out;
+        }
+
+        @keyframes drift {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(-60px, 90px) scale(1.2); }
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            border: 1px solid #fbcfe8; /* Pink-200 */
+            border-radius: 2rem;
+            padding: 2rem;
+            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .glass-panel:hover {
+            box-shadow: 0 20px 40px -10px var(--primary-glow);
+            border-color: #f9a8d4; /* Pink-300 */
+        }
+
+        .quote-box {
+            border-left: 4px solid var(--primary);
+            padding-left: 1.5rem;
+            margin: 1.5rem 0;
+            background: linear-gradient(90deg, rgba(236,72,153,0.05) 0%, rgba(255,255,255,0) 100%);
+            padding-top: 1rem;
+            padding-bottom: 1rem;
+            border-radius: 0 1rem 1rem 0;
+        }
+
+        .flashcard-container {
+            perspective: 1000px;
+            cursor: pointer;
+            height: 140px;
+        }
+        .flashcard {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform-style: preserve-3d;
+        }
+        .flashcard-container.flipped .flashcard {
+            transform: rotateY(180deg);
+        }
+        .flashcard-front, .flashcard-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            border-radius: 1.5rem;
+            border: 1px solid #fbcfe8;
+        }
+        .flashcard-front {
+            background-color: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+        .flashcard-back {
+            background-color: var(--primary);
+            color: white;
+            transform: rotateY(180deg);
+            box-shadow: 0 10px 25px -5px var(--primary-glow);
+        }
+
+        .quiz-option {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            border-radius: 1rem;
+            border: 2px solid #e2e8f0;
+            background: white;
+            font-size: 1rem;
+            font-weight: 700;
+            color: #475569;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .quiz-option:hover {
+            border-color: var(--primary);
+            background: rgba(236,72,153,0.05);
+            color: var(--primary);
+            transform: translateX(4px);
+        }
+        .quiz-option.correct {
+            border-color: #10b981;
+            background: rgba(16,185,129,0.1);
+            color: #10b981;
+        }
+        .quiz-option.wrong {
+            border-color: #ef4444;
+            background: rgba(239,68,68,0.1);
+            color: #ef4444;
+        }
+
+        .feedback-correct { color: #10b981; font-weight: 800; animation: popIn 0.4s ease; }
+        .feedback-wrong { color: #ef4444; font-weight: 800; animation: shake 0.4s ease; }
+
+        @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+        
+        .video-wrapper {
+            position: relative;
+            padding-bottom: 56.25%; /* 16:9 Aspect Ratio */
+            height: 0;
+            overflow: hidden;
+            border-radius: 1.5rem;
+            border: 1px solid #fbcfe8;
+        }
+        .video-wrapper iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body class="min-h-screen pb-20 relative">
+
+    <div class="bg-blob w-[600px] h-[600px] bg-pink-200 top-[-10%] left-[-10%]"></div>
+    <div class="bg-blob w-[500px] h-[500px] bg-rose-200 bottom-[20%] right-[-5%]"></div>
+
+    <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-pink-100 shadow-sm">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <a href="Tysk-Index.html" class="w-10 h-10 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-full flex items-center justify-center transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+                </a>
+                <div>
+                    <span class="text-xl font-black tracking-tight block leading-none text-slate-900 uppercase">Mr. Vuong</span>
+                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">Tekst & Videoportræt</span>
+                </div>
+            </div>
+            <div class="hidden sm:flex items-center gap-2 px-4 py-2 bg-pink-50 text-pink-600 rounded-full text-xs font-bold uppercase tracking-widest border border-pink-100">
+                <span class="w-2 h-2 rounded-full bg-pink-500 animate-pulse"></span>
+                Emne 04: Gastronomi & Identitet
+            </div>
+        </div>
+    </nav>
+
+    <header class="max-w-4xl mx-auto px-6 pt-20 pb-16 text-center">
+        <h1 class="text-5xl md:text-7xl font-black tracking-tighter text-slate-900 mb-6 uppercase leading-[0.9]">
+            Die Kulinarische <br><span class="text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-rose-600 italic">Brücke</span>
+        </h1>
+        <p class="text-slate-500 text-lg md:text-xl leading-relaxed font-medium">
+            Hvordan madkulturen blev en genvej til integration for Dat Vuong. Historien om at omdanne familiens asylhistorie til Berlins mest elskede vietnamesiske restaurant.
+        </p>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-6 space-y-8">
+        
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <!-- Venstre kolonne: Handlingen & Temaer -->
+            <div class="glass-panel lg:col-span-2">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/></svg>
+                        </div>
+                        <h2 class="text-2xl font-black uppercase tracking-tight text-slate-800">Dat Vuongs Historie</h2>
+                    </div>
+                </div>
+                
+                <div class="space-y-6 text-slate-600 font-medium leading-relaxed">
+                    <p>Historien om "Monsieur Vuong" (Dat Vuong) er et strålende eksempel på, hvordan den sydvietnamesiske *Boat People*-migration til Vesttyskland (BRD) har udviklet sig succesfuldt over tid.</p>
+                    
+                    <ul class="space-y-4">
+                        <li class="relative pl-6 border-l-2 border-pink-200">
+                            <div class="absolute w-3 h-3 bg-pink-500 rounded-full -left-[7px] top-1.5 shadow-[0_0_0_4px_rgba(236,72,153,0.2)]"></div>
+                            <h4 class="text-pink-600 font-black uppercase text-sm mb-1 tracking-widest">Familien Baggrund</h4>
+                            <p>Dats familie flygtede fra Vietnamkrigen til Sydtyskland i 1980'erne (som asylansøgere / "Boat People"). Maden, særligt Pho-suppen, blev en måde at bevare deres kultur og "Heimat" på i et fremmed land.</p>
+                        </li>
+                        <li class="relative pl-6 border-l-2 border-pink-200">
+                            <div class="absolute w-3 h-3 bg-pink-500 rounded-full -left-[7px] top-1.5 shadow-[0_0_0_4px_rgba(236,72,153,0.2)]"></div>
+                            <h4 class="text-pink-600 font-black uppercase text-sm mb-1 tracking-widest">Restauranten i Berlin (Mitte)</h4>
+                            <p>Dat flytter senere til Berlin og åbner restauranten "Monsieur Vuong". Konceptet var simpelt, men revolutionerende: Autentisk, frisk vietnamesisk gademad uden tyske tilpasninger, præsenteret i et moderne, hipt miljø.</p>
+                        </li>
+                        <li class="relative pl-6 border-l-2 border-transparent">
+                            <div class="absolute w-3 h-3 bg-pink-500 rounded-full -left-[7px] top-1.5 shadow-[0_0_0_4px_rgba(236,72,153,0.2)]"></div>
+                            <h4 class="text-pink-600 font-black uppercase text-sm mb-1 tracking-widest">Mad som Integration</h4>
+                            <p>Mad bliver her en brobygger (*Brückenbauer*). I stedet for sproglige barrierer mødes tyskere og vietnamesere om maden. Gennem smag og dufte opnår kulturen anerkendelse og respekt i majoritetssamfundet.</p>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="quote-box">
+                    <p class="text-slate-800 font-bold text-lg">„Das Essen ist eine universelle Sprache, die alle verstehen.“</p>
+                    <p class="text-sm text-slate-500 mt-1">Maden er et universelt sprog, som alle forstår. (Central analytisk pointe til din fremlæggelse).</p>
+                </div>
+            </div>
+
+            <!-- Højre kolonne: Analytiske Vendinger -->
+            <div class="glass-panel bg-slate-900 text-white border-slate-800">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-10 h-10 rounded-xl bg-pink-500 text-white flex items-center justify-center">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/></svg>
+                    </div>
+                    <h2 class="text-xl font-black uppercase tracking-tight">Analytiske <br>Byggeklodser</h2>
+                </div>
+                <p class="text-slate-400 text-sm mb-6">Brug disse sætninger til at forklare, hvordan kultur og mad hænger sammen med integration.</p>
+                
+                <div class="space-y-4">
+                    <div class="p-4 bg-slate-800 rounded-xl border border-slate-700">
+                        <p class="text-xs text-pink-400 font-bold uppercase mb-1">Tema: Kulturel Bevarelse</p>
+                        <p class="font-medium text-sm">Für die Familie Vuong war das Essen ein Stück Heimat im Exil.</p>
+                    </div>
+                    <div class="p-4 bg-slate-800 rounded-xl border border-slate-700">
+                        <p class="text-xs text-pink-400 font-bold uppercase mb-1">Tema: Integration via Mad</p>
+                        <p class="font-medium text-sm">Die Gastronomie baut Vorurteile ab und bringt die Kulturen zusammen.</p>
+                    </div>
+                    <div class="p-4 bg-slate-800 rounded-xl border border-slate-700">
+                        <p class="text-xs text-pink-400 font-bold uppercase mb-1">Perspektivering til Kadem</p>
+                        <p class="font-medium text-sm">Wie bei der Familie Kadem in Kreuzberg, ist dies ein Beispiel für gelungene Integration.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Video Sektion -->
+        <div class="glass-panel border-pink-200">
+            <div class="flex items-center gap-3 mb-6">
+                <div class="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                </div>
+                <h2 class="text-2xl font-black uppercase tracking-tight text-slate-800">Videoportræt: eNtR Berlin</h2>
+            </div>
+            <p class="text-slate-600 mb-6 font-medium">Se det korte dokumentarportræt "Work Hard, Eat Well", som I analyserede i klassen. Læg mærke til den moderne, urbane stemning i restauranten sammenlignet med det traditionelle asylcenter, familien kom fra.</p>
+            
+            <div class="video-wrapper shadow-lg">
+                <iframe src="https://www.youtube.com/embed/Lej18R2K6DE" title="Monsieur Vuong - Work Hard, Eat Well" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            </div>
+        </div>
+
+        <!-- Gloser -->
+        <div>
+            <div class="flex items-center gap-4 mb-6 mt-8">
+                <span class="px-3 py-1 bg-slate-200 text-slate-700 font-bold uppercase tracking-widest text-xs rounded-full">Ordforråd</span>
+                <h3 class="text-2xl font-black text-slate-800 tracking-tight">Gloser til Monsieur Vuong</h3>
+            </div>
+            
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="flashcard-container" onclick="this.classList.toggle('flipped')">
+                    <div class="flashcard">
+                        <div class="flashcard-front"><span class="font-bold text-lg">Maden (retten)</span><span class="text-xs text-slate-400 mt-2">Klik for at vende</span></div>
+                        <div class="flashcard-back"><span class="font-bold text-lg">das Essen / das Gericht</span></div>
+                    </div>
+                </div>
+                <div class="flashcard-container" onclick="this.classList.toggle('flipped')">
+                    <div class="flashcard">
+                        <div class="flashcard-front"><span class="font-bold text-lg">Kogebogen</span></div>
+                        <div class="flashcard-back"><span class="font-bold text-lg">das Kochbuch</span></div>
+                    </div>
+                </div>
+                <div class="flashcard-container" onclick="this.classList.toggle('flipped')">
+                    <div class="flashcard">
+                        <div class="flashcard-front"><span class="font-bold text-lg">Smagen</span></div>
+                        <div class="flashcard-back"><span class="font-bold text-lg">der Geschmack</span></div>
+                    </div>
+                </div>
+                <div class="flashcard-container" onclick="this.classList.toggle('flipped')">
+                    <div class="flashcard">
+                        <div class="flashcard-front"><span class="font-bold text-lg">At nedbryde fordomme</span></div>
+                        <div class="flashcard-back"><span class="font-bold text-lg text-center px-2">Vorurteile abbauen</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Interaktiv Quiz -->
+        <div class="glass-panel border-pink-200 bg-pink-50/50 relative overflow-hidden">
+            <div class="absolute -right-20 -top-20 w-64 h-64 bg-pink-200/50 rounded-full blur-3xl pointer-events-none"></div>
+            
+            <div class="relative z-10 max-w-3xl mx-auto text-center">
+                <span class="inline-block px-3 py-1 bg-white text-pink-600 border border-pink-200 font-black uppercase tracking-widest text-[10px] rounded-full mb-4 shadow-sm">AI Coach Simulation</span>
+                <h3 class="text-3xl font-black text-slate-800 tracking-tight mb-2">Perspektiverings-Træner</h3>
+                <p class="text-slate-500 font-medium mb-8">Et af de vigtigste krav til STX B mundtlig tysk er *perspektivering*. Kan du koble pointerne fra de forskellige tekster sammen?</p>
+                
+                <div class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-100 text-left mb-6">
+                    
+                    <div class="mb-8">
+                        <span id="quiz-question-counter" class="text-xs font-bold text-pink-500 uppercase tracking-widest block mb-2">Spørgsmål 1 af 3</span>
+                        <h4 id="quiz-question-text" class="text-xl md:text-2xl font-black text-slate-800 leading-snug">
+                            "Monsieur Vuong og familien Kadem (Kreuzberg) har begge oplevet..."
+                        </h4>
+                    </div>
+                    
+                    <div id="quiz-options" class="grid grid-cols-1 gap-3 mb-2">
+                        <!-- Options injected by JS -->
+                    </div>
+                    
+                    <div id="quiz-feedback" class="mt-4 text-center h-6 text-lg hidden"></div>
+                </div>
+                
+                <!-- Dots for progress -->
+                <div class="flex justify-center gap-2">
+                    <div class="w-2 h-2 rounded-full bg-pink-500 transition-colors" id="dot-0"></div>
+                    <div class="w-2 h-2 rounded-full bg-slate-300 transition-colors" id="dot-1"></div>
+                    <div class="w-2 h-2 rounded-full bg-slate-300 transition-colors" id="dot-2"></div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        const quizData = [
+            {
+                text: '"Monsieur Vuong og familien Kadem (Kreuzberg) har begge oplevet..."',
+                options: [
+                    'At blive udstødt af det tyske samfund, og derfor flytter de tilbage til hjemlandet.',
+                    'Gelungene Integration (vellykket integration), hvor hårdt arbejde skaber anerkendelse i samfundet.',
+                    'At arbejde som "Vertragsarbeiter" i DDR for staten.'
+                ],
+                correctIndex: 1,
+                hint: "Tænk over den positive tone i begge historier. Begge familier opnår stor succes i det tyske samfund gennem hårdt arbejde."
+            },
+            {
+                text: '"I kontrast til Antonella, oplever Dat Vuong..."',
+                options: [
+                    'At den tyske befolkning er nysgerrige og tager positivt imod hans kultur (gennem maden).',
+                    'At han ikke kan sproget, og derfor må han arbejde i en barak.',
+                    'At han bliver stoppet af en vicevært (Hausverwalterin), som skælder ham ud.'
+                ],
+                correctIndex: 0,
+                hint: "Antonella møder massiv racisme. Dat Vuong oplever det modsatte, da berlinerne flokkes til hans restaurant."
+            },
+            {
+                text: '"Historisk set tilhører familien Vuongs forældre gruppen af..."',
+                options: [
+                    'Italienske Gastarbeiter.',
+                    'DDR-kontraktarbejdere (Vertragsarbeiter).',
+                    'Sydvietnamesiske bådflygtninge (Boat People) i Vesttyskland.'
+                ],
+                correctIndex: 2,
+                hint: "Husk forskellen på Øst og Vest. Dats familie flygtede fra Vietnamkrigen og fik asyl i Vesttyskland."
+            }
+        ];
+
+        let currentQuestion = 0;
+        let isAnswered = false;
+        
+        const questionTextEl = document.getElementById('quiz-question-text');
+        const questionCounterEl = document.getElementById('quiz-question-counter');
+        const optionsContainer = document.getElementById('quiz-options');
+        const feedbackEl = document.getElementById('quiz-feedback');
+
+        function loadQuestion() {
+            isAnswered = false;
+            const q = quizData[currentQuestion];
+            
+            questionCounterEl.textContent = `Perspektivering ${currentQuestion + 1} af ${quizData.length}`;
+            questionTextEl.innerHTML = q.text;
+            feedbackEl.classList.add('hidden');
+            
+            // Generate options
+            optionsContainer.innerHTML = '';
+            q.options.forEach((opt, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'quiz-option text-sm md:text-base font-bold';
+                btn.innerHTML = `<span class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-sm shrink-0">${String.fromCharCode(65 + index)}</span> <span>${opt}</span>`;
+                btn.onclick = () => handleAnswer(index, btn);
+                optionsContainer.appendChild(btn);
+            });
+            
+            // Update dots
+            for(let i=0; i<3; i++) {
+                document.getElementById(`dot-${i}`).className = `w-2 h-2 rounded-full transition-colors ${i <= currentQuestion ? 'bg-pink-500' : 'bg-slate-300'}`;
+            }
+        }
+
+        function handleAnswer(selectedIndex, btnElement) {
+            if(isAnswered) return;
+            isAnswered = true;
+            
+            const q = quizData[currentQuestion];
+            
+            feedbackEl.classList.remove('hidden');
+            
+            if (selectedIndex === q.correctIndex) {
+                btnElement.classList.add('correct');
+                feedbackEl.innerHTML = '🎯 <strong>Ganz genau!</strong> Perfekt perspektivering.';
+                feedbackEl.className = 'mt-4 text-center h-6 text-lg feedback-correct';
+                
+                setTimeout(() => {
+                    currentQuestion++;
+                    if (currentQuestion < quizData.length) {
+                        loadQuestion();
+                    } else {
+                        questionCounterEl.textContent = "Fantastisk!";
+                        questionTextEl.innerHTML = "Du har fuldstændig styr på perspektiveringen! 🎉";
+                        optionsContainer.innerHTML = '';
+                        feedbackEl.innerHTML = 'Klar til at imponere censor med dine tværgående analyser.';
+                        feedbackEl.className = 'mt-4 text-center h-6 text-lg font-bold text-pink-600';
+                    }
+                }, 2500);
+            } else {
+                btnElement.classList.add('wrong');
+                feedbackEl.innerHTML = `❌ <strong>Nej.</strong> ${q.hint}`;
+                feedbackEl.className = 'mt-4 text-center h-6 text-lg feedback-wrong';
+                
+                // Allow them to try again
+                setTimeout(() => {
+                    btnElement.classList.remove('wrong');
+                    isAnswered = false;
+                    feedbackEl.classList.add('hidden');
+                }, 3000);
+            }
+        }
+
+        // Initialize
+        loadQuestion();
+    </script>
+</body>
+</html>

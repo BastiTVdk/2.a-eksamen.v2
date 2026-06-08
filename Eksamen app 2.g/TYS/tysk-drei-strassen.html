@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drei Straßen weiter | Analyse</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #6366f1; /* Indigo accent for "den usynlige mur" / klassefokus */
+            --primary-glow: rgba(99, 102, 241, 0.15);
+            --slate-bg: #f8fafc;
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--slate-bg);
+            color: #0f172a;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        .bg-blob {
+            position: fixed;
+            z-index: -1;
+            filter: blur(120px);
+            opacity: 0.12;
+            pointer-events: none;
+            border-radius: 50%;
+            animation: drift 25s infinite alternate ease-in-out;
+        }
+
+        @keyframes drift {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(-60px, 90px) scale(1.2); }
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            border: 1px solid #e0e7ff; /* Indigo-100 */
+            border-radius: 2rem;
+            padding: 2rem;
+            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+        
+        .glass-panel:hover {
+            box-shadow: 0 20px 40px -10px var(--primary-glow);
+            border-color: #c7d2fe; /* Indigo-200 */
+        }
+
+        .quote-box {
+            border-left: 4px solid var(--primary);
+            padding-left: 1.5rem;
+            margin: 1.5rem 0;
+            background: linear-gradient(90deg, rgba(99,102,241,0.05) 0%, rgba(255,255,255,0) 100%);
+            padding-top: 1rem;
+            padding-bottom: 1rem;
+            border-radius: 0 1rem 1rem 0;
+        }
+
+        .flashcard-container {
+            perspective: 1000px;
+            cursor: pointer;
+            height: 140px;
+        }
+        .flashcard {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            transform-style: preserve-3d;
+        }
+        .flashcard-container.flipped .flashcard {
+            transform: rotateY(180deg);
+        }
+        .flashcard-front, .flashcard-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+            border-radius: 1.5rem;
+            border: 1px solid #e0e7ff;
+        }
+        .flashcard-front {
+            background-color: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+        }
+        .flashcard-back {
+            background-color: var(--primary);
+            color: white;
+            transform: rotateY(180deg);
+            box-shadow: 0 10px 25px -5px var(--primary-glow);
+        }
+
+        .quiz-option {
+            width: 100%;
+            padding: 1rem 1.5rem;
+            border-radius: 1rem;
+            border: 2px solid #e2e8f0;
+            background: white;
+            font-size: 1rem;
+            font-weight: 700;
+            color: #475569;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .quiz-option:hover {
+            border-color: var(--primary);
+            background: rgba(99,102,241,0.05);
+            color: var(--primary);
+            transform: translateX(4px);
+        }
+        .quiz-option.correct {
+            border-color: #10b981;
+            background: rgba(16,185,129,0.1);
+            color: #10b981;
+        }
+        .quiz-option.wrong {
+            border-color: #ef4444;
+            background: rgba(239,68,68,0.1);
+            color: #ef4444;
+        }
+
+        .feedback-correct { color: #10b981; font-weight: 800; animation: popIn 0.4s ease; }
+        .feedback-wrong { color: #ef4444; font-weight: 800; animation: shake 0.4s ease; }
+
+        @keyframes popIn { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
+    </style>
+</head>
+<body class="min-h-screen pb-20 relative">
+
+    <div class="bg-blob w-[600px] h-[600px] bg-indigo-200 top-[-10%] left-[-10%]"></div>
+    <div class="bg-blob w-[500px] h-[500px] bg-violet-200 bottom-[20%] right-[-5%]"></div>
+
+    <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-indigo-100 shadow-sm">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <a href="Tysk-Index.html" class="w-10 h-10 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-full flex items-center justify-center transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
+                </a>
+                <div>
+                    <span class="text-xl font-black tracking-tight block leading-none text-slate-900 uppercase">Drei Straßen</span>
+                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">Ursula Wölfel (1993)</span>
+                </div>
+            </div>
+            <div class="hidden sm:flex items-center gap-2 px-4 py-2 bg-indigo-50 text-indigo-600 rounded-full text-xs font-bold uppercase tracking-widest border border-indigo-100">
+                <span class="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></span>
+                Emne 01: Sociale Fordomme
+            </div>
+        </div>
+    </nav>
+
+    <header class="max-w-4xl mx-auto px-6 pt-20 pb-16 text-center">
+        <h1 class="text-5xl md:text-7xl font-black tracking-tighter text-slate-900 mb-6 uppercase leading-[0.9]">
+            Die Unsichtbare <br><span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-violet-700 italic">Mauer</span>
+        </h1>
+        <p class="text-slate-500 text-lg md:text-xl leading-relaxed font-medium">
+            En fortælling om social kontrol og fordomme. Hvorfor overgangen fra barakkerne til et "rigtigt hus" bliver et umuligt projekt på trods af familiens forsøg på assimilation.
+        </p>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-6 space-y-8">
+        
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <!-- Venstre kolonne: Handlingen (Zusammenfassung) -->
+            <div class="glass-panel lg:col-span-2">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-10 h-10 rounded-xl bg-slate-900 text-white flex items-center justify-center">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/></svg>
+                    </div>
+                    <h2 class="text-2xl font-black uppercase tracking-tight text-slate-800">Die Handlung (Zusammenfassung)</h2>
+                </div>
+                
+                <ul class="space-y-6 text-slate-600 font-medium leading-relaxed">
+                    <li class="relative pl-6 border-l-2 border-indigo-200">
+                        <div class="absolute w-3 h-3 bg-indigo-500 rounded-full -left-[7px] top-1.5 shadow-[0_0_0_4px_rgba(99,102,241,0.2)]"></div>
+                        <h4 class="text-indigo-600 font-black uppercase text-sm mb-1 tracking-widest">1. Der Umzug (Flytningen)</h4>
+                        <p>En familie flytter fra usle barakker ("Baracken") til en 4-værelses lejlighed i et rigtigt hus med bad og altan. De gamle naboer i barakkerne er en anelse misundelige (*neidisch*).</p>
+                    </li>
+                    <li class="relative pl-6 border-l-2 border-indigo-200">
+                        <div class="absolute w-3 h-3 bg-indigo-500 rounded-full -left-[7px] top-1.5 shadow-[0_0_0_4px_rgba(99,102,241,0.2)]"></div>
+                        <h4 class="text-indigo-600 font-black uppercase text-sm mb-1 tracking-widest">2. Die Assimilation (Forsøget på tilpasning)</h4>
+                        <p>Familien forsøger desperat at tilpasse sig for ikke at skille sig ud (*nicht auffallen*). Forældrene låner penge til gulvtæpper, forbyder børnene at lege i gården, og moderen tager et natjob i et hotelkøkken for at betale regningerne.</p>
+                    </li>
+                    <li class="relative pl-6 border-l-2 border-indigo-200">
+                        <div class="absolute w-3 h-3 bg-indigo-500 rounded-full -left-[7px] top-1.5 shadow-[0_0_0_4px_rgba(99,102,241,0.2)]"></div>
+                        <h4 class="text-indigo-600 font-black uppercase text-sm mb-1 tracking-widest">3. Die Vorurteile (Den usynlige mur)</h4>
+                        <p>Ligegyldigt hvad de gør, klager viceværten (*Hausverwalterin*) og naboerne. De bliver kaldt "Barackenpack", og deres gamle, slidte møbler udstilles nådesløst på gaden i dagslyset. Naboerne kritiserer endda, at moderen arbejder om natten.</p>
+                    </li>
+                    <li class="relative pl-6 border-l-2 border-transparent">
+                        <div class="absolute w-3 h-3 bg-indigo-500 rounded-full -left-[7px] top-1.5 shadow-[0_0_0_4px_rgba(99,102,241,0.2)]"></div>
+                        <h4 class="text-indigo-600 font-black uppercase text-sm mb-1 tracking-widest">4. Die Resignation (Tilbagetoget)</h4>
+                        <p>Da familiens gamle venner fra barakkerne kommer på besøg, skaber de glæde og larm, hvilket resulterer i en klagestorm fra de andre beboere. Faderen bliver rasende over småligheden. Efter blot et halvt år giver familien op og flytter tilbage til barakkerne, hvor de gamle naboer tager skadefro imod dem.</p>
+                    </li>
+                </ul>
+
+                <div class="quote-box">
+                    <p class="text-slate-800 font-bold text-lg">„Da seid ihr ja wieder! sagten die alten Nachbarn in den Baracken. Und das klang ein bißchen schadenfroh.“</p>
+                    <p class="text-sm text-slate-500 mt-1">"Der er I jo igen!", sagde de gamle naboer. Og det lød en anelse skadefro. (Uddragets tragiske slutning).</p>
+                </div>
+            </div>
+
+            <div class="glass-panel bg-slate-900 text-white border-slate-800">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-10 h-10 rounded-xl bg-indigo-500 text-white flex items-center justify-center">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
+                    </div>
+                    <h2 class="text-xl font-black uppercase tracking-tight">Analytiske <br>Byggeklodser</h2>
+                </div>
+                <p class="text-slate-400 text-sm mb-6">Brug disse direkte i din fremlæggelse for at vise akademisk overskud. Fokusér på udtalen af *Vorurteile* og *Klasse*.</p>
+                
+                <div class="space-y-4">
+                    <div class="p-4 bg-slate-800 rounded-xl border border-slate-700">
+                        <p class="text-xs text-indigo-400 font-bold uppercase mb-1">Tema: Assimilation slår fejl</p>
+                        <p class="font-medium text-sm">Die Assimilation der Familie scheitert, weil die Gesellschaft sie nicht akzeptiert.</p>
+                    </div>
+                    <div class="p-4 bg-slate-800 rounded-xl border border-slate-700">
+                        <p class="text-xs text-indigo-400 font-bold uppercase mb-1">Tema: Viceværtens Fordomme</p>
+                        <p class="font-medium text-sm">Die Hausverwalterin und die Nachbarn haben tiefe Vorurteile gegen das "Barackenpack".</p>
+                    </div>
+                    <div class="p-4 bg-slate-800 rounded-xl border border-slate-700">
+                        <p class="text-xs text-indigo-400 font-bold uppercase mb-1">Tema: Social Klasse (Perspektivering)</p>
+                        <p class="font-medium text-sm">Der Text zeigt, dass Ausgrenzung oft mit der sozialen Klasse zusammenhängt.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <div class="flex items-center gap-4 mb-6 mt-8">
+                <span class="px-3 py-1 bg-slate-200 text-slate-700 font-bold uppercase tracking-widest text-xs rounded-full">Ordforråd</span>
+                <h3 class="text-2xl font-black text-slate-800 tracking-tight">Gloser til Teksten</h3>
+            </div>
+            
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="flashcard-container" onclick="this.classList.toggle('flipped')">
+                    <div class="flashcard">
+                        <div class="flashcard-front"><span class="font-bold text-lg">Barak-pakket</span><span class="text-xs text-slate-400 mt-2">(Nedsættende ord for fattige)</span></div>
+                        <div class="flashcard-back"><span class="font-bold text-lg">das Barackenpack</span></div>
+                    </div>
+                </div>
+                <div class="flashcard-container" onclick="this.classList.toggle('flipped')">
+                    <div class="flashcard">
+                        <div class="flashcard-front"><span class="font-bold text-lg">Viceværten</span><span class="text-xs text-slate-400 mt-2">Klik for at vende</span></div>
+                        <div class="flashcard-back"><span class="font-bold text-lg">die Hausverwalterin</span></div>
+                    </div>
+                </div>
+                <div class="flashcard-container" onclick="this.classList.toggle('flipped')">
+                    <div class="flashcard">
+                        <div class="flashcard-front"><span class="font-bold text-lg text-center px-2">Misundelig / Skadefro</span></div>
+                        <div class="flashcard-back"><span class="font-bold text-lg text-center px-2">neidisch / schadenfroh</span></div>
+                    </div>
+                </div>
+                <div class="flashcard-container" onclick="this.classList.toggle('flipped')">
+                    <div class="flashcard">
+                        <div class="flashcard-front"><span class="font-bold text-lg">At vække opsigt (stikke ud)</span></div>
+                        <div class="flashcard-back"><span class="font-bold text-lg">auffallen</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="glass-panel border-indigo-200 bg-indigo-50/50 relative overflow-hidden">
+            <!-- Dekorativ blob indeni kortet -->
+            <div class="absolute -right-20 -top-20 w-64 h-64 bg-indigo-200/50 rounded-full blur-3xl pointer-events-none"></div>
+            
+            <div class="relative z-10 max-w-3xl mx-auto text-center">
+                <span class="inline-block px-3 py-1 bg-white text-indigo-600 border border-indigo-200 font-black uppercase tracking-widest text-[10px] rounded-full mb-4 shadow-sm">AI Coach Simulation</span>
+                <h3 class="text-3xl font-black text-slate-800 tracking-tight mb-2">Argumentations-Træner</h3>
+                <p class="text-slate-500 font-medium mb-8">For at score topkarakterer skal dine argumenter hænge logisk sammen. Træn brugen af bindeord (konjunktioner) som <strong>weil</strong> (fordi), <strong>obwohl</strong> (selvom) og <strong>aber</strong> (men). Vælg det korrekte ord til at fuldende analysen.</p>
+                
+                <div class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-slate-100 text-left mb-6">
+                    
+                    <div class="mb-8">
+                        <span id="quiz-question-counter" class="text-xs font-bold text-indigo-500 uppercase tracking-widest block mb-2">Spørgsmål 1 af 4</span>
+                        <h4 id="quiz-question-text" class="text-xl md:text-2xl font-black text-slate-800 leading-snug">
+                            Die Familie kauft einen teuren Teppich, <span class="text-indigo-400 border-b-2 border-dashed border-indigo-300 pb-1 px-2">_____</span> die Hausverwalterin beschwert sich trotzdem über den Lärm.
+                        </h4>
+                    </div>
+                    
+                    <div id="quiz-options" class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-2">
+                        <!-- Options injected by JS -->
+                    </div>
+                    
+                    <div id="quiz-feedback" class="mt-4 text-center h-6 text-lg hidden"></div>
+                </div>
+                
+                <!-- Dots for progress -->
+                <div class="flex justify-center gap-2">
+                    <div class="w-2 h-2 rounded-full bg-indigo-500 transition-colors" id="dot-0"></div>
+                    <div class="w-2 h-2 rounded-full bg-slate-300 transition-colors" id="dot-1"></div>
+                    <div class="w-2 h-2 rounded-full bg-slate-300 transition-colors" id="dot-2"></div>
+                    <div class="w-2 h-2 rounded-full bg-slate-300 transition-colors" id="dot-3"></div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        const quizData = [
+            {
+                text: 'Die Familie kauft einen teuren Teppich, <span class="text-indigo-400 border-b-2 border-dashed border-indigo-300 pb-1 px-2">_____</span> die Hausverwalterin beschwert sich trotzdem über den Lärm.',
+                options: ['aber', 'weil', 'dass'],
+                correctIndex: 0,
+                hint: "'Aber' (men) bruges her for at vise en modsætning. De gør noget godt, MEN hun klager alligevel."
+            },
+            {
+                text: 'Die Assimilation scheitert, <span class="text-indigo-400 border-b-2 border-dashed border-indigo-300 pb-1 px-2">_____</span> die Nachbarn voller Vorurteile sind.',
+                options: ['obwohl', 'weil', 'und'],
+                correctIndex: 1,
+                hint: "'Weil' (fordi) angiver årsagen til, at deres tilpasning mislykkes. Husk verbet (sind) står til sidst!"
+            },
+            {
+                text: '<span class="text-indigo-400 border-b-2 border-dashed border-indigo-300 pb-1 px-2">_____</span> die Mutter abends extra arbeitet, haben sie nicht genug Geld für neue Möbel.',
+                options: ['Weil', 'Obwohl', 'Deshalb'],
+                correctIndex: 1,
+                hint: "'Obwohl' (selvom) bruges til en indrømmelsessætning. SELVOM hun arbejder ekstra, har de ikke penge nok."
+            },
+            {
+                text: 'Die Nachbarn in den Baracken freuen sich, <span class="text-indigo-400 border-b-2 border-dashed border-indigo-300 pb-1 px-2">_____</span> die Familie am Ende zurückkehrt.',
+                options: ['obwohl', 'aber', 'dass'],
+                correctIndex: 2,
+                hint: "'Dass' (at) indleder en almindelig genstandsledsætning. De glæder sig over, AT familien vender tilbage."
+            }
+        ];
+
+        let currentQuestion = 0;
+        let isAnswered = false;
+        
+        const questionTextEl = document.getElementById('quiz-question-text');
+        const questionCounterEl = document.getElementById('quiz-question-counter');
+        const optionsContainer = document.getElementById('quiz-options');
+        const feedbackEl = document.getElementById('quiz-feedback');
+
+        function loadQuestion() {
+            isAnswered = false;
+            const q = quizData[currentQuestion];
+            
+            questionCounterEl.textContent = `Analytisk Argument ${currentQuestion + 1} af ${quizData.length}`;
+            questionTextEl.innerHTML = q.text;
+            feedbackEl.classList.add('hidden');
+            
+            // Generate options
+            optionsContainer.innerHTML = '';
+            q.options.forEach((opt, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'quiz-option';
+                btn.innerHTML = `<span class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-sm">${String.fromCharCode(65 + index)}</span> ${opt}`;
+                btn.onclick = () => handleAnswer(index, btn);
+                optionsContainer.appendChild(btn);
+            });
+            
+            // Update dots
+            for(let i=0; i<4; i++) {
+                document.getElementById(`dot-${i}`).className = `w-2 h-2 rounded-full transition-colors ${i <= currentQuestion ? 'bg-indigo-500' : 'bg-slate-300'}`;
+            }
+        }
+
+        function handleAnswer(selectedIndex, btnElement) {
+            if(isAnswered) return;
+            isAnswered = true;
+            
+            const q = quizData[currentQuestion];
+            const allButtons = optionsContainer.querySelectorAll('button');
+            
+            feedbackEl.classList.remove('hidden');
+            
+            if (selectedIndex === q.correctIndex) {
+                btnElement.classList.add('correct');
+                feedbackEl.innerHTML = '🎯 <strong>Ganz genau!</strong> Det giver logisk mening.';
+                feedbackEl.className = 'mt-4 text-center h-6 text-lg feedback-correct';
+                
+                // Set the missing word into the text
+                questionTextEl.innerHTML = q.text.replace('<span class="text-indigo-400 border-b-2 border-dashed border-indigo-300 pb-1 px-2">_____</span>', `<span class="text-indigo-600 border-b-2 border-indigo-500 pb-1 px-2">${q.options[q.correctIndex]}</span>`);
+                
+                setTimeout(() => {
+                    currentQuestion++;
+                    if (currentQuestion < quizData.length) {
+                        loadQuestion();
+                    } else {
+                        questionCounterEl.textContent = "Fantastisk!";
+                        questionTextEl.innerHTML = "Du har fuldstændig styr på bindeordene (Konjunktionen)! 🎉";
+                        optionsContainer.innerHTML = '';
+                        feedbackEl.innerHTML = 'Klar til at argumentere knivskarpt til eksamen.';
+                        feedbackEl.className = 'mt-4 text-center h-6 text-lg font-bold text-indigo-600';
+                    }
+                }, 2000);
+            } else {
+                btnElement.classList.add('wrong');
+                feedbackEl.innerHTML = `❌ <strong>Nej.</strong> ${q.hint}`;
+                feedbackEl.className = 'mt-4 text-center h-6 text-lg feedback-wrong';
+                
+                // Allow them to try again
+                setTimeout(() => {
+                    btnElement.classList.remove('wrong');
+                    isAnswered = false;
+                    feedbackEl.classList.add('hidden');
+                }, 2500);
+            }
+        }
+
+        // Initialize
+        loadQuestion();
+    </script>
+</body>
+</html>

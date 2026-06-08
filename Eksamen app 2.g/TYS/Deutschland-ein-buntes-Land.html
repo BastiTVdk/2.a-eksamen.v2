@@ -1,410 +1,373 @@
 <!DOCTYPE html>
-<html lang="da" class="dark">
+<html lang="da">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Deutschland ein buntes Land | Tysk Mundtlig STX B</title>
+    <title>Buntes Land Quest | 2.g SAG</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        darkBg: '#0b0f1a',
-                        darkCard: 'rgba(30, 41, 59, 0.4)',
-                        lightBg: '#f8fafc',
-                    }
-                }
-            }
-        }
-    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
     <style>
-        body { 
-            font-family: 'Inter', sans-serif; 
-            transition: background-color 0.3s ease, color 0.3s ease;
-            margin: 0;
-            overflow-x: hidden;
-        }
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 1.5rem;
-        }
-        .tile {
-            backdrop-filter: blur(10px);
-            border-radius: 1.5rem;
-            padding: 2rem;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            position: relative;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-        }
-        .tile:hover {
-            transform: translateY(-5px);
-            border-color: rgba(16, 185, 129, 0.3);
-            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.2);
-        }
-        .glass-nav {
-            backdrop-filter: blur(16px);
-        }
-        .badge {
-            font-size: 0.65rem;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            padding: 0.3rem 0.8rem;
-            border-radius: 2rem;
-            font-weight: 800;
-            margin-bottom: 1rem;
-            display: inline-block;
-        }
-        .quote-box {
-            border-left: 4px solid currentColor;
-            padding-left: 1rem;
-            font-style: italic;
-            margin-top: 1rem;
+        :root {
+            --primary: #e11d48; /* Tysk rød accent */
+            --primary-glow: rgba(225, 29, 72, 0.15);
+            --slate-bg: #fffbfb; /* Meget lys rød-tonet baggrund */
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
         }
 
-        /* Flashcard CSS */
-        .flashcard-container {
-            perspective: 1000px;
-            cursor: pointer;
-            height: 120px;
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--slate-bg);
+            color: #0f172a;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
         }
-        .flashcard {
+
+        #particle-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            pointer-events: none;
+            opacity: 0.25;
+        }
+
+        .bg-blob {
+            position: fixed;
+            z-index: -1;
+            filter: blur(120px);
+            opacity: 0.08;
+            pointer-events: none;
+            border-radius: 50%;
+            animation: drift 25s infinite alternate ease-in-out;
+        }
+
+        @keyframes drift {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(60px, -90px) scale(1.2); }
+        }
+
+        .section-gastarbeiter { --accent: #1e293b; --accent-glow: rgba(30, 41, 59, 0.15); }
+        .section-integration { --accent: #e11d48; --accent-glow: rgba(225, 29, 72, 0.2); }
+        .section-vietnam { --accent: #d97706; --accent-glow: rgba(217, 119, 6, 0.2); }
+        .section-kultur { --accent: #059669; --accent-glow: rgba(5, 150, 105, 0.2); }
+
+        .quest-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            border: 1px solid #fce8eb;
+            border-radius: 2rem;
+            padding: 1.75rem;
+            transition: all 0.4s var(--ease-out-expo);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
             position: relative;
-            width: 100%;
-            height: 100%;
-            text-align: center;
-            transition: transform 0.6s;
-            transform-style: preserve-3d;
+            overflow: hidden;
+            border-left: 6px solid var(--accent);
         }
-        .flashcard-container.flipped .flashcard {
-            transform: rotateY(180deg);
+
+        .quest-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 20px 40px -10px var(--accent-glow);
+            border-color: var(--accent);
         }
-        .flashcard-front, .flashcard-back {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            backface-visibility: hidden;
+
+        .btn-start {
+            @apply w-full bg-slate-50 text-slate-700 z-10;
+            margin-top: auto;
             display: flex;
             align-items: center;
             justify-content: center;
-            padding: 1rem;
-            border-radius: 1rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            gap: 0.5rem;
+            padding: 0.75rem 1rem;
+            border-radius: 9999px;
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-size: 0.75rem;
+            white-space: nowrap;
         }
-        .flashcard-front {
-            background-color: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255,255,255,0.1);
+
+        .btn-start svg {
+            flex-shrink: 0;
+            width: 28px;
+            height: 28px;
+            padding: 6px;
+            border-radius: 50%;
+            background-color: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            color: var(--accent);
+            transition: all 0.3s ease;
         }
-        .flashcard-back {
-            background-color: #10b981;
+
+        .btn-start:hover {
+            border-color: var(--accent);
+            background: white;
+            box-shadow: 0 8px 25px -5px var(--accent-glow);
+            color: var(--accent);
+        }
+
+        .btn-start:hover svg {
+            background-color: var(--accent);
             color: white;
-            transform: rotateY(180deg);
-            border: 1px solid #059669;
+            transform: translateX(4px);
         }
-        .dark .flashcard-front {
-            background-color: rgba(30, 41, 59, 0.8);
+
+        #typewriter::after {
+            content: "|";
+            animation: blink 1s step-end infinite;
+            margin-left: 2px;
+            color: var(--primary);
+        }
+
+        @keyframes blink {
+            from, to { opacity: 1; }
+            50% { opacity: 0; }
         }
     </style>
 </head>
-<body class="min-h-screen bg-lightBg text-slate-900 dark:bg-darkBg dark:text-slate-100">
+<body class="min-h-screen pb-20">
 
-    <!-- Navigation -->
-    <nav class="glass-nav sticky top-0 z-50 px-4 md:px-8 py-4 bg-white/80 dark:bg-darkBg/80 border-b border-slate-200 dark:border-white/5">
-        <div class="max-w-7xl mx-auto flex justify-between items-center">
+    <canvas id="particle-canvas"></canvas>
+
+    <div class="bg-blob w-[600px] h-[600px] bg-amber-200 top-[-10%] left-[-10%]"></div>
+    <div class="bg-blob w-[500px] h-[500px] bg-rose-300 bottom-[20%] right-[-5%]"></div>
+
+    <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-rose-100 shadow-sm">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
             <div class="flex items-center gap-4">
-                <div class="bg-green-600 p-2.5 rounded-xl shadow-lg flex items-center justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                <div class="w-12 h-12 bg-gradient-to-br from-slate-900 via-rose-600 to-amber-500 rounded-2xl flex items-center justify-center shadow-lg shadow-rose-500/20">
+                    <span class="text-white font-black text-xl italic">DE</span>
                 </div>
                 <div>
-                    <h1 class="text-xl font-black tracking-tighter uppercase">Ein buntes <span class="text-green-500">Land</span></h1>
-                    <p class="text-xs text-slate-500 font-bold tracking-widest uppercase">Eksamens-Dashboard</p>
+                    <span class="text-xl font-black tracking-tight block leading-none text-slate-900 uppercase">Buntes <span class="text-rose-600">Land</span></span>
+                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">2.g Sankt Annæ Gymnasium</span>
                 </div>
             </div>
-            <button id="theme-toggle" class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-white/10 transition-transform hover:scale-110 focus:outline-none">
-                <svg id="sun-icon" class="hidden w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707m12.728 12.728L12 12l.01.01H12z"></path></svg>
-                <svg id="moon-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
-            </button>
+            <div class="flex items-center gap-6 hidden sm:flex">
+                <a href="Tysk-Index.html" class="text-xs font-black text-slate-500 hover:text-rose-600 transition uppercase tracking-widest flex items-center gap-1">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+                    Oversigt
+                </a>
+                <a href="grammatik-trainer.html" class="text-xs font-black text-slate-500 hover:text-rose-600 transition uppercase tracking-widest">Präteritum Træner</a>
+                <div class="h-6 w-px bg-slate-200"></div>
+                <a href="wortschatz.html" class="px-6 py-2.5 bg-slate-900 text-white rounded-full text-xs font-bold hover:bg-rose-600 transition-all active:scale-95 uppercase tracking-wider shadow-lg">Guldgloser</a>
+            </div>
         </div>
     </nav>
 
-    <main class="max-w-7xl mx-auto px-4 md:px-8 mt-12 pb-20">
+    <header class="max-w-7xl mx-auto px-6 pt-24 pb-20 text-center relative">
+        <div class="inline-block mb-4 px-4 py-1.5 rounded-full bg-rose-50 border border-rose-100 text-rose-600 font-bold text-xs tracking-widest uppercase shadow-sm">
+            Mundtlig Tysk STX B
+        </div>
+        <h1 class="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter text-slate-900 mb-8 uppercase leading-[0.9]">
+            Deutschland <br><span id="typewriter" class="text-transparent bg-clip-text bg-gradient-to-r from-rose-600 to-amber-500 italic">Ein buntes Land</span>
+        </h1>
+        <p class="text-slate-500 text-lg md:text-2xl max-w-3xl mx-auto leading-relaxed font-medium">
+            Din interaktive portal til tyskforløbet om indvandring, identitetskampe og begrebet „Heimat“. Fra Gastarbeiter-boomet til det moderne, multikulturelle samfund.
+        </p>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-6 space-y-32">
         
-        <!-- Hero Section -->
-        <div class="mb-12 border-l-8 border-green-600 pl-6 py-2">
-            <span class="badge bg-green-100 text-green-700 dark:bg-green-500/10 dark:text-green-400 border border-green-200 dark:border-green-500/20">Modul: Integration & Identitet</span>
-            <h2 class="text-4xl md:text-6xl font-black mb-4 tracking-tight uppercase leading-none">Deutschland ist <br><span class="text-green-600 italic">ein Einwanderungsland</span></h2>
-            <p class="text-slate-600 dark:text-slate-400 text-lg max-w-3xl font-medium leading-relaxed">
-                Fra Gastarbeiter i Wirtschaftswunder-tiden til nutidens multikulturelle samfund. Et komplet overblik over tekster, film og analytiske pointer til din mundtlige STX B eksamen.
-            </p>
-        </div>
-
-        <div class="dashboard-grid mb-12">
-            
-            <!-- Das Wunder von Kreuzberg vs Antonella -->
-            <div class="tile bg-white/80 dark:bg-slate-800/40 border border-slate-200 dark:border-white/5 shadow-sm md:col-span-2 lg:col-span-3">
-                <h4 class="text-2xl font-black mb-6 uppercase italic text-blue-500 flex items-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M16 3h5v5"/><path d="M8 3H3v5"/><path d="M21 16v5h-5"/><path d="M3 16v5h5"/><path d="M12 8v8"/><path d="M8 12h8"/></svg>
-                    Kontrasten: Gelungene vs. Misslungene Integration
-                </h4>
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
-                    <!-- Succesen -->
-                    <div class="space-y-4">
-                        <div class="flex items-center gap-3 border-b border-slate-200 dark:border-white/10 pb-3">
-                            <div class="w-10 h-10 rounded-xl bg-green-500/20 flex items-center justify-center text-green-600 dark:text-green-400 font-bold text-xl">1</div>
-                            <div>
-                                <h5 class="font-black uppercase text-lg text-slate-800 dark:text-white">Das Wunder von Kreuzberg</h5>
-                                <p class="text-xs font-bold text-green-600 dark:text-green-400">Succeshistorien (Gelungene Integration)</p>
-                            </div>
-                        </div>
-                        <ul class="space-y-3 text-sm leading-relaxed text-slate-700 dark:text-slate-300">
-                            <li><strong>1. Generation (Cennet & Hassan):</strong> Kommer fra Tyrkiet. Cennet insisterer på at lære tysk (skriver gloser på armen) for at opnå selvstændighed. De arbejder ekstremt hårdt for børnenes fremtid.</li>
-                            <li><strong>2. Generation (Hatice):</strong> Uddanner sig til læge. Føler sig tysk, men har den tyrkiske kultur som en "melankoli" i hjertet. Fokuserer på humanistiske værdier i opdragelsen.</li>
-                            <li><strong>3. Generation (Børnebørn):</strong> Taler perfekt tysk. Ser ikke deres identitet som et problem – de er simpelthen bare sig selv i et multikulturelt Tyskland.</li>
-                        </ul>
-                        <div class="quote-box text-green-600 dark:text-green-400">
-                            "Nøglen til succes er sproget (Die Sprache) og tilliden til uddannelsessystemet (Bildung)."
-                        </div>
-                    </div>
-                    
-                    <!-- Tragedien -->
-                    <div class="space-y-4">
-                        <div class="flex items-center gap-3 border-b border-slate-200 dark:border-white/10 pb-3">
-                            <div class="w-10 h-10 rounded-xl bg-red-500/20 flex items-center justify-center text-red-600 dark:text-red-400 font-bold text-xl">2</div>
-                            <div>
-                                <h5 class="font-black uppercase text-lg text-slate-800 dark:text-white">Antonella</h5>
-                                <p class="text-xs font-bold text-red-600 dark:text-red-400">Tragedien (Misslungene Integration)</p>
-                            </div>
-                        </div>
-                        <ul class="space-y-3 text-sm leading-relaxed text-slate-700 dark:text-slate-300">
-                            <li><strong>Sprogbarrieren:</strong> Antonella (italiensk gæstearbejderbarn) forstår ikke tysk. Det ødelægger hendes skolegang, selv i matematik (tekstopgaver).</li>
-                            <li><strong>Isolation & Fordomme:</strong> Læreren opgiver hende. Børnene kalder hende racistiske skældsord ("Spaghettifresser", "Ithaker") og isolerer hende fuldstændigt.</li>
-                            <li><strong>Klimaks:</strong> Hun beskyldes falsk for at stjæle en fyldepen. I panik flygter hun og bliver kørt ned. Selv efter ulykken mødes hun med fordomme fra de voksne ("hvor de kommer fra, findes der kun æsler").</li>
-                        </ul>
-                        <div class="quote-box text-red-600 dark:text-red-400">
-                            "Teksten viser, hvordan manglende sprogkundskaber og samfundets fordomme (Vorurteile) fører til total udstødelse (Ausgrenzung)."
-                        </div>
-                    </div>
-                </div>
+        <section id="gastarbeiter" class="section-gastarbeiter scroll-mt-28">
+            <div class="flex items-center gap-6 mb-12">
+                <div class="w-16 h-1.5 bg-slate-800 rounded-full shadow-sm"></div>
+                <h2 class="text-xs font-black uppercase tracking-[0.4em] text-slate-500/80">01. Gastarbeiter & Oprindelige Udfordringer</h2>
             </div>
-
-            <!-- Drei Straßen weiter -->
-            <div class="tile bg-white/80 dark:bg-slate-800/40 border border-slate-200 dark:border-white/5 shadow-sm">
-                <h4 class="text-xl font-black mb-4 uppercase italic text-purple-500 flex items-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-                    Drei Straßen weiter
-                </h4>
-                <div class="space-y-3 text-sm text-slate-700 dark:text-slate-300">
-                    <p><strong>Tema: Social arv og klassediskrimination.</strong></p>
-                    <p>En familie flytter fra usle barakker til en rigtig 4-værelses lejlighed for at forbedre deres liv. Men de møder en massiv <strong>usynlig mur</strong> af fordomme fra naboerne og viceværten.</p>
-                    <ul class="list-disc pl-5 space-y-1">
-                        <li>De kaldes "Barackenpack".</li>
-                        <li>De forsøger desperat at tilpasse sig (køber tæpper for lånte penge, moderen tager natarbejde).</li>
-                        <li>Uanset hvad de gør, bliver de afvist. De flytter til sidst tilbage til barakkerne.</li>
-                    </ul>
-                    <div class="quote-box text-purple-500 mt-4">
-                        "Assimilation fejler, fordi majoritetssamfundet nægter at acceptere dem på grund af deres sociale klasse."
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <a href="tysk-antonella.html" class="quest-card group">
+                    <div>
+                        <div class="w-12 h-12 rounded-xl bg-slate-50 text-slate-800 flex items-center justify-center mb-6 shadow-sm group-hover:scale-110 transition-transform">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-4 italic tracking-tight text-slate-800">Antonella</h3>
+                        <p class="text-sm text-slate-500 leading-relaxed font-medium">Analyse af Frederik Hetmanns novelle om den italienske gæstearbejderpige. Fokus på sprogbarrierer, institutionaliseret svigt, racisme og den ultimative integrationskatastrofe.</p>
                     </div>
-                </div>
+                    <div class="btn-start">Åbn Analyse <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></div>
+                </a>
+                <a href="tysk-drei-strassen.html" class="quest-card group">
+                    <div>
+                        <div class="w-12 h-12 rounded-xl bg-slate-50 text-slate-800 flex items-center justify-center mb-6 shadow-sm group-hover:scale-110 transition-transform">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-4 italic tracking-tight text-slate-800">Drei Straßen weiter</h3>
+                        <p class="text-sm text-slate-500 leading-relaxed font-medium">Analyse af Ursula Wölfels novelle. Undersøgelse af sociale fordomme, presset for assimilation og assimilationens pris, når man forsøger at flytte væk fra barakkerne.</p>
+                    </div>
+                    <div class="btn-start">Åbn Analyse <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></div>
+                </a>
             </div>
+        </section>
 
-            <!-- Vietnamesen in Deutschland -->
-            <div class="tile bg-white/80 dark:bg-slate-800/40 border border-slate-200 dark:border-white/5 shadow-sm">
-                <h4 class="text-xl font-black mb-4 uppercase italic text-amber-500 flex items-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
-                    Øst vs. Vest (Vietnamesen)
-                </h4>
-                <div class="space-y-3 text-sm text-slate-700 dark:text-slate-300">
-                    <p>Historien om vietnameserne i Tyskland er delt af den Kolde Krig:</p>
-                    <div class="mt-3 p-3 bg-slate-100 dark:bg-slate-700/50 rounded-lg border border-slate-200 dark:border-slate-600">
-                        <strong class="text-amber-600 dark:text-amber-400 uppercase text-xs block mb-1">DDR (Østtyskland): Vertragsarbeiter</strong>
-                        Kom fra 50'erne til 80'erne på tidsbegrænsede kontrakter. Levede ofte isoleret fra tyskerne.
-                    </div>
-                    <div class="mt-3 p-3 bg-slate-100 dark:bg-slate-700/50 rounded-lg border border-slate-200 dark:border-slate-600">
-                        <strong class="text-amber-600 dark:text-amber-400 uppercase text-xs block mb-1">BRD (Vesttyskland): Boat People</strong>
-                        Flygtede i 70'erne og 80'erne fra Vietnamkrigen. Blev anerkendt som asylansøgere.
-                    </div>
-                    <p class="mt-3 font-bold">Monsieur Vuong (Videoportræt/Tekst):</p>
-                    <p>Viser hvordan mad og gastronomi kan skabe kulturel brobygning. Den vietnamesiske restaurant bliver et symbol på succesfuld integration.</p>
-                </div>
+        <section id="integration" class="section-integration scroll-mt-28">
+            <div class="flex items-center gap-6 mb-12">
+                <div class="w-16 h-1.5 bg-rose-500 rounded-full shadow-sm"></div>
+                <h2 class="text-xs font-black uppercase tracking-[0.4em] text-rose-500/80">02. Generationsskifter & Gelungene Integration</h2>
             </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <a href="tysk-wunder-kreuzberg.html" class="quest-card group">
+                    <div>
+                        <div class="w-12 h-12 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center mb-6 shadow-sm group-hover:scale-110 transition-transform">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-4 italic tracking-tight text-slate-800">Das Wunder von Kreuzberg</h3>
+                        <p class="text-sm text-slate-500 leading-relaxed font-medium">Et tre-generations-portræt af den tyrkisk-tyske familie Kadem. Fra Cennets radikale sprogkamp på syfabrikken til børnebørnenes flydende, multikulturelle selvforståelse.</p>
+                    </div>
+                    <div class="btn-start">Åbn Analyse <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></div>
+                </a>
+                <a href="tysk-almanya.html" class="quest-card group">
+                    <div>
+                        <div class="w-12 h-12 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center mb-6 shadow-sm group-hover:scale-110 transition-transform">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-4 italic tracking-tight text-slate-800">Almanya – Willkommen in DE</h3>
+                        <p class="text-sm text-slate-500 leading-relaxed font-medium">Analyse af spillefilmen af Yasemin Samdereli. Undersøgelse af Hüseyin Yilmaz' rejse, kultursmæk, identitetskriser på tværs af tre generationer og den humoristiske afmontering af fordomme.</p>
+                    </div>
+                    <div class="btn-start">Åbn Analyse <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></div>
+                </a>
+            </div>
+        </section>
 
-            <!-- Film: Almanya -->
-            <div class="tile bg-slate-900 text-white shadow-xl md:col-span-2">
-                <h4 class="text-2xl font-black mb-4 uppercase italic text-pink-500 flex items-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="2.18" ry="2.18"/><line x1="7" y1="2" x2="7" y2="22"/><line x1="17" y1="2" x2="17" y2="22"/><line x1="2" y1="12" x2="22" y2="12"/><line x1="2" y1="7" x2="7" y2="7"/><line x1="2" y1="17" x2="7" y2="17"/><line x1="17" y1="17" x2="22" y2="17"/><line x1="17" y1="7" x2="22" y2="7"/></svg>
-                    Filmanalyse: Almanya – Willkommen in Deutschland
-                </h4>
-                <p class="text-slate-300 text-sm mb-6 max-w-2xl">En humoristisk og hjertevarm film, der spejler integrationsprocessen over tre generationer af den tyrkisk-tyske familie Yilmaz.</p>
-                
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm">
-                    <div class="bg-white/10 p-4 rounded-xl border border-white/20">
-                        <h6 class="font-bold uppercase text-pink-400 mb-2">1. Gen: Hüseyin</h6>
-                        <p class="text-slate-300 leading-relaxed">Kom i 1964 som gæstearbejder nr. 1.000.001. Oplever "Kulturschock" (kæmpe rotter, mærkelig mad, Jesus på korset). Nu, som ældre, køber han et hus i Tyrkiet for at finde tilbage til sine rødder.</p>
-                    </div>
-                    <div class="bg-white/10 p-4 rounded-xl border border-white/20">
-                        <h6 class="font-bold uppercase text-pink-400 mb-2">2. Gen: Børnene</h6>
-                        <p class="text-slate-300 leading-relaxed">Fanget mellem kulturer (Zerrissenheit). De vokser op i Tyskland, men opdrages med tyrkiske værdier. Eksempelvis bliver datteren gravid med en brite, hvilket udfordrer patriarkatet.</p>
-                    </div>
-                    <div class="bg-white/10 p-4 rounded-xl border border-white/20">
-                        <h6 class="font-bold uppercase text-pink-400 mb-2">3. Gen: Cenk</h6>
-                        <p class="text-slate-300 leading-relaxed">Seksårige Cenk bliver ikke valgt til hverken det tyrkiske eller tyske fodboldhold. Han spørger: <em>"Wer bin ich eigentlich? Türke oder Deutscher?"</em>. Filmen konkluderer, at man kan være begge dele.</p>
-                    </div>
-                </div>
+        <section id="vietnam" class="section-vietnam scroll-mt-28">
+            <div class="flex items-center gap-6 mb-12">
+                <div class="w-16 h-1.5 bg-amber-500 rounded-full shadow-sm"></div>
+                <h2 class="text-xs font-black uppercase tracking-[0.4em] text-amber-500/80">03. Det Vietnamesiske Mindretal & Systemforskelle</h2>
             </div>
-        </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <a href="tysk-vietnamesen-de.html" class="quest-card group">
+                    <div>
+                        <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center mb-6 shadow-sm group-hover:scale-110 transition-transform">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 20l-5.447-2.724A2 2 0 013 15.447V6.553a2 2 0 011.553-1.958l6-1.5a2 2 0 011.894.448L15 6l5.447-2.724A2 2 0 0121 5.053v8.894a2 2 0 01-1.106 1.789L15 18l-6 2z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-4 italic tracking-tight text-slate-800">Vietnamesen in Deutschland</h3>
+                        <p class="text-sm text-slate-500 leading-relaxed font-medium">Belysning af den historiske opdeling af indvandringen. Kontrasten mellem DDR's kontrollerede „Vertragsarbeiter“ og BRD's flygtende „Boat People“ under den kolde krig.</p>
+                    </div>
+                    <div class="btn-start">Åbn Analyse <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></div>
+                </a>
+            </div>
+        </section>
 
-        <!-- Interaktiv Eksamens-træner (Flashcards) -->
-        <div class="mb-12">
-            <h3 class="text-3xl font-black mb-6 uppercase tracking-tight flex items-center gap-3">
-                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                Interaktiv Eksamens-træner
-            </h3>
-            <p class="text-slate-600 dark:text-slate-400 mb-6">Klik på kortene for at øve vigtige begreber og formuleringer (Redemittel) til din fremlæggelse. Brug ledsætninger (weil/dass) til eksamen!</p>
-            
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                <!-- Card 1 -->
-                <div class="flashcard-container" onclick="this.classList.toggle('flipped')">
-                    <div class="flashcard">
-                        <div class="flashcard-front">
-                            <span class="font-bold text-lg">Fordomme</span>
-                        </div>
-                        <div class="flashcard-back">
-                            <span class="font-bold text-lg">die Vorurteile</span>
-                        </div>
-                    </div>
-                </div>
-                <!-- Card 2 -->
-                <div class="flashcard-container" onclick="this.classList.toggle('flipped')">
-                    <div class="flashcard">
-                        <div class="flashcard-front">
-                            <span class="font-bold text-lg">Integrationen lykkes, fordi...</span>
-                        </div>
-                        <div class="flashcard-back flex-col">
-                            <span class="font-bold text-sm">Die Integration gelingt, weil...</span>
-                            <span class="text-xs mt-1 opacity-80">(Husk verbet til sidst!)</span>
-                        </div>
-                    </div>
-                </div>
-                <!-- Card 3 -->
-                <div class="flashcard-container" onclick="this.classList.toggle('flipped')">
-                    <div class="flashcard">
-                        <div class="flashcard-front">
-                            <span class="font-bold text-lg">Gæstearbejder</span>
-                        </div>
-                        <div class="flashcard-back">
-                            <span class="font-bold text-lg">der Gastarbeiter</span>
-                        </div>
-                    </div>
-                </div>
-                <!-- Card 4 -->
-                <div class="flashcard-container" onclick="this.classList.toggle('flipped')">
-                    <div class="flashcard">
-                        <div class="flashcard-front">
-                            <span class="font-bold text-lg">Jeg mener, at...</span>
-                        </div>
-                        <div class="flashcard-back flex-col">
-                            <span class="font-bold text-sm">Ich meine, dass...</span>
-                            <span class="text-xs mt-1 opacity-80">(Husk verbet til sidst!)</span>
-                        </div>
-                    </div>
-                </div>
-                <!-- Card 5 -->
-                <div class="flashcard-container" onclick="this.classList.toggle('flipped')">
-                    <div class="flashcard">
-                        <div class="flashcard-front">
-                            <span class="font-bold text-lg">Udstødelse</span>
-                        </div>
-                        <div class="flashcard-back">
-                            <span class="font-bold text-lg">die Ausgrenzung</span>
-                        </div>
-                    </div>
-                </div>
-                <!-- Card 6 -->
-                <div class="flashcard-container" onclick="this.classList.toggle('flipped')">
-                    <div class="flashcard">
-                        <div class="flashcard-front text-center">
-                            <span class="font-bold text-sm">Følelsen af at være splittet mellem kulturer</span>
-                        </div>
-                        <div class="flashcard-back">
-                            <span class="font-bold text-lg">die Zerrissenheit</span>
-                        </div>
-                    </div>
-                </div>
-                <!-- Card 7 -->
-                <div class="flashcard-container" onclick="this.classList.toggle('flipped')">
-                    <div class="flashcard">
-                        <div class="flashcard-front text-center">
-                            <span class="font-bold text-sm">Teksten handler om...</span>
-                        </div>
-                        <div class="flashcard-back">
-                            <span class="font-bold text-sm">Der Text handelt von (+ Dativ)</span>
-                        </div>
-                    </div>
-                </div>
-                <!-- Card 8 -->
-                <div class="flashcard-container" onclick="this.classList.toggle('flipped')">
-                    <div class="flashcard">
-                        <div class="flashcard-front">
-                            <span class="font-bold text-lg">Samfundet</span>
-                        </div>
-                        <div class="flashcard-back">
-                            <span class="font-bold text-lg">die Gesellschaft</span>
-                        </div>
-                    </div>
-                </div>
+        <section id="kultur" class="section-kultur scroll-mt-28">
+            <div class="flex items-center gap-6 mb-12">
+                <div class="w-16 h-1.5 bg-emerald-500 rounded-full shadow-sm"></div>
+                <h2 class="text-xs font-black uppercase tracking-[0.4em] text-emerald-500/80">04. Identitet Gennem Gastronomi</h2>
             </div>
-        </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                <a href="tysk-monsieur-vuong.html" class="quest-card group">
+                    <div>
+                        <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center mb-6 shadow-sm group-hover:scale-110 transition-transform">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-4 italic tracking-tight text-slate-800">Monsieur Vuong</h3>
+                        <p class="text-sm text-slate-500 leading-relaxed font-medium">Kogebogsuddrag og videoportræt fra Berlin. Fokus på, hvordan gastronomi, smage og dufte fungerer som en uformel og dybdegående brobygger til integration og accept i det tyske samfund.</p>
+                    </div>
+                    <div class="btn-start">Åbn Analyse <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></div>
+                </a>
+            </div>
+        </section>
 
     </main>
 
     <script>
-        const themeToggleBtn = document.getElementById('theme-toggle');
-        const sunIcon = document.getElementById('sun-icon');
-        const moonIcon = document.getElementById('moon-icon');
-        const html = document.documentElement;
+        // --- Typewriter Animation Logik ---
+        const words = ["Ein buntes Land", "Integration", "Heimat", "Gastarbeiter", "Identität", "Kulturschock", "Vertragsarbeiter"];
+        let wordIndex = 0;
+        let charIndex = 0;
+        let isDeleting = false;
+        const typewriterElement = document.getElementById('typewriter');
+        const typeSpeed = 140;
+        const backSpeed = 70;
+        const delay = 2200;
 
-        // Check for saved user preference, if any, on load of the website
-        if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-            html.classList.add('dark');
-            sunIcon.classList.remove('hidden');
-            moonIcon.classList.add('hidden');
-        } else {
-            html.classList.remove('dark');
-            sunIcon.classList.add('hidden');
-            moonIcon.classList.remove('hidden');
+        function type() {
+            const currentWord = words[wordIndex];
+            
+            if (isDeleting) {
+                typewriterElement.textContent = currentWord.substring(0, charIndex - 1);
+                charIndex--;
+            } else {
+                typewriterElement.textContent = currentWord.substring(0, charIndex + 1);
+                charIndex++;
+            }
+
+            let currentSpeed = isDeleting ? backSpeed : typeSpeed;
+
+            if (!isDeleting && charIndex === currentWord.length) {
+                isDeleting = true;
+                currentSpeed = delay;
+            } else if (isDeleting && charIndex === 0) {
+                isDeleting = false;
+                wordIndex = (wordIndex + 1) % words.length;
+                currentSpeed = 400;
+            }
+
+            setTimeout(type, currentSpeed);
         }
 
-        themeToggleBtn.addEventListener('click', function() {
-            // Toggle icons
-            sunIcon.classList.toggle('hidden');
-            moonIcon.classList.toggle('hidden');
+        // --- Partikel Animation ---
+        const canvas = document.getElementById('particle-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
 
-            // If is set in localstorage
-            if (localStorage.getItem('color-theme')) {
-                if (localStorage.getItem('color-theme') === 'light') {
-                    html.classList.add('dark');
-                    localStorage.setItem('color-theme', 'dark');
-                } else {
-                    html.classList.remove('dark');
-                    localStorage.setItem('color-theme', 'light');
-                }
-            } else {
-                // If not set in localstorage
-                if (html.classList.contains('dark')) {
-                    html.classList.remove('dark');
-                    localStorage.setItem('color-theme', 'light');
-                } else {
-                    html.classList.add('dark');
-                    localStorage.setItem('color-theme', 'dark');
-                }
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 1;
+                this.speedX = (Math.random() - 0.5) * 0.4;
+                this.speedY = (Math.random() - 0.5) * 0.4;
+                this.color = Math.random() > 0.5 ? '#e11d48' : '#d97706';
             }
-        });
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.x > canvas.width) this.x = 0;
+                if (this.x < 0) this.x = canvas.width;
+                if (this.y > canvas.height) this.y = 0;
+                if (this.y < 0) this.y = canvas.height;
+            }
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function initParticles() {
+            particles = [];
+            for (let i = 0; i < 45; i++) {
+                particles.push(new Particle());
+            }
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animateParticles);
+        }
+
+        window.addEventListener('resize', resize);
+        window.onload = () => {
+            resize();
+            initParticles();
+            animateParticles();
+            type();
+        };
     </script>
 </body>
 </html>

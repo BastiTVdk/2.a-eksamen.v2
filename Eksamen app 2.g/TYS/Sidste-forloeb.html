@@ -1,269 +1,555 @@
 <!DOCTYPE html>
-<html lang="da" class="dark">
+<html lang="da">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Weimarer Republik | Tysk Mundtlig 2.a</title>
+    <title>Weimarer Republik | Tysk 2.a</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        darkBg: '#0b0f1a',
-                        darkCard: 'rgba(30, 41, 59, 0.4)',
-                        lightBg: '#f8fafc',
-                    }
-                }
-            }
-        }
-    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+    
     <style>
-        body { 
-            font-family: 'Inter', sans-serif; 
-            transition: background-color 0.3s ease, color 0.3s ease;
-            margin: 0;
+        :root {
+            /* Weimar Tema: Lilla (Historie/Kultur) og Gylden (De brølende 20'ere) */
+            --primary: #a855f7; 
+            --primary-glow: rgba(168, 85, 247, 0.15);
+            --slate-bg: #fdfaff; 
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--slate-bg);
+            color: #1e293b;
             overflow-x: hidden;
+            scroll-behavior: smooth;
         }
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 1.5rem;
+
+        /* Partikel Canvas */
+        #particle-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            pointer-events: none;
+            opacity: 0.3;
         }
-        .tile {
-            backdrop-filter: blur(10px);
-            border-radius: 1.5rem;
-            padding: 2rem;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+
+        /* Dynamiske Baggrunds-blobs */
+        .bg-blob {
+            position: fixed;
+            z-index: -1;
+            filter: blur(120px);
+            opacity: 0.12;
+            pointer-events: none;
+            border-radius: 50%;
+            animation: drift 25s infinite alternate ease-in-out;
+        }
+
+        @keyframes drift {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(50px, -80px) scale(1.15); }
+        }
+
+        /* Tema-identitet for kort */
+        .section-historie { --accent: #f59e0b; --accent-glow: rgba(245, 158, 11, 0.2); }
+        .section-litteratur { --accent: #8b5cf6; --accent-glow: rgba(139, 92, 246, 0.2); }
+        .section-kunst { --accent: #e11d48; --accent-glow: rgba(225, 29, 72, 0.2); }
+        .section-film { --accent: #4f46e5; --accent-glow: rgba(79, 70, 229, 0.2); }
+
+        .quest-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            border: 1px solid #f0e6f5;
+            border-radius: 2rem;
+            padding: 1.75rem;
+            transition: all 0.4s var(--ease-out-expo);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
             position: relative;
             overflow: hidden;
+            border-left: 6px solid var(--accent);
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .quest-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 20px 40px -10px var(--accent-glow);
+            border-color: var(--accent);
+        }
+
+        .btn-start {
+            width: 100%;
+            background: #f8fafc;
+            color: #334155;
+            z-index: 10;
+            margin-top: 1.5rem;
             display: flex;
-            flex-direction: column;
-            height: 100%;
-        }
-        .tile:hover {
-            transform: translateY(-5px);
-            border-color: rgba(168, 85, 247, 0.3);
-        }
-        .glass-nav {
-            backdrop-filter: blur(16px);
-        }
-        .badge {
-            font-size: 0.65rem;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1rem;
+            border-radius: 9999px;
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 0.1em;
-            padding: 0.3rem 0.8rem;
-            border-radius: 2rem;
-            font-weight: 800;
-            margin-bottom: 1rem;
-            display: inline-block;
+            letter-spacing: 0.05em;
+            font-size: 0.75rem;
+            white-space: nowrap;
         }
-        .timeline-container {
-            display: flex;
-            flex-direction: column;
-            gap: 1rem;
-            border-left: 2px solid rgba(168, 85, 247, 0.3);
-            padding-left: 1.5rem;
-            margin-left: 0.5rem;
-        }
-        .timeline-item {
-            position: relative;
-        }
-        .timeline-item::before {
-            content: '';
-            position: absolute;
-            left: -1.9rem;
-            top: 0.5rem;
-            width: 10px;
-            height: 10px;
-            background: #a855f7;
+
+        .btn-start svg {
+            flex-shrink: 0;
+            width: 28px;
+            height: 28px;
+            padding: 6px;
             border-radius: 50%;
+            background-color: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            color: var(--accent);
+            transition: all 0.3s ease;
         }
-        .quote-box {
-            border-left: 4px solid #a855f7;
-            padding-left: 1rem;
-            font-style: italic;
+
+        .quest-card:hover .btn-start {
+            border-color: var(--accent);
+            background: white;
+            box-shadow: 0 8px 25px -5px var(--accent-glow);
+            color: var(--accent);
+        }
+
+        .quest-card:hover .btn-start svg {
+            background-color: var(--accent);
+            color: white;
+            transform: translateX(4px);
+        }
+
+        /* Gloser/Wortschatz kort */
+        .phrase-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.25rem;
+            border-radius: 1rem;
+            background: white;
+            border: 1px solid #e2e8f0;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+        .phrase-card:hover {
+            transform: translateY(-2px);
+            border-color: #a855f7;
+            box-shadow: 0 10px 15px -3px rgba(168, 85, 247, 0.1);
+        }
+        .phrase-card.copied {
+            background: #f0fdf4;
+            border-color: #22c55e;
+        }
+
+        #typewriter::after {
+            content: "|";
+            animation: blink 1s step-end infinite;
+            margin-left: 2px;
+            color: var(--primary);
+        }
+
+        @keyframes blink {
+            from, to { opacity: 1; }
+            50% { opacity: 0; }
         }
     </style>
 </head>
-<body class="min-h-screen bg-lightBg text-slate-900 dark:bg-darkBg dark:text-slate-100">
+<body class="min-h-screen pb-20">
 
-    <!-- Navigation -->
-    <nav class="glass-nav sticky top-0 z-50 px-8 py-4 bg-white/80 dark:bg-darkBg/80 border-b border-slate-200 dark:border-white/5">
-        <div class="max-w-7xl mx-auto flex justify-between items-center">
+    <!-- Animeret Partikel System -->
+    <canvas id="particle-canvas"></canvas>
+
+    <!-- Background Blobs (Lilla og Gylden for Weimar-temaet) -->
+    <div class="bg-blob w-[600px] h-[600px] bg-purple-400 top-[-10%] left-[-10%]"></div>
+    <div class="bg-blob w-[500px] h-[500px] bg-amber-400 bottom-[20%] right-[-5%]"></div>
+
+    <!-- Navigation Bar -->
+    <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-purple-100 shadow-sm">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
             <div class="flex items-center gap-4">
-                <button onclick="window.location.href='Tysk-Index.html'" class="bg-blue-600 p-2.5 rounded-xl shadow-lg hover:bg-blue-700 transition flex items-center justify-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
-                </button>
+                <a href="Tysk-Index.html" class="w-12 h-12 bg-gradient-to-br from-purple-500 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg shadow-purple-500/30 hover:scale-105 transition-transform">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                </a>
                 <div>
-                    <h1 class="text-xl font-black tracking-tighter uppercase">Weimarer <span class="text-purple-500">Republik</span></h1>
+                    <span class="text-xl font-black tracking-tight block leading-none text-slate-900 uppercase">Weimarer <span class="text-purple-500">Republik</span></span>
+                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">Periode: 1919 - 1933</span>
                 </div>
             </div>
-            <button id="theme-toggle" class="p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-white/10 transition-transform hover:scale-110">
-                <svg id="sun-icon" class="hidden w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707m12.728 12.728L12 12l.01.01H12z"></path></svg>
-                <svg id="moon-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
-            </button>
+            <div class="flex items-center gap-6 hidden sm:flex">
+                <a href="#historie" class="text-xs font-black text-slate-500 hover:text-purple-600 transition uppercase tracking-widest">Historie</a>
+                <a href="#texte" class="text-xs font-black text-slate-500 hover:text-purple-600 transition uppercase tracking-widest">Texte & Kunst</a>
+                <a href="#film" class="text-xs font-black text-slate-500 hover:text-purple-600 transition uppercase tracking-widest">Film</a>
+                <div class="h-6 w-px bg-slate-200"></div>
+                <a href="Eksamens-Kit.html" class="px-6 py-2.5 bg-slate-900 text-white rounded-full text-xs font-bold hover:bg-purple-600 transition-all active:scale-95 uppercase tracking-wider shadow-lg flex items-center gap-2">
+                    Cheat Sheet
+                </a>
+            </div>
         </div>
     </nav>
 
-    <main class="max-w-7xl mx-auto px-8 mt-16 pb-20">
+    <!-- Header Section -->
+    <header class="max-w-7xl mx-auto px-6 pt-24 pb-20 text-center relative">
+        <div class="inline-block mb-4 px-4 py-1.5 rounded-full bg-purple-50 border border-purple-100 text-purple-600 font-bold text-xs tracking-widest uppercase shadow-sm">
+            Forløbsoversigt
+        </div>
+        <h1 class="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter text-slate-900 mb-8 uppercase leading-[0.9]">
+            Mestre <br><span id="typewriter" class="text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-amber-500 italic">Republikken</span>
+        </h1>
+        <p class="text-slate-500 text-lg md:text-2xl max-w-2xl mx-auto leading-relaxed font-medium">
+            Fra det knusende nederlag i 1. verdenskrig, gennem de brølende 20'eres opblomstring, til Hitlers magtovertagelse.
+        </p>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-6 space-y-32">
         
-        <!-- Hero Section -->
-        <div class="mb-16 border-l-8 border-purple-600 pl-8 py-4">
-            <span class="badge bg-purple-100 text-purple-600 dark:bg-purple-500/10 dark:text-purple-500 border border-purple-200 dark:border-purple-500/20">Modul 7: Historisk Krise & Kultur</span>
-            <h2 class="text-6xl font-black mb-6 tracking-tight uppercase leading-none">Tanz auf dem <br><span class="text-purple-600 italic">Vulkan</span></h2>
-            <p class="text-slate-500 dark:text-slate-400 text-xl max-w-3xl font-medium leading-relaxed italic">
-                Fra kaos og sult til de gyldne tyvere og demokratiets sammenbrud (1918-1933).
-            </p>
-        </div>
-
-        <div class="dashboard-grid">
+        <!-- Sektion: Historisk Baggrund -->
+        <section id="historie" class="section-historie scroll-mt-28">
+            <div class="flex items-center gap-6 mb-12">
+                <div class="w-16 h-1.5 bg-amber-500 rounded-full shadow-sm"></div>
+                <h2 class="text-xs font-black uppercase tracking-[0.4em] text-slate-500/80">1. Historischer Hintergrund</h2>
+            </div>
             
-            <!-- Historisk Tidslinje -->
-            <div class="tile bg-white/80 dark:bg-slate-800/40 border border-slate-200 dark:border-white/5 shadow-sm md:col-span-2">
-                <h4 class="text-2xl font-black mb-6 uppercase italic text-purple-500 flex items-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                    Historisk Overblik
-                </h4>
-                <div class="timeline-container">
-                    <div class="timeline-item">
-                        <span class="text-purple-500 font-bold">1918-1919:</span>
-                        <p class="text-sm text-slate-600 dark:text-slate-300">Tyskland taber 1. verdenskrig. Kejseren flygter, og Weimarrepublikken grundlægges (valg i 1919).</p>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <!-- Fase 1 -->
+                <a href="Geschichte-Weimar.html#krisenjahre" class="quest-card group" style="--accent: #ef4444; --accent-glow: rgba(239, 68, 68, 0.15);">
+                    <div>
+                        <div class="inline-block px-3 py-1 bg-red-50 text-red-600 text-[10px] font-bold uppercase tracking-widest rounded-full mb-4">1918-1923</div>
+                        <h3 class="text-2xl font-bold mb-4 italic tracking-tight text-slate-800 uppercase">Die Krisenjahre</h3>
+                        <p class="text-sm text-slate-500 leading-relaxed font-medium">
+                            Nederlag i 1. verdenskrig. Versailles-traktaten dikterer enorme erstatninger. Hyperinflation, fattigdom og "Dolchstoßlegende".
+                        </p>
                     </div>
-                    <div class="timeline-item">
-                        <span class="text-purple-500 font-bold">1923:</span>
-                        <p class="text-sm text-slate-600 dark:text-slate-300">Hyperinflation og krise. Penge bliver værdiløse, og folk sulter.</p>
-                    </div>
-                    <div class="timeline-item">
-                        <span class="text-purple-500 font-bold">1924-1929:</span>
-                        <p class="text-sm text-slate-600 dark:text-slate-300"><strong>Die Goldenen Zwanziger.</strong> Økonomisk opsving, jazz, kabaret og kulturel blomstring i Berlin.</p>
-                    </div>
-                    <div class="timeline-item">
-                        <span class="text-purple-500 font-bold">1932-1933:</span>
-                        <p class="text-sm text-slate-600 dark:text-slate-300">Demokratiet bryder sammen. Hitler udnævnes til rigskansler d. 30. januar 1933.</p>
-                    </div>
-                </div>
-            </div>
+                    <div class="btn-start">Læs tekst <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></div>
+                </a>
 
-            <!-- Ekspressionisme & Kunst -->
-            <div class="tile bg-white/80 dark:bg-slate-800/40 border border-slate-200 dark:border-white/5 shadow-sm">
-                <h4 class="text-xl font-black mb-6 uppercase italic text-pink-500 flex items-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20.94c1.88-1.55 3.75-3.1 5.63-4.65 1.57-1.3 3.37-2.6 3.37-4.29 0-3.31-2.69-6-6-6-1.51 0-2.88.56-3.95 1.48L11 7.5l-1.05-.02C8.88 6.56 7.51 6 6 6c-3.31 0-6 2.69-6 6 0 1.69 1.8 2.99 3.37 4.29 1.88 1.55 3.75 3.1 5.63 4.65Z"/></svg>
-                    Expressionismus
-                </h4>
-                <div class="space-y-4 text-sm">
-                    <p class="leading-relaxed">
-                        Kunstnerne ville væk fra den pompøse kaisertid. De fokuserede på <strong>følelser</strong> frem for virkelighed.
-                    </p>
-                    <div class="p-3 bg-pink-500/5 rounded-lg border border-pink-500/10">
-                        <p class="text-xs font-bold uppercase text-pink-500 mb-1">Kendetegn:</p>
-                        <ul class="text-xs space-y-1 text-slate-500">
-                            <li>• Skrigende farver</li>
-                            <li>• Forvridne former</li>
-                            <li>• Fokus på storbyens kaos og angst</li>
-                        </ul>
+                <!-- Fase 2 -->
+                <a href="Geschichte-Weimar.html#goldene-zwanziger" class="quest-card group" style="--accent: #f59e0b; --accent-glow: rgba(245, 158, 11, 0.15);">
+                    <div>
+                        <div class="inline-block px-3 py-1 bg-amber-50 text-amber-600 text-[10px] font-bold uppercase tracking-widest rounded-full mb-4">1924-1929</div>
+                        <h3 class="text-2xl font-bold mb-4 italic tracking-tight text-slate-800 uppercase">Goldene Zwanziger</h3>
+                        <p class="text-sm text-slate-500 leading-relaxed font-medium">
+                            Demokratisk og kulturel genstart. Kvinder får valgret. Bauhaus-stil og "Neue Sachlichkeit" dominerer kunsten.
+                        </p>
                     </div>
-                </div>
-            </div>
+                    <div class="btn-start">Læs tekst <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></div>
+                </a>
 
-            <!-- Babylon Berlin & Storbyen -->
-            <div class="tile bg-white/80 dark:bg-slate-800/40 border border-slate-200 dark:border-white/5 shadow-sm">
-                <h4 class="text-xl font-black mb-6 uppercase italic text-amber-500 flex items-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><line x1="9" y1="22" x2="9" y2="2"/><line x1="15" y1="22" x2="15" y2="2"/><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="20" y2="17"/></svg>
-                    Babylon Berlin
-                </h4>
-                <div class="space-y-4 text-sm leading-relaxed text-slate-600 dark:text-slate-300">
-                    <p>Berlin var verdens kulturelle centrum. Folk søgte nydelse efter krigens rædsler.</p>
-                    <div class="border-l-2 border-amber-500 pl-4 py-1 italic text-xs">
-                        "Man danser på vulkanen" — man fester, selvom man ved, at katastrofen (nazismen) er på vej.
+                <!-- Fase 3 -->
+                <a href="Geschichte-Weimar.html#untergang" class="quest-card group" style="--accent: #1e293b; --accent-glow: rgba(30, 41, 59, 0.15);">
+                    <div>
+                        <div class="inline-block px-3 py-1 bg-slate-100 text-slate-600 text-[10px] font-bold uppercase tracking-widest rounded-full mb-4">1929-1933</div>
+                        <h3 class="text-2xl font-bold mb-4 italic tracking-tight text-slate-800 uppercase">Der Untergang</h3>
+                        <p class="text-sm text-slate-500 leading-relaxed font-medium">
+                            Børskrak og økonomisk krise. Folket søger mod radikale partier (NSDAP). Hitler udnævnes til kansler og afskaffer demokratiet.
+                        </p>
                     </div>
-                    <p class="text-xs">Kontraster: Rigdom vs. fattigdom, luksus vs. kriminalitet.</p>
-                </div>
+                    <div class="btn-start">Læs tekst <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></div>
+                </a>
             </div>
+        </section>
 
-            <!-- Reparationen & Krise -->
-            <div class="tile bg-white/80 dark:bg-slate-800/40 border border-slate-200 dark:border-white/5 shadow-sm">
-                <h4 class="text-xl font-black mb-6 uppercase italic text-red-500 flex items-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
-                    Wirtschaftskrise
-                </h4>
-                <div class="space-y-4 text-sm">
-                    <p>Tyskland skulle betale <strong>132 milliarder guldmark</strong> i erstatning (Reparationen).</p>
-                    <div class="bg-red-500/10 p-3 rounded-lg">
-                        <p class="font-bold text-red-500 text-xs uppercase">Konsekvens:</p>
-                        <p class="text-xs text-slate-500">Folk mister troen på demokratiet og vender sig mod radikale partier som NSDAP.</p>
-                    </div>
-                </div>
+        <!-- Sektion: Tekster og Kunst -->
+        <section id="texte" class="section-litteratur scroll-mt-28">
+            <div class="flex items-center gap-6 mb-12">
+                <div class="w-16 h-1.5 bg-purple-500 rounded-full shadow-sm"></div>
+                <h2 class="text-xs font-black uppercase tracking-[0.4em] text-purple-500/80">2. Texte & Kunst (Pensum)</h2>
             </div>
-
-            <!-- Guld-gloser til Eksamen -->
-            <div class="tile bg-slate-900 text-white dark:bg-slate-800/60 border border-slate-700 dark:border-white/10 shadow-xl md:col-span-2">
-                <h4 class="text-xl font-black mb-6 uppercase italic text-emerald-400">Eksamens-træner</h4>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
-                    <div class="space-y-4">
-                        <div class="quote-box">
-                            <p class="font-bold">"Deutschland hat den Ersten Weltkrieg verloren."</p>
-                            <p class="text-emerald-400/80 text-xs mt-1">Tyskland har tabt 1. verdenskrig.</p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                
+                <!-- Erich Kästner -->
+                <a href="Besuch-vom-Lande.html" class="quest-card group" style="--accent: #8b5cf6; --accent-glow: rgba(139, 92, 246, 0.15);">
+                    <div>
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="inline-block px-3 py-1 bg-purple-50 text-purple-600 text-[10px] font-bold uppercase tracking-widest rounded-full">Gedicht (1928)</div>
                         </div>
-                        <div class="quote-box">
-                            <p class="font-bold">"Die Menschen versuchen einen Neuanfang in Politik und Kultur."</p>
-                            <p class="text-emerald-400/80 text-xs mt-1">Folk forsøger en ny start i politik og kultur.</p>
-                        </div>
+                        <h3 class="text-2xl font-bold mb-1 italic tracking-tight text-slate-800 uppercase">Besuch vom Lande</h3>
+                        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Erich Kästner</p>
+                        <p class="text-sm text-slate-500 leading-relaxed font-medium">
+                            Et digt om landfolk, der bliver overvældet ("verstört") af larmen, teknologien og anonymiteten på Potsdamer Platz.
+                        </p>
                     </div>
-                    <div class="space-y-4">
-                        <div class="quote-box">
-                            <p class="font-bold">"Die Kunst geht neue Wege und will weg von der Kaiserzeit."</p>
-                            <p class="text-emerald-400/80 text-xs mt-1">Kunsten går nye veje og vil væk fra kejsertiden.</p>
+                    <div class="btn-start">Åbn Tekst <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></div>
+                </a>
+
+                <!-- Expressionismus -->
+                <a href="Expressionismus.html" class="quest-card group" style="--accent: #ec4899; --accent-glow: rgba(236, 72, 153, 0.15);">
+                    <div>
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="inline-block px-3 py-1 bg-pink-50 text-pink-600 text-[10px] font-bold uppercase tracking-widest rounded-full">Sachtext</div>
                         </div>
-                        <div class="quote-box">
-                            <p class="font-bold">"Hitler schafft die Demokratie ab."</p>
-                            <p class="text-emerald-400/80 text-xs mt-1">Hitler afskaffer demokratiet.</p>
-                        </div>
+                        <h3 class="text-2xl font-bold mb-1 italic tracking-tight text-slate-800 uppercase">Der Expressionismus</h3>
+                        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Josiane Speckenwirth</p>
+                        <p class="text-sm text-slate-500 leading-relaxed font-medium">
+                            Kunstretningen, der afbilder "Innere Empfindungen" frem for virkeligheden. Ekspressionisterne udtrykte frygt for krig, storby og død.
+                        </p>
                     </div>
-                </div>
+                    <div class="btn-start">Åbn Tekst <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></div>
+                </a>
+
+                <!-- Otto Dix -->
+                <a href="Grossstadt-Dix.html" class="quest-card group section-kunst">
+                    <div>
+                        <div class="flex justify-between items-start mb-4">
+                            <div class="inline-block px-3 py-1 bg-rose-50 text-rose-600 text-[10px] font-bold uppercase tracking-widest rounded-full">Gemälde (1928)</div>
+                        </div>
+                        <h3 class="text-2xl font-bold mb-1 italic tracking-tight text-slate-800 uppercase">Großstadt</h3>
+                        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Otto Dix (Triptychon)</p>
+                        <p class="text-sm text-slate-500 leading-relaxed font-medium">
+                            Maleriet viser den ekstreme kontrast i 20'ernes samfund: Rige der danser jazz i midten, og krigsveteraner (Krüppel) i fattigdom på siderne.
+                        </p>
+                    </div>
+                    <div class="btn-start">Åbn Billede <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg></div>
+                </a>
+
+            </div>
+        </section>
+
+        <!-- Sektion: Film -->
+        <section id="film" class="section-film scroll-mt-28">
+            <div class="flex items-center gap-6 mb-12">
+                <div class="w-16 h-1.5 bg-indigo-500 rounded-full shadow-sm"></div>
+                <h2 class="text-xs font-black uppercase tracking-[0.4em] text-indigo-500/80">3. Film & TV-Serien</h2>
             </div>
 
-        </div>
+            <a href="Babylon-Berlin.html" class="block bg-white/90 backdrop-blur-xl border border-indigo-100 rounded-[2rem] p-8 md:p-12 relative overflow-hidden shadow-xl hover:shadow-2xl hover:scale-[1.01] transition-all duration-300 group">
+                <!-- Dekorativ effekt -->
+                <div class="absolute right-0 top-0 w-1/2 h-full bg-gradient-to-l from-indigo-500/10 to-transparent pointer-events-none blur-2xl group-hover:from-indigo-500/20 transition-all"></div>
+                
+                <div class="relative z-10 flex flex-col md:flex-row gap-8 items-center justify-between">
+                    <div class="max-w-xl">
+                        <div class="inline-block px-3 py-1 bg-indigo-50 text-indigo-600 text-[10px] font-bold uppercase tracking-widest rounded-full mb-6 border border-indigo-100">1929 Berlin</div>
+                        <h4 class="text-4xl font-black mb-4 text-slate-900 uppercase tracking-tighter">Babylon Berlin</h4>
+                        <p class="text-slate-600 text-sm leading-relaxed mb-6 font-medium">
+                            Serien skildrer Berlin som den bibelske "Hure Babylon" – en by fuld af synd, korruption og vold. Vi følger Kriminalkommissar Gereon Rath (med krigstraume) og Kriminalassistentin Charlotte Ritter ("Die Neue Frau").
+                        </p>
+                        <div class="flex items-center text-indigo-600 font-bold text-sm uppercase tracking-widest">
+                            Åbn Serie-Noter <svg class="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 8l4 4m0 0l-4 4m4-4H3"/></svg>
+                        </div>
+                    </div>
+                    
+                    <!-- Fiktiv plakat illustration (Light theme tilpasset) -->
+                    <div class="w-full md:w-64 h-80 bg-slate-900 rounded-xl border border-slate-800 shadow-2xl flex flex-col items-center justify-center p-6 text-center transform group-hover:-rotate-2 transition-transform duration-500 relative overflow-hidden">
+                        <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-30"></div>
+                        <div class="text-5xl font-black text-amber-500 mb-2 uppercase tracking-tighter relative z-10" style="font-family: 'Space Grotesk', sans-serif;">Babylon</div>
+                        <div class="text-3xl font-bold text-white uppercase tracking-widest relative z-10">Berlin</div>
+                        <div class="mt-8 text-xs text-slate-400 uppercase tracking-widest font-bold border-t border-slate-700 pt-4 relative z-10">Gereon & Charlotte</div>
+                    </div>
+                </div>
+            </a>
+        </section>
 
-        <!-- Bonus Info -->
-        <div class="mt-12 p-8 bg-purple-600/10 rounded-3xl border border-purple-500/20">
-            <h5 class="font-black text-purple-500 uppercase mb-2">Husk til samtalen:</h5>
-            <p class="text-sm text-slate-500 leading-relaxed italic">
-                Sammenlign Weimarrepublikkens skrøbelige demokrati med nutidens politiske landskab. Hvad sker der, når folk mister troen på de etablerede politikere på grund af økonomisk krise? Dette er en stærk perspektivering til tysk B.
-            </p>
-        </div>
+        <!-- Sektion: Guld-Gloser -->
+        <section class="pb-20">
+            <div class="flex items-center gap-6 mb-12">
+                <div class="w-16 h-1.5 bg-emerald-500 rounded-full shadow-sm"></div>
+                <h2 class="text-xs font-black uppercase tracking-[0.4em] text-emerald-500/80">4. Themen-Wortschatz</h2>
+                <span class="text-xs text-slate-400 font-bold uppercase tracking-widest ml-auto">(Klik for at kopiere)</span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- Wort 1 -->
+                <div class="phrase-card" onclick="copyPhrase(this)">
+                    <div>
+                        <p class="font-bold text-slate-800 text-base mb-1 german-text">Die Dolchstoßlegende</p>
+                        <p class="text-xs text-slate-500 font-medium uppercase">Dolkestødslegenden (Hindenburgs løgn)</p>
+                    </div>
+                    <svg class="w-5 h-5 copy-icon text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                </div>
+
+                <!-- Wort 2 -->
+                <div class="phrase-card" onclick="copyPhrase(this)">
+                    <div>
+                        <p class="font-bold text-slate-800 text-base mb-1 german-text">Innere Empfindungen</p>
+                        <p class="text-xs text-slate-500 font-medium uppercase">Indre fornemmelser (Expressionismus)</p>
+                    </div>
+                    <svg class="w-5 h-5 copy-icon text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                </div>
+
+                <!-- Wort 3 -->
+                <div class="phrase-card" onclick="copyPhrase(this)">
+                    <div>
+                        <p class="font-bold text-slate-800 text-base mb-1 german-text">Die Neue Frau</p>
+                        <p class="text-xs text-slate-500 font-medium uppercase">Den moderne, frigjorte kvinde</p>
+                    </div>
+                    <svg class="w-5 h-5 copy-icon text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                </div>
+
+                <!-- Wort 4 -->
+                <div class="phrase-card" onclick="copyPhrase(this)">
+                    <div>
+                        <p class="font-bold text-slate-800 text-base mb-1 german-text">Krasse Gegensätze</p>
+                        <p class="text-xs text-slate-500 font-medium uppercase">Skarpe kontraster (Dix maleriet)</p>
+                    </div>
+                    <svg class="w-5 h-5 copy-icon text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                </div>
+
+                <!-- Wort 5 -->
+                <div class="phrase-card" onclick="copyPhrase(this)">
+                    <div>
+                        <p class="font-bold text-slate-800 text-base mb-1 german-text">Die Orientierungslosigkeit</p>
+                        <p class="text-xs text-slate-500 font-medium uppercase">Desorientering (Kästner)</p>
+                    </div>
+                    <svg class="w-5 h-5 copy-icon text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                </div>
+
+                <!-- Wort 6 -->
+                <div class="phrase-card" onclick="copyPhrase(this)">
+                    <div>
+                        <p class="font-bold text-slate-800 text-base mb-1 german-text">Die Wirtschaftskrise</p>
+                        <p class="text-xs text-slate-500 font-medium uppercase">Den økonomiske krise (1929)</p>
+                    </div>
+                    <svg class="w-5 h-5 copy-icon text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                </div>
+            </div>
+        </section>
+
     </main>
 
-    <script>
-        const themeToggle = document.getElementById('theme-toggle');
-        const sunIcon = document.getElementById('sun-icon');
-        const moonIcon = document.getElementById('moon-icon');
-        const html = document.documentElement;
+    <footer class="text-center py-16 border-t border-purple-100 text-slate-400 text-[10px] font-black uppercase tracking-[0.2em] relative z-10">
+        <p>Sankt Annæ Gymnasium • 2.A Tysk B • Udviklet til Marius</p>
+    </footer>
 
-        function updateIcons() {
-            if (html.classList.contains('dark')) {
-                sunIcon.classList.remove('hidden');
-                moonIcon.classList.add('hidden');
+    <script>
+        // --- Typewriter Animation ---
+        const words = ["Republikken", "Die Goldenen Zwanziger", "Expressionismus", "Babylon Berlin"];
+        let wordIndex = 0;
+        let charIndex = 0;
+        let isDeleting = false;
+        const typewriterElement = document.getElementById('typewriter');
+        const typeSpeed = 100;
+        const backSpeed = 50;
+        const delay = 2000;
+
+        function type() {
+            const currentWord = words[wordIndex];
+            
+            if (isDeleting) {
+                typewriterElement.textContent = currentWord.substring(0, charIndex - 1);
+                charIndex--;
             } else {
-                sunIcon.classList.add('hidden');
-                moonIcon.classList.remove('hidden');
+                typewriterElement.textContent = currentWord.substring(0, charIndex + 1);
+                charIndex++;
+            }
+
+            let currentSpeed = isDeleting ? backSpeed : typeSpeed;
+
+            if (!isDeleting && charIndex === currentWord.length) {
+                isDeleting = true;
+                currentSpeed = delay;
+            } else if (isDeleting && charIndex === 0) {
+                isDeleting = false;
+                wordIndex = (wordIndex + 1) % words.length;
+                currentSpeed = 500;
+            }
+
+            setTimeout(type, currentSpeed);
+        }
+
+        // --- Partikel Animation ---
+        const canvas = document.getElementById('particle-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 1;
+                this.speedX = (Math.random() - 0.5) * 0.4;
+                this.speedY = (Math.random() - 0.5) * 0.4;
+                // Farver: Lilla og Amber
+                this.color = Math.random() > 0.5 ? '#a855f7' : '#f59e0b';
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.x > canvas.width) this.x = 0;
+                if (this.x < 0) this.x = canvas.width;
+                if (this.y > canvas.height) this.y = 0;
+                if (this.y < 0) this.y = canvas.height;
+            }
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
             }
         }
 
-        if (localStorage.theme === 'light') {
-            html.classList.remove('dark');
-        } else {
-            html.classList.add('dark');
+        function initParticles() {
+            particles = [];
+            for (let i = 0; i < 40; i++) {
+                particles.push(new Particle());
+            }
         }
-        updateIcons();
 
-        themeToggle.addEventListener('click', () => {
-            html.classList.toggle('dark');
-            localStorage.theme = html.classList.contains('dark') ? 'dark' : 'light';
-            updateIcons();
-        });
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animateParticles);
+        }
+
+        window.addEventListener('resize', resize);
+        window.onload = () => {
+            resize();
+            initParticles();
+            animateParticles();
+            type();
+        };
+
+        // --- Kopier Gloser Funktion ---
+        function copyPhrase(element) {
+            const textToCopy = element.querySelector('.german-text').innerText;
+            const textArea = document.createElement("textarea");
+            textArea.value = textToCopy;
+            document.body.appendChild(textArea);
+            textArea.select();
+            
+            try {
+                document.execCommand('copy');
+                
+                // Visuel feedback
+                const icon = element.querySelector('.copy-icon');
+                const originalIconPath = icon.innerHTML;
+                
+                element.classList.add('copied');
+                icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>';
+                icon.classList.remove('text-slate-300');
+                icon.classList.add('text-emerald-500');
+                
+                setTimeout(() => {
+                    element.classList.remove('copied');
+                    icon.innerHTML = originalIconPath;
+                    icon.classList.add('text-slate-300');
+                    icon.classList.remove('text-emerald-500');
+                }, 1500);
+
+            } catch (err) {
+                console.error('Kunne ikke kopiere teksten: ', err);
+            }
+            
+            document.body.removeChild(textArea);
+        }
     </script>
 </body>
 </html>

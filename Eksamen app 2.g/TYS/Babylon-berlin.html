@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Babylon Berlin | Tysk 2.a</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            /* Weimar Tema: Indigo (Film/Mysterium) og Gylden */
+            --primary: #4f46e5; 
+            --primary-glow: rgba(79, 70, 229, 0.15);
+            --slate-bg: #fdfaff; 
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--slate-bg);
+            color: #1e293b;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        #particle-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            pointer-events: none;
+            opacity: 0.3;
+        }
+
+        .bg-blob {
+            position: fixed;
+            z-index: -1;
+            filter: blur(120px);
+            opacity: 0.12;
+            pointer-events: none;
+            border-radius: 50%;
+            animation: drift 25s infinite alternate ease-in-out;
+        }
+
+        @keyframes drift {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(50px, -80px) scale(1.15); }
+        }
+
+        .premium-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            border-radius: 1.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 10px 15px -3px rgba(0, 0, 0, 0.02);
+            transition: all 0.3s ease;
+            height: 100%;
+        }
+
+        .premium-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 15px 30px -5px rgba(79, 70, 229, 0.1);
+            border-color: #c7d2fe; /* Indigo 200 */
+        }
+
+        .german-phrase {
+            font-family: 'Space Grotesk', sans-serif;
+            color: #312e81;
+            background: #e0e7ff;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 700;
+        }
+
+        /* Kopier-kort til Redemittel */
+        .phrase-card {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem;
+            border-radius: 1rem;
+            background: white;
+            border: 1px solid #e2e8f0;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .phrase-card:hover {
+            transform: translateY(-2px);
+            border-color: #4f46e5;
+            box-shadow: 0 10px 15px -3px rgba(79, 70, 229, 0.1);
+        }
+        .phrase-card.copied {
+            background: #f0fdf4;
+            border-color: #22c55e;
+        }
+    </style>
+</head>
+<body class="min-h-screen pb-24">
+
+    <canvas id="particle-canvas"></canvas>
+    <div class="bg-blob w-[600px] h-[600px] bg-indigo-400 top-[-10%] left-[-10%]"></div>
+    <div class="bg-blob w-[500px] h-[500px] bg-amber-400 bottom-[20%] right-[-5%]"></div>
+
+    <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-indigo-100 shadow-sm">
+        <div class="max-w-5xl mx-auto px-6 h-20 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <a href="Sidste-forloeb.html" class="w-12 h-12 bg-white border border-slate-200 rounded-2xl flex items-center justify-center shadow-sm hover:scale-105 hover:border-indigo-300 hover:text-indigo-600 transition-all text-slate-500">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+                </a>
+                <div>
+                    <span class="text-xl font-black tracking-tight block leading-none text-slate-900 uppercase">Text <span class="text-indigo-500">02</span></span>
+                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">TV-Serie • 1929</span>
+                </div>
+            </div>
+            <div class="flex items-center gap-6">
+                <a href="Eksamens-Kit.html" class="px-5 py-2.5 bg-slate-900 text-white rounded-full text-xs font-bold hover:bg-indigo-600 transition-all active:scale-95 uppercase tracking-wider shadow-lg flex items-center gap-2">
+                    Cheat Sheet
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <header class="max-w-5xl mx-auto px-6 pt-20 pb-12">
+        <div class="inline-block px-3 py-1 bg-indigo-50 text-indigo-600 text-[10px] font-bold uppercase tracking-widest rounded-full mb-4 border border-indigo-100">Film & TV</div>
+        <h1 class="text-4xl md:text-6xl font-black tracking-tighter text-slate-900 mb-4 uppercase leading-tight">
+            Babylon <span class="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-amber-500 italic">Berlin</span>
+        </h1>
+        <p class="text-slate-500 text-lg font-medium">Lynhurtige noter og stikord til karakteristik af hovedpersonerne og byen Berlin i 1929.</p>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-6 space-y-8">
+        
+        <div class="bg-white/90 backdrop-blur-xl rounded-3xl p-8 border border-indigo-100 shadow-lg relative overflow-hidden">
+            <div class="absolute top-0 right-0 w-64 h-64 bg-indigo-500/5 blur-3xl rounded-full pointer-events-none"></div>
+            
+            <h3 class="text-xs font-black text-indigo-500 uppercase tracking-widest mb-4 flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                Kurzzusammenfassung
+            </h3>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm text-slate-600 font-medium leading-relaxed relative z-10">
+                <div>
+                    <p class="mb-3"><strong class="text-slate-900">Der Titel:</strong> Spielt auf die "Hure Babylon" aus der Bibel an. Berlin wird als eine Stadt der Sünde (synd), Korruption und Gewalt beschrieben, in der jedoch auch großer Reichtum und Anziehungskraft existieren.</p>
+                </div>
+                <div>
+                    <p><strong class="text-slate-900">Die Handlung:</strong> Beginnt 1929 während der Weimarer Republik. Wir folgen Kriminalkommissar Gereon Rath (mit Kriegstrauma) und Charlotte Ritter, die "die moderne Frau" verkörpert. Die Stadt Berlin spielt quasi die dritte Hauptrolle.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 items-stretch">
+            
+            <!-- Karakter 1: Gereon Rath -->
+            <div class="premium-card p-6 border-t-4 border-t-blue-500">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-12 h-12 bg-blue-50 border border-blue-100 text-blue-600 rounded-xl flex items-center justify-center font-black text-xl shadow-sm">G</div>
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-900 tracking-tight">Gereon Rath</h2>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Kriminalkommissar</p>
+                    </div>
+                </div>
+                <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-4 border-b border-slate-100 pb-2">📌 Eksamens-stikord</h3>
+                <ul class="space-y-4 text-sm text-slate-700 font-medium">
+                    <li class="flex items-start gap-3">
+                        <svg class="w-5 h-5 text-blue-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                        <span>Kommer fra byen Köln til Berlin.</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <svg class="w-5 h-5 text-blue-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                        <span>Lider af <span class="german-phrase">ein Trauma</span> fra 1. verdenskrig. (Viser krigens lange skygger).</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <svg class="w-5 h-5 text-blue-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                        <span>Tager medicin/stoffer for at skjule, at han ryster (<span class="german-phrase">zittern</span>).</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Karakter 2: Charlotte Ritter -->
+            <div class="premium-card p-6 border-t-4 border-t-pink-500">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-12 h-12 bg-pink-50 border border-pink-100 text-pink-600 rounded-xl flex items-center justify-center font-black text-xl shadow-sm">C</div>
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-900 tracking-tight">Charlotte Ritter</h2>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Kriminalassistentin</p>
+                    </div>
+                </div>
+                <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-4 border-b border-slate-100 pb-2">📌 Eksamens-stikord</h3>
+                <ul class="space-y-4 text-sm text-slate-700 font-medium">
+                    <li class="flex items-start gap-3">
+                        <svg class="w-5 h-5 text-pink-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                        <span>Drømmer om at blive rigtig efterforsker (sjældent for kvinder dengang).</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <svg class="w-5 h-5 text-pink-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                        <span>Repræsenterer <span class="german-phrase">Die Neue Frau</span>. Hun er uafhængig (<span class="german-phrase">unabhängig</span>).</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <svg class="w-5 h-5 text-pink-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                        <span>Kommer fra ekstrem fattigdom (<span class="german-phrase">Armut</span>), men arbejder sig op.</span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Miljø: Berlin 1929 -->
+            <div class="premium-card p-6 border-t-4 border-t-amber-500 bg-amber-50/20">
+                <div class="flex items-center gap-3 mb-6">
+                    <div class="w-12 h-12 bg-amber-50 border border-amber-100 text-amber-600 rounded-xl flex items-center justify-center font-black text-xl shadow-sm">B</div>
+                    <div>
+                        <h2 class="text-xl font-bold text-slate-900 tracking-tight">Berlin 1929</h2>
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-0.5">Das Milieu</p>
+                    </div>
+                </div>
+                <h3 class="text-xs font-black text-slate-400 uppercase tracking-widest mb-4 border-b border-slate-100 pb-2">📌 Eksamens-stikord</h3>
+                <ul class="space-y-4 text-sm text-slate-700 font-medium">
+                    <li class="flex items-start gap-3">
+                        <svg class="w-5 h-5 text-amber-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                        <span>Skildres som <span class="german-phrase">die Hure Babylon</span> (fuld af synd, jazz, fest og vold).</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <svg class="w-5 h-5 text-amber-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                        <span>Enorm <span class="german-phrase">Kontrast</span> mellem rigdom (fester i Moka Efti) og dyb fattigdom.</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <svg class="w-5 h-5 text-amber-500 shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg>
+                        <span>Politisk uro: Gadekampe mellem kommunister og politiet lurer.</span>
+                    </li>
+                </ul>
+            </div>
+
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+            
+            <!-- Ordbogen -->
+            <div class="bg-white rounded-2xl border border-slate-200 p-6 shadow-sm">
+                <h3 class="text-sm font-black text-slate-900 uppercase tracking-widest mb-5 flex items-center gap-2">
+                    <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129"/></svg>
+                    Vigtige Gloser
+                </h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4 text-sm font-medium">
+                    <div class="flex justify-between border-b border-slate-50 pb-1.5"><span class="text-slate-800 font-bold">Die Sünde</span><span class="text-slate-500">synden</span></div>
+                    <div class="flex justify-between border-b border-slate-50 pb-1.5"><span class="text-slate-800 font-bold">Die Gewalt</span><span class="text-slate-500">volden</span></div>
+                    <div class="flex justify-between border-b border-slate-50 pb-1.5"><span class="text-slate-800 font-bold">Verkörpern</span><span class="text-slate-500">legemliggøre</span></div>
+                    <div class="flex justify-between border-b border-slate-50 pb-1.5"><span class="text-slate-800 font-bold">Der Reichtum</span><span class="text-slate-500">rigdommen</span></div>
+                    <div class="flex justify-between border-b border-slate-50 pb-1.5"><span class="text-slate-800 font-bold">Lauern</span><span class="text-slate-500">at lure/ligge på lur</span></div>
+                    <div class="flex justify-between border-b border-slate-50 pb-1.5"><span class="text-slate-800 font-bold">Anziehungskraft</span><span class="text-slate-500">tiltrækningskraft</span></div>
+                </div>
+            </div>
+
+            <!-- Guld-Gloser / Redemittel -->
+            <div class="bg-indigo-50 rounded-2xl border border-indigo-100 p-6 shadow-sm">
+                <div class="flex items-center justify-between mb-5">
+                    <h3 class="text-sm font-black text-indigo-900 uppercase tracking-widest flex items-center gap-2">
+                        <svg class="w-5 h-5 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg>
+                        Redemittel
+                    </h3>
+                    <span class="text-[10px] text-indigo-400 font-bold uppercase tracking-widest">Klik for at kopiere</span>
+                </div>
+                
+                <div class="space-y-3">
+                    <div class="phrase-card" onclick="copyPhrase(this)">
+                        <div class="pr-4">
+                            <p class="font-bold text-slate-800 text-sm mb-1 german-text">Charlotte Ritter ist ein gutes Beispiel für die Neue Frau, weil sie unabhängig ist.</p>
+                            <p class="text-[11px] text-slate-500 font-medium uppercase">Charlotte er et godt eksempel på 'den nye kvinde', fordi hun er uafhængig.</p>
+                        </div>
+                        <svg class="w-5 h-5 copy-icon text-slate-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                    </div>
+                    
+                    <div class="phrase-card" onclick="copyPhrase(this)">
+                        <div class="pr-4">
+                            <p class="font-bold text-slate-800 text-sm mb-1 german-text">Man sieht die Folgen des Krieges an Gereon Rath, weil er ein Trauma hat.</p>
+                            <p class="text-[11px] text-slate-500 font-medium uppercase">Man ser følgerne af krigen på Gereon Rath, fordi han har et traume.</p>
+                        </div>
+                        <svg class="w-5 h-5 copy-icon text-slate-300 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <footer class="text-center py-16 mt-12 border-t border-indigo-100 text-slate-400 text-[10px] font-black uppercase tracking-[0.2em] relative z-10">
+        <p>Sankt Annæ Gymnasium • 2.A Tysk B</p>
+    </footer>
+
+    <script>
+        // --- Kopier Funktion til Redemittel ---
+        function copyPhrase(element) {
+            const textToCopy = element.querySelector('.german-text').innerText;
+            const textArea = document.createElement("textarea");
+            textArea.value = textToCopy;
+            document.body.appendChild(textArea);
+            textArea.select();
+            
+            try {
+                document.execCommand('copy');
+                const icon = element.querySelector('.copy-icon');
+                const originalIconPath = icon.innerHTML;
+                
+                element.classList.add('copied');
+                icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>';
+                icon.classList.remove('text-slate-300');
+                icon.classList.add('text-emerald-500');
+                
+                setTimeout(() => {
+                    element.classList.remove('copied');
+                    icon.innerHTML = originalIconPath;
+                    icon.classList.add('text-slate-300');
+                    icon.classList.remove('text-emerald-500');
+                }, 1500);
+
+            } catch (err) {
+                console.error('Kunne ikke kopiere teksten: ', err);
+            }
+            document.body.removeChild(textArea);
+        }
+
+        // --- Partikel Animation ---
+        const canvas = document.getElementById('particle-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 1;
+                this.speedX = (Math.random() - 0.5) * 0.4;
+                this.speedY = (Math.random() - 0.5) * 0.4;
+                // Bruger Indigo og Amber farver til dette tema
+                this.color = Math.random() > 0.5 ? '#4f46e5' : '#f59e0b';
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.x > canvas.width) this.x = 0;
+                if (this.x < 0) this.x = canvas.width;
+                if (this.y > canvas.height) this.y = 0;
+                if (this.y < 0) this.y = canvas.height;
+            }
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function initParticles() {
+            particles = [];
+            for (let i = 0; i < 30; i++) {
+                particles.push(new Particle());
+            }
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animateParticles);
+        }
+
+        window.addEventListener('resize', resize);
+        window.onload = () => {
+            resize();
+            initParticles();
+            animateParticles();
+        };
+    </script>
+</body>
+</html>

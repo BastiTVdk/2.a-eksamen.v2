@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Babylon Berlin - Tysk B | Sankt Annæ</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome til ikoner -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts: Plus Jakarta Sans & Space Grotesk -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            /* Tema farve for Weimar & Babylon Berlin (Dyb gylden/orange og rød) */
+            --primary: #f59e0b; 
+            --primary-glow: rgba(245, 158, 11, 0.15);
+            --slate-bg: #fffcf8; /* Varm lys baggrund */
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--slate-bg);
+            color: #1e293b;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        #particle-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            pointer-events: none;
+            opacity: 0.45;
+        }
+
+        .bg-blob {
+            position: fixed;
+            z-index: -1;
+            filter: blur(120px);
+            opacity: 0.12;
+            pointer-events: none;
+            border-radius: 50%;
+            animation: drift 25s infinite alternate ease-in-out;
+        }
+
+        @keyframes drift {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(50px, -80px) scale(1.15); }
+        }
+
+        /* Quest Card (Glassmorphism styling) */
+        .quest-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            border: 1px solid #fef3c7; /* Lys gylden border */
+            border-radius: 2rem;
+            padding: 1.75rem;
+            transition: all 0.4s var(--ease-out-expo);
+            position: relative;
+            overflow: hidden;
+            border-left: 6px solid var(--accent, #f59e0b);
+        }
+
+        .quest-card.interactive:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 20px 40px -10px var(--accent-glow, rgba(245, 158, 11, 0.2));
+            border-color: var(--accent, #f59e0b);
+        }
+
+        /* Knap-design */
+        .btn-action {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.65rem 1.25rem;
+            border-radius: 9999px;
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-size: 0.75rem;
+            background: white;
+            cursor: pointer;
+        }
+
+        .btn-action:hover {
+            border-color: var(--primary);
+            box-shadow: 0 8px 25px -5px var(--primary-glow);
+            color: var(--primary);
+        }
+
+        /* Active indicator states for double role togglers */
+        .role-box {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .role-box:hover {
+            background: rgba(245, 158, 11, 0.05);
+            border-color: rgba(245, 158, 11, 0.3);
+        }
+        .role-box.active {
+            background: rgba(245, 158, 11, 0.08);
+            border-color: var(--primary);
+            box-shadow: 0 4px 20px -5px rgba(245, 158, 11, 0.15);
+        }
+
+        /* Tab buttons */
+        .tab-btn {
+            font-family: 'Space Grotesk', sans-serif;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+        .tab-btn.active {
+            border-bottom-color: var(--accent, #f59e0b);
+            color: var(--accent, #f59e0b);
+        }
+
+        /* Flashcards 3D Styling */
+        .perspective-1000 { perspective: 1000px; }
+        .backface-hidden { backface-visibility: hidden; }
+        .rotate-y-180 { transform: rotateY(180deg); }
+        .transform-style-3d { transform-style: preserve-3d; }
+
+        /* Typewriter text cursor effect */
+        #typewriter::after {
+            content: "|";
+            animation: blink 1s step-end infinite;
+            margin-left: 2px;
+            color: var(--primary);
+        }
+
+        @keyframes blink {
+            from, to { opacity: 1; }
+            50% { opacity: 0; }
+        }
+    </style>
+</head>
+<body class="min-h-screen pb-20">
+
+    <!-- Animeret Partikel System -->
+    <canvas id="particle-canvas"></canvas>
+
+    <!-- Background Blobs -->
+    <div class="bg-blob w-[600px] h-[600px] bg-amber-400 top-[-10%] left-[-10%]"></div>
+    <div class="bg-blob w-[500px] h-[500px] bg-red-400 bottom-[20%] right-[-5%]"></div>
+
+    <!-- Navigation Bar -->
+    <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-amber-100 shadow-sm">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <div class="flex items-center gap-4 cursor-pointer" onclick="window.location.href='sidste-forloeb.html'">
+                <div class="w-12 h-12 bg-gradient-to-br from-amber-500 to-red-600 rounded-2xl flex items-center justify-center shadow-lg shadow-amber-500/30">
+                    <span class="text-white font-black text-2xl">ß</span>
+                </div>
+                <div>
+                    <span class="text-xl font-black tracking-tight block leading-none text-slate-900 uppercase">TYSK <span class="text-amber-500">B</span></span>
+                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">Undervisningsværktøj: Babylon Berlin</span>
+                </div>
+            </div>
+            <div class="flex items-center gap-6">
+                <a href="sidste-forloeb.html" class="text-xs font-black text-slate-500 hover:text-amber-600 transition uppercase tracking-widest flex items-center gap-2">
+                    <i class="fa-solid fa-arrow-left"></i> Tilbage til Weimarer Rep.
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header Section -->
+    <header class="max-w-7xl mx-auto px-6 pt-24 pb-16 text-center relative">
+        <div class="inline-block mb-4 px-4 py-1.5 rounded-full bg-amber-50 border border-amber-100 text-amber-600 font-bold text-xs tracking-widest uppercase shadow-sm">
+            Weimarrepublikken i Opløsning (1929)
+        </div>
+        <h1 class="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter text-slate-900 mb-6 uppercase leading-[0.9]">
+            Babylon <br><span id="typewriter" class="text-transparent bg-clip-text bg-gradient-to-r from-amber-500 to-red-500 italic">Berlin</span>
+        </h1>
+        <p class="text-slate-600 text-lg md:text-xl max-w-3xl mx-auto leading-relaxed font-medium">
+            Mellem guld, synd og politisk sammenbrud. Oplev, hvordan tv-serien portrætterer et splittet og traumatiseret samfund, hvor storbyen fungerer som en levende, kynisk medspiller.
+        </p>
+    </header>
+
+    <!-- Quick Facts Row -->
+    <main class="max-w-7xl mx-auto px-6 space-y-24">
+        <section class="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div class="bg-white p-6 rounded-2xl border border-amber-100 shadow-sm text-center">
+                <span class="text-xs font-bold text-amber-500 uppercase tracking-widest block mb-2">Historisk År</span>
+                <span class="text-lg font-extrabold text-slate-800">1929 (Krakket)</span>
+            </div>
+            <div class="bg-white p-6 rounded-2xl border border-amber-100 shadow-sm text-center">
+                <span class="text-xs font-bold text-amber-500 uppercase tracking-widest block mb-2">Storbyens Rolle</span>
+                <span class="text-lg font-extrabold text-slate-800">Der Mitspieler</span>
+            </div>
+            <div class="bg-white p-6 rounded-2xl border border-amber-100 shadow-sm text-center">
+                <span class="text-xs font-bold text-amber-500 uppercase tracking-widest block mb-2">Kernekoncept</span>
+                <span class="text-lg font-extrabold text-slate-800">Zwei Gesichter</span>
+            </div>
+            <div class="bg-white p-6 rounded-2xl border border-amber-100 shadow-sm text-center">
+                <span class="text-xs font-bold text-amber-500 uppercase tracking-widest block mb-2">Nøglested</span>
+                <span class="text-lg font-extrabold text-slate-800">Moka Efti (Klub)</span>
+            </div>
+        </section>
+
+        <!-- Interactive Visual Analyzer: Die zwei Gesichter Berlins -->
+        <section id="visual-analyzer" class="scroll-mt-28">
+            <div class="flex items-center gap-6 mb-10">
+                <div class="w-16 h-1.5 bg-amber-500 rounded-full shadow-sm"></div>
+                <h2 class="text-xs font-black uppercase tracking-[0.4em] text-amber-500/80">Die Doppelrolle der Großstadt (Dobbeltheden)</h2>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                
+                <!-- Left: Interactive Søjler Selector -->
+                <div class="lg:col-span-6 space-y-4">
+                    <p class="text-xs text-slate-400 font-bold uppercase tracking-wider mb-2">
+                        <i class="fa-solid fa-hand-pointer text-amber-500"></i> Klik på en af byens roller for at se den dybe analyse og de tyske begreber:
+                    </p>
+                    
+                    <!-- Role 1: Glanz und Party -->
+                    <div id="role-1" onclick="selectRole(1)" class="role-box active border border-slate-200 p-6 rounded-2xl bg-white">
+                        <div class="flex items-center gap-3 mb-2">
+                            <span class="text-amber-500 text-lg"><i class="fa-solid fa-glass-cheers"></i></span>
+                            <span class="text-xs font-bold text-amber-500 block">Ansigt 1: Glanz, Pragt & Eskapismus</span>
+                        </div>
+                        <h4 class="text-lg font-black text-slate-800 mb-1">De gyldne tyveres fest (Nachtleben)</h4>
+                        <p class="text-xs text-slate-500">Moka Efti som eskapistisk fristed, hvor jazzen pumper, og alt er tilladt.</p>
+                    </div>
+
+                    <!-- Role 2: Dreck und Trauma -->
+                    <div id="role-2" onclick="selectRole(2)" class="role-box border border-slate-200 p-6 rounded-2xl bg-white">
+                        <div class="flex items-center gap-3 mb-2">
+                            <span class="text-amber-500 text-lg"><i class="fa-solid fa-shield-halved"></i></span>
+                            <span class="text-xs font-bold text-amber-500 block">Ansigt 2: Dreck, Synd & Krigstraumer</span>
+                        </div>
+                        <h4 class="text-lg font-black text-slate-800 mb-1">Storbyens mørke underverden (Elend)</h4>
+                        <p class="text-xs text-slate-500">Gereons lammende granatchok, fattigdom, prostitution og moralsk opløsning.</p>
+                    </div>
+                </div>
+
+                <!-- Right: Analysis Output Card -->
+                <div class="lg:col-span-6 sticky top-28 space-y-6">
+                    <div class="quest-card" style="--accent: #f59e0b;">
+                        <h3 class="text-2xl font-black text-slate-900 mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-masks-theater text-amber-500"></i>
+                            <span id="role-title">Huren Babylon - Der goldene Schein</span>
+                        </h3>
+                        
+                        <!-- Analysis Description -->
+                        <div class="mb-6">
+                            <span class="text-[10px] text-amber-500 font-bold uppercase tracking-widest block mb-2">Faglig forklaring</span>
+                            <p id="role-desc" class="text-sm text-slate-600 leading-relaxed font-medium bg-amber-50/50 p-4 rounded-xl border border-amber-100">
+                                Titlen "Babylon Berlin" refererer til det bibelske "Huren Babylon" (Skøgen Babylon) på grund af den omsiggribende synd, korruption og vold, som hersker i gaderne. Samtidig har byen en magisk tiltrækningskraft pga. rigdommen, luksussen og festen. Byen er ikke bare en kulisse; den er en aktiv 'Mitspieler' (medspiller), der tvinger folk ind i et dobbeltliv for at overleve.
+                            </p>
+                        </div>
+
+                        <!-- Poetic Point in German -->
+                        <div class="mb-6">
+                            <span class="text-[10px] text-amber-500 font-bold uppercase tracking-widest block mb-2">Guld-argument til eksamen (Tysk)</span>
+                            <p id="role-german" class="text-sm text-slate-700 leading-relaxed font-semibold italic border-l-4 border-amber-500 pl-4">
+                                "Die Stadt Berlin fungiert als ein aktiver 'Mitspieler'. Sie zeigt eine extreme Doppelheit: Auf der einen Seite sehen wir den Glanz des Nachtlebens im 'Moka Efti', auf der anderen Seite die bittere Armut und Gereon Raths Kriegstrauma."
+                            </p>
+                        </div>
+
+                        <!-- Vocabulary Box -->
+                        <div>
+                            <span class="text-[10px] text-amber-500 font-bold uppercase tracking-widest block mb-2">Begreber til storbyanalysen</span>
+                            <div id="role-vocab" class="grid grid-cols-2 gap-2 text-xs font-bold text-slate-600">
+                                <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-150"><span class="text-amber-600">das Nachtleben</span> = nattelivet</div>
+                                <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-150"><span class="text-amber-600">der Mitspieler</span> = medspilleren</div>
+                                <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-150"><span class="text-amber-600">der Eskapismus</span> = eskapisme / flugt</div>
+                                <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-150"><span class="text-amber-600">der Scheinglanz</span> = falsk glans / facade</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Interactive Character Gallery -->
+        <section id="gallery" class="scroll-mt-28">
+            <div class="flex items-center gap-6 mb-10">
+                <div class="w-16 h-1.5 bg-red-500 rounded-full shadow-sm"></div>
+                <h2 class="text-xs font-black uppercase tracking-[0.4em] text-red-500/80">Die Charaktere (Dossier)</h2>
+            </div>
+
+            <!-- Tabs Navigation -->
+            <div class="flex flex-wrap border-b border-slate-200 gap-2 mb-8" style="--accent: #ef4444;">
+                <button onclick="switchCharacterTab('rath', this)" class="tab-btn active px-4 py-3 text-sm font-bold text-slate-500 hover:text-slate-850 flex items-center gap-2">
+                    <i class="fa-solid fa-user-shield"></i> Gereon Rath (Kriegstrauma)
+                </button>
+                <button onclick="switchCharacterTab('ritter', this)" class="tab-btn px-4 py-3 text-sm font-bold text-slate-500 hover:text-slate-850 flex items-center gap-2">
+                    <i class="fa-solid fa-venus"></i> Charlotte Ritter (Die neue Frau)
+                </button>
+            </div>
+
+            <!-- Tab Content: Gereon Rath -->
+            <div id="char-rath" class="char-content block animate-fadeIn">
+                <div class="quest-card" style="--accent: #ef4444;">
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                        <!-- Left: Visual Placeholder -->
+                        <div class="lg:col-span-4 bg-gradient-to-tr from-stone-800 via-zinc-700 to-slate-900 p-8 rounded-2xl border border-red-200 flex flex-col items-center justify-center text-white text-center shadow-inner h-64">
+                            <i class="fa-solid fa-user-injured text-6xl mb-4 text-red-400"></i>
+                            <h4 class="font-bold text-lg">Gereon Rath</h4>
+                            <span class="text-[10px] uppercase font-bold tracking-widest opacity-85">Kriminalkommissar & Veteran</span>
+                        </div>
+                        <!-- Right: Deep Analytical Breakdown -->
+                        <div class="lg:col-span-8 space-y-4">
+                            <span class="text-xs font-bold text-red-500 block uppercase tracking-widest">Krigens lemlæstede arv</span>
+                            <h3 class="text-2xl font-black text-slate-800">Uforarbejdede krigstraumer (PTSD)</h3>
+                            <p class="text-sm text-slate-600 leading-relaxed">
+                                Gereon Rath bærer på ufattelige traumer fra 1. verdenskrig (granatchok / PTSD). Hans fysiske lammelse opstår, når han udsættes for situationer, der minder ham om skyttegravenes rædsler, især når han skal affyre sin pistol. Han dæmper angsten medicinsk (og hemmeligt) og lever dermed en personlig og ekstrem udgave af "Zwei Gesichter".
+                            </p>
+                            <div class="bg-red-50/50 p-4 rounded-xl border border-red-100 text-xs">
+                                <span class="font-bold text-red-800 block mb-1">Eksamens-Kobling:</span>
+                                <p class="text-slate-600">Gereons traume viser, at krigen i 1929 stadig er en aktiv mental trussel mod demokratiet. Han repræsenterer den tyske stats dybe, uhelede sår, som banede vejen for militarismen og Hitlers magtovertagelse.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Content: Charlotte Ritter -->
+            <div id="char-ritter" class="char-content hidden animate-fadeIn">
+                <div class="quest-card" style="--accent: #ef4444;">
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                        <!-- Left: Visual Placeholder -->
+                        <div class="lg:col-span-4 bg-gradient-to-tr from-amber-400 via-pink-500 to-red-600 p-8 rounded-2xl border border-red-200 flex flex-col items-center justify-center text-white text-center shadow-inner h-64">
+                            <i class="fa-solid fa-star text-6xl mb-4 text-yellow-300"></i>
+                            <h4 class="font-bold text-lg">Charlotte Ritter</h4>
+                            <span class="text-[10px] uppercase font-bold tracking-widest opacity-85">Die moderne Frau (Frigørelse)</span>
+                        </div>
+                        <!-- Right: Analytical Breakdown -->
+                        <div class="lg:col-span-8 space-y-4">
+                            <span class="text-xs font-bold text-red-500 block uppercase tracking-widest">Frigørelse over afgrunden</span>
+                            <h3 class="text-2xl font-black text-slate-800">Frigørelse vs. Social Kamp</h3>
+                            <p class="text-sm text-slate-600 leading-relaxed">
+                                Charlotte, også kaldet Lotte, inkarnerer den legendariske "neue Frau" i tyverne. Hun har kortklippet hår, drømmer om at blive kriminalassistent og tager sin seksualitet og frihed i egne hænder. Men hendes frigørelse er mærket af ekstrem fattigdom. For at overleve og forsørge sin dybt dysfunktionelle familie må hun leve et dobbeltliv som prostitueret om natten i Moka Eftis kælder.
+                            </p>
+                            <div class="bg-red-50/50 p-4 rounded-xl border border-red-100 text-xs">
+                                <span class="font-bold text-red-800 block mb-1">Eksamens-Kobling:</span>
+                                <p class="text-slate-600">Charlotte er en fantastisk karakter til at illustrere, at tyvernes kvindefrigørelse ofte skete på en knivsæg af ren, brutal overlevelse – en direkte parallel til de prostituerede på Otto Dix' sidepaneler i maleriet *Großstadt*.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Focus Section: Expressionistiske Filmgreb -->
+        <section id="expressionism-integration" class="scroll-mt-28">
+            <div class="flex items-center gap-6 mb-10">
+                <div class="w-16 h-1.5 bg-amber-500 rounded-full shadow-sm"></div>
+                <h2 class="text-xs font-black uppercase tracking-[0.4em] text-amber-500/80">Expressionisme i Babylon Berlin (Filmgreb)</h2>
+            </div>
+
+            <div class="quest-card" style="--accent: #f59e0b;">
+                <h3 class="text-2xl font-black text-slate-900 mb-4">Sådan overbeviser du censor om 12-tallet</h3>
+                <p class="text-sm text-slate-600 leading-relaxed mb-6 font-medium">
+                    Tv-serien benytter bevidst **filmekspressionistiske greb** fra 1920'ernes tyske filmguldalder (f.eks. *Das Cabinet des Dr. Caligari*) til at synliggøre karakterernes psykiske mareridt. I stedet for at filme objektivt, gøres billedet til et direkte spejl af angsten:
+                </p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="bg-amber-50/50 p-4 rounded-xl border border-amber-100">
+                        <span class="block font-bold text-amber-800 text-xs uppercase mb-1">Deformerede Kameravinkler</span>
+                        <p class="text-[11px] text-slate-600 leading-relaxed">Når Gereon får sine voldsomme panikanfald, tippes kameraet skævt (hollandsk vinkel). Dette symboliserer det fuldstændige tab af fodfæste og kontrol over virkeligheden.</p>
+                    </div>
+                    <div class="bg-amber-50/50 p-4 rounded-xl border border-amber-100">
+                        <span class="block font-bold text-amber-800 text-xs uppercase mb-1">Chiaroscuro (Lys og Skygge)</span>
+                        <p class="text-[11px] text-slate-600 leading-relaxed">Ekstreme kontraster mellem dybe skygger og skarpt, kunstigt neonlys fremhæver det hemmelighedsfulde og truende ved mørket i Berlin.</p>
+                    </div>
+                    <div class="bg-amber-50/50 p-4 rounded-xl border border-amber-100">
+                        <span class="block font-bold text-amber-800 text-xs uppercase mb-1">Stroboskopisk Redigering</span>
+                        <p class="text-[11px] text-slate-600 leading-relaxed">De hurtige, næsten stroboskopiske klip under panikscenerne genskaber maskingeværernes rytme fra skyttegravene i Gereons hjerne.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Context & Synthesis Connections -->
+        <section id="syntese" class="section-syntese scroll-mt-28">
+            <div class="flex items-center gap-6 mb-10">
+                <div class="w-16 h-1.5 bg-blue-500 rounded-full shadow-sm"></div>
+                <h2 class="text-xs font-black uppercase tracking-[0.4em] text-blue-500/80">Eksamens-Syntese (Marius' Genvej til 12)</h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Kobling 1: Erich Kästner - Besuch vom Lande -->
+                <div class="quest-card interactive" style="--accent: #3b82f6; --accent-glow: rgba(59, 130, 246, 0.2);">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold shadow-sm">
+                            <i class="fa-solid fa-city"></i>
+                        </div>
+                        <h3 class="text-xl font-bold tracking-tight text-slate-800 uppercase">Babylon Berlin vs. Besuch vom Lande</h3>
+                    </div>
+                    <p class="text-sm text-slate-600 leading-relaxed font-medium mb-4">
+                        I begge værker er <strong class="text-slate-800">storbyen en dehumaniserende maskine</strong>, der lammer individet. Kästner personificerer bilerne som "skrigende" monstre, der overkører provinsfolkene. I serien overvælder Berlins tempo og farer Gereon på samme kyniske måde.
+                    </p>
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 text-xs">
+                        <span class="font-bold text-slate-700 block mb-1">Tysk argument til oplægget:</span>
+                        <p class="italic text-slate-600">"Sowohl in der Serie 'Babylon Berlin' als auch in Kästners Gedicht ist die Großstadt ein bedrohlicher Mitspieler. Die Stadt schockiert und deformiert die Menschen, weil das Tempo und der Lärm zu groß sind."</p>
+                    </div>
+                </div>
+
+                <!-- Kobling 2: Otto Dix - Großstadt -->
+                <div class="quest-card interactive" style="--accent: #3b82f6; --accent-glow: rgba(59, 130, 246, 0.2);">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold shadow-sm">
+                            <i class="fa-solid fa-palette"></i>
+                        </div>
+                        <h3 class="text-xl font-bold tracking-tight text-slate-800 uppercase">Babylon Berlin vs. Otto Dix (Großstadt)</h3>
+                    </div>
+                    <p class="text-sm text-slate-600 leading-relaxed font-medium mb-4">
+                        Den ekstreme kontrast i tv-serien (det rige jazz-liv på Moka Efti vs. den dybe fattigdom i Charlottes barndomshjem) afspejler perfekt Otto Dix' triptykon. Dix maler overklassens fest på midterpanelet, mens de handicappede tiggere sidder i gaden.
+                    </p>
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 text-xs">
+                        <span class="font-bold text-slate-700 block mb-1">Tysk argument til oplægget:</span>
+                        <p class="italic text-slate-600">"Der scharfe Kontrast zwischen der Oberschicht im Nachtclub 'Moka Efti' und dem Elend von Charlottes Familie ist wie eine lebendige Darstellung des Triptychons von Otto Dix. Beide kritisieren den kynischen Genuss der Reichen."</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Blitz-Karten (Flashcards for Vocabulary) -->
+        <section id="flashcards" class="scroll-mt-28">
+            <div class="flex items-center gap-6 mb-10">
+                <div class="w-16 h-1.5 bg-yellow-400 rounded-full shadow-sm"></div>
+                <h2 class="text-xs font-black uppercase tracking-[0.4em] text-yellow-500/80">Blitz-Karten: Seriens vigtigste begreber</h2>
+            </div>
+            
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                <!-- Card 1 -->
+                <div class="w-full h-40 perspective-1000 cursor-pointer group" onclick="this.querySelector('.card-inner').classList.toggle('rotate-y-180')">
+                    <div class="card-inner relative w-full h-full transition-transform duration-500 transform-style-3d">
+                        <div class="absolute w-full h-full bg-white border border-slate-200 rounded-2xl flex items-center justify-center p-4 backface-hidden shadow-sm group-hover:border-yellow-400">
+                            <h4 class="font-bold text-slate-800 text-center">das Kriegstrauma</h4>
+                        </div>
+                        <div class="absolute w-full h-full bg-gradient-to-br from-yellow-400 to-amber-500 text-white rounded-2xl flex flex-col items-center justify-center p-4 backface-hidden rotate-y-180 shadow-lg text-center text-sm font-medium">
+                            <span class="text-xs uppercase opacity-70 mb-1">Glose</span>
+                            Krigstraumet (især Gereons granatchok / PTSD)
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="w-full h-40 perspective-1000 cursor-pointer group" onclick="this.querySelector('.card-inner').classList.toggle('rotate-y-180')">
+                    <div class="card-inner relative w-full h-full transition-transform duration-500 transform-style-3d">
+                        <div class="absolute w-full h-full bg-white border border-slate-200 rounded-2xl flex items-center justify-center p-4 backface-hidden shadow-sm group-hover:border-yellow-400">
+                            <h4 class="font-bold text-slate-800 text-center">der Eskapismus</h4>
+                        </div>
+                        <div class="absolute w-full h-full bg-gradient-to-br from-yellow-400 to-amber-500 text-white rounded-2xl flex flex-col items-center justify-center p-4 backface-hidden rotate-y-180 shadow-lg text-center text-sm font-medium">
+                            <span class="text-xs uppercase opacity-70 mb-1">Glose</span>
+                            Virkelighedsflugt (at glemme traumet gennem vild fest)
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="w-full h-40 perspective-1000 cursor-pointer group" onclick="this.querySelector('.card-inner').classList.toggle('rotate-y-180')">
+                    <div class="card-inner relative w-full h-full transition-transform duration-500 transform-style-3d">
+                        <div class="absolute w-full h-full bg-white border border-slate-200 rounded-2xl flex items-center justify-center p-4 backface-hidden shadow-sm group-hover:border-yellow-400">
+                            <h4 class="font-bold text-slate-800 text-center">die neue Frau</h4>
+                        </div>
+                        <div class="absolute w-full h-full bg-gradient-to-br from-yellow-400 to-amber-500 text-white rounded-2xl flex flex-col items-center justify-center p-4 backface-hidden rotate-y-180 shadow-lg text-center text-sm font-medium">
+                            <span class="text-xs uppercase opacity-70 mb-1">Glose</span>
+                            Den frigjorte, moderne kvinde i 1920'erne (Charlotte)
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 4 -->
+                <div class="w-full h-40 perspective-1000 cursor-pointer group" onclick="this.querySelector('.card-inner').classList.toggle('rotate-y-180')">
+                    <div class="card-inner relative w-full h-full transition-transform duration-500 transform-style-3d">
+                        <div class="absolute w-full h-full bg-white border border-slate-200 rounded-2xl flex items-center justify-center p-4 backface-hidden shadow-sm group-hover:border-yellow-400">
+                            <h4 class="font-bold text-slate-800 text-center">Huren Babylon</h4>
+                        </div>
+                        <div class="absolute w-full h-full bg-gradient-to-br from-yellow-400 to-amber-500 text-white rounded-2xl flex flex-col items-center justify-center p-4 backface-hidden rotate-y-180 shadow-lg text-center text-sm font-medium">
+                            <span class="text-xs uppercase opacity-70 mb-1">Glose</span>
+                            "Skøgen Babylon" (symbol på Berlins synd og korruption)
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Strategy for Marius (Oral Exam simulation) -->
+        <section id="marius-strategy" class="pb-20 scroll-mt-28">
+            <div class="bg-white/80 backdrop-blur-xl border border-amber-200/50 rounded-[2.5rem] p-8 md:p-12 relative overflow-hidden shadow-2xl">
+                <div class="relative z-10 grid grid-cols-1 lg:grid-cols-3 gap-12">
+                    
+                    <div class="lg:col-span-1">
+                        <div class="flex items-center gap-4 mb-6">
+                            <div class="h-8 w-1.5 bg-amber-500 rounded-full"></div>
+                            <h3 class="text-3xl font-black uppercase tracking-tight text-slate-900">Eksamenstips</h3>
+                        </div>
+                        <p class="text-slate-600 text-sm font-medium leading-relaxed mb-6">Hvis du trækker *Babylon Berlin* til den mundtlige eksamen, skal du fokusere på disse tre faglige råd for at sikre 10-12:</p>
+                        
+                        <div class="space-y-4">
+                            <div class="bg-amber-50 p-4 rounded-xl border border-amber-100">
+                                <span class="block font-bold text-amber-800 text-xs uppercase mb-1">Tydelig Karaktermodstilling</span>
+                                <p class="text-[11px] text-slate-600 leading-relaxed">Sæt altid Gereon (veteran med angst) og Charlotte (kvinde med vilje til frigørelse) op mod hinanden som to forskellige skæbner af samme by.</p>
+                            </div>
+                            <div class="bg-amber-50 p-4 rounded-xl border border-amber-100">
+                                <span class="block font-bold text-amber-800 text-xs uppercase mb-1">Tale-kontrol & V2</span>
+                                <p class="text-[11px] text-slate-600 leading-relaxed">Når du taler om tunge emner som PTSD, så hold tempoet roligt. Det hjælper dig til at sende verberne rigtigt til sidst efter *weil* og *dass*.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Interactive Oral Guide step by step -->
+                    <div class="lg:col-span-2 space-y-6">
+                        <div class="bg-amber-50 border border-amber-100 rounded-2xl p-6">
+                            <span class="text-xs font-bold text-amber-500 uppercase tracking-widest block mb-1">Oplægs-Struktur: Babylon Berlin</span>
+                            <h4 class="text-xl font-bold italic text-slate-800 mb-4">Udforsk strukturen for dit 5-minutters oplæg:</h4>
+                            
+                            <!-- Interactive Steps -->
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs font-medium">
+                                <div onclick="toggleStep(1)" id="step-btn-1" class="step-card active cursor-pointer border border-amber-200 bg-white p-4 rounded-xl shadow-sm hover:border-amber-500 transition">
+                                    <span class="w-6 h-6 rounded-full bg-amber-100 text-amber-600 font-bold flex items-center justify-center mb-2">1</span>
+                                    <span class="font-bold text-slate-800 text-sm block mb-1">Einleitung</span>
+                                    <p class="text-slate-500 leading-relaxed">Præsenter serien og dens historiske ramme i 1929.</p>
+                                </div>
+                                <div onclick="toggleStep(2)" id="step-btn-2" class="step-card cursor-pointer border border-slate-200 bg-white p-4 rounded-xl shadow-sm hover:border-amber-500 transition">
+                                    <span class="w-6 h-6 rounded-full bg-slate-100 text-slate-600 font-bold flex items-center justify-center mb-2">2</span>
+                                    <span class="font-bold text-slate-800 text-sm block mb-1">Analyse</span>
+                                    <p class="text-slate-500 leading-relaxed">Dyk ned i Gereons angst og Charlottes dobbeltliv.</p>
+                                </div>
+                                <div onclick="toggleStep(3)" id="step-btn-3" class="step-card cursor-pointer border border-slate-200 bg-white p-4 rounded-xl shadow-sm hover:border-amber-500 transition">
+                                    <span class="w-6 h-6 rounded-full bg-slate-100 text-slate-600 font-bold flex items-center justify-center mb-2">3</span>
+                                    <span class="font-bold text-slate-800 text-sm block mb-1">Syntese</span>
+                                    <p class="text-slate-500 leading-relaxed">Sammenlign med Otto Dix og Erich Kästners digt.</p>
+                                </div>
+                            </div>
+
+                            <!-- Step description output -->
+                            <div class="mt-6 bg-white p-5 rounded-xl border border-amber-100">
+                                <h5 class="text-xs font-bold text-amber-500 uppercase tracking-widest block mb-2" id="step-title">Fase 1: Einleitung (Ca. 1.5 minutter)</h5>
+                                <p id="step-desc" class="text-sm text-slate-700 leading-relaxed">
+                                    Slå tonen an med en stærk tysk indledning: <br>
+                                    <strong class="text-slate-900 italic">"Ich möchte heute über die Serie 'Babylon Berlin' sprechen. Die Serie spielt im Jahr 1929 am Ende der Weimarer Republik. Sie zeigt die extreme Spaltung der Gesellschaft."</strong><br><br>
+                                    Forklar kort, at titlen "Babylon" refererer til synden og korruptionen, som hærger under den gyldne overflade.
+                                </p>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+                <div class="absolute -right-20 -bottom-20 w-96 h-96 bg-gradient-to-tl from-amber-400/20 to-red-400/10 rounded-full blur-3xl pointer-events-none"></div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="text-center py-16 border-t border-amber-100 text-slate-400 text-[10px] font-black uppercase tracking-[0.2em] relative z-10">
+        <p>Sankt Annæ Gymnasium • 2.A Tysk B • Udviklet til Marius</p>
+    </footer>
+
+    <!-- Scripts Logic -->
+    <script>
+        // --- Typewriter Animation ---
+        const words = ["Huren Babylon", "Gereon Rath", "Charlotte Ritter", "Moka Efti", "Eskapismus", "Zwei Gesichter"];
+        let wordIndex = 0;
+        let charIndex = 0;
+        let isDeleting = false;
+        const typewriterElement = document.getElementById('typewriter');
+        const typeSpeed = 150;
+        const backSpeed = 80;
+        const delay = 2000;
+
+        function type() {
+            const currentWord = words[wordIndex];
+            
+            if (isDeleting) {
+                typewriterElement.textContent = currentWord.substring(0, charIndex - 1);
+                charIndex--;
+            } else {
+                typewriterElement.textContent = currentWord.substring(0, charIndex + 1);
+                charIndex++;
+            }
+
+            let currentSpeed = isDeleting ? backSpeed : typeSpeed;
+
+            if (!isDeleting && charIndex === currentWord.length) {
+                isDeleting = true;
+                currentSpeed = delay;
+            } else if (isDeleting && charIndex === 0) {
+                isDeleting = false;
+                wordIndex = (wordIndex + 1) % words.length;
+                currentSpeed = 500;
+            }
+
+            setTimeout(type, currentSpeed);
+        }
+
+        // --- Partikel Animation ---
+        const canvas = document.getElementById('particle-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 1;
+                this.speedX = (Math.random() - 0.5) * 0.4;
+                this.speedY = (Math.random() - 0.5) * 0.4;
+                this.color = Math.random() > 0.5 ? '#f59e0b' : '#ef4444'; 
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.x > canvas.width) this.x = 0;
+                if (this.x < 0) this.x = canvas.width;
+                if (this.y > canvas.height) this.y = 0;
+                if (this.y < 0) this.y = canvas.height;
+            }
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function initParticles() {
+            particles = [];
+            for (let i = 0; i < 30; i++) {
+                particles.push(new Particle());
+            }
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animateParticles);
+        }
+
+        window.addEventListener('resize', resize);
+        window.onload = () => {
+            resize();
+            initParticles();
+            animateParticles();
+            type();
+        };
+
+        // --- Interactive Double-role Toggler ---
+        const roleData = {
+            1: {
+                title: "Huren Babylon - Der goldene Schein",
+                desc: "Her ser vi den glamourøse eskapisme. Folk fester og danser ekstravagant natten lang i Moka Efti for at glemme virkelighedens kriser og traumer. Charlotte Ritter personificerer denne energi: Hun tager sin frihed og seksualitet i egne hænder, klæder sig festligt og danser løs under jazzens toner.",
+                german: "\"Die Oberschicht und junge Menschen wie Charlotte Ritter flüchten in das glitzernde Nachtleben von Berlin. Im Club 'Moka Efti' herrscht reiner Eskapismus, um die politische Instabilität und persönliche Sorgen zu vergessen.\"",
+                vocab: [
+                    { de: "das Nachtleben", da: "nattelivet" },
+                    { de: "der Schein", da: "skinnet / overfladen" },
+                    { de: "der Tanzclub", da: "danseklubben (Moka Efti)" },
+                    { de: "flüchten", da: "at flygte" }
+                ]
+            },
+            2: {
+                title: "Dreck, Elend & das Kriegstrauma",
+                desc: "Bag festens glitrende facade lurer en barsk, kold realitet. Kriminalkommissær Gereon Rath lider under granatchok (PTSD) og må ulovligt dæmpe sin angst med morfin. Charlotte Ritter må prostituere sig for at brødføde sin ludfattige familie. Det borgerlige demokrati er døende, og ekstrem vold dominerer gaderne.",
+                german: "\"Hinter der Fassade verbirgt sich das Elend. Gereon Rath leidet an einem schweren Kriegstrauma und Charlotte muss sich prostituieren, um ihre arme Familie zu ernähren. Das zeigt die soziale Kälte der Stadt.\"",
+                vocab: [
+                    { de: "das Kriegstrauma", da: "krigstraumet" },
+                    { de: "das Elend", da: "elendigheden" },
+                    { de: "die Prostitution", da: "prostitutionen" },
+                    { de: "die Spaltung", da: "splittelsen" }
+                ]
+            }
+        };
+
+        function selectRole(num) {
+            document.querySelectorAll('.role-box').forEach(el => el.classList.remove('active'));
+            document.getElementById('role-' + num).classList.add('active');
+            
+            const data = roleData[num];
+            document.getElementById('role-title').innerText = data.title;
+            document.getElementById('role-desc').innerText = data.desc;
+            document.getElementById('role-german').innerText = data.german;
+            
+            const vocabContainer = document.getElementById('role-vocab');
+            vocabContainer.innerHTML = '';
+            data.vocab.forEach(item => {
+                vocabContainer.innerHTML += `
+                    <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-150">
+                        <span class="text-amber-600 font-mono">${item.de}</span> = ${item.da}
+                    </div>
+                `;
+            });
+        }
+
+        // --- Tabs Logic (Character Dossier) ---
+        function switchCharacterTab(tabId, btn) {
+            document.querySelectorAll('.char-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(el => {
+                el.classList.remove('active');
+                el.classList.add('text-slate-500');
+            });
+            document.getElementById('char-' + tabId).classList.remove('hidden');
+            btn.classList.add('active');
+            btn.classList.remove('text-slate-500');
+        }
+
+        // --- Oral Presentation Steps ---
+        const stepData = {
+            1: {
+                title: "Fase 1: Einleitung (Ca. 1.5 minutter)",
+                desc: "Start med at slå fast, hvilket værk du har trukket: <br><strong class='text-slate-900 italic'>\"Ich möchte heute über die Serie 'Babylon Berlin' sprechen. Die Serie spielt im Jahr 1929 am Ende der Weimarer Republik. Sie zeigt die extreme Spaltung der Gesellschaft.\"</strong><br><br>Forklar kort, at Berlin i 1929 var mærket af vild eskapisme under den glitrende overflade, og at byen fungerer som en aktiv medspiller."
+            },
+            2: {
+                title: "Fase 2: Analyse & Charaktere (Ca. 2 minutter)",
+                desc: "Dyk dybt ned i karaktererne: <br><strong class='text-slate-900 italic'>\"In der Serie sehen wir zwei Hauptcharaktere: Gereon Rath, ein traumatisierter Kriegsveteran, und Charlotte Ritter, die die 'neue Frau' repräsentiert. Beide müssen ein Doppelleben führen, um in der grausamen Großstadt zu überleben.\"</strong><br><br>Forklar her, hvordan Gereons PTSD filmes med expressionistiske filmgreb (rystende billeder, skygger)."
+            },
+            3: {
+                title: "Fase 3: Syntese & Perspektiv (Ca. 1.5 minutter)",
+                desc: "Slut af med en stærk perspektivering for at sikre topkarakteren: <br><strong class='text-slate-900 italic'>\"Wenn man Babylon Berlin mit Erich Kästners 'Besuch vom Lande' vergleicht, sieht man, dass die Großstadt in beiden Werken ein kynisches Monster ist. Und der soziale Kontrast spiegelt genau das Tryptichon von Otto Dix wider.\"</strong>"
+            }
+        };
+
+        function toggleStep(stepNum) {
+            document.querySelectorAll('.step-card').forEach(el => {
+                el.classList.remove('border-amber-500', 'active');
+                el.querySelector('span').classList.remove('bg-amber-100', 'text-amber-600');
+                el.querySelector('span').classList.add('bg-slate-100', 'text-slate-600');
+            });
+            
+            const activeCard = document.getElementById('step-btn-' + stepNum);
+            activeCard.classList.add('border-amber-500', 'active');
+            
+            const badge = activeCard.querySelector('span');
+            badge.classList.remove('bg-slate-100', 'text-slate-600');
+            badge.classList.add('bg-amber-100', 'text-amber-600');
+            
+            const data = stepData[stepNum];
+            document.getElementById('step-title').innerHTML = data.title;
+            document.getElementById('step-desc').innerHTML = data.desc;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="da">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Der Expressionismus - Tysk B | Sankt Annæ</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- FontAwesome til ikoner -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Google Fonts: Plus Jakarta Sans & Space Grotesk -->
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            /* Tema farve for Expressionismus (Dyb lilla/magenta baseret på dit hovedindex) */
+            --primary: #a855f7; 
+            --primary-glow: rgba(168, 85, 247, 0.15);
+            --slate-bg: #fffcf8; /* Varm lys baggrund */
+            --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: var(--slate-bg);
+            color: #1e293b;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        #particle-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -2;
+            pointer-events: none;
+            opacity: 0.45;
+        }
+
+        .bg-blob {
+            position: fixed;
+            z-index: -1;
+            filter: blur(120px);
+            opacity: 0.12;
+            pointer-events: none;
+            border-radius: 50%;
+            animation: drift 25s infinite alternate ease-in-out;
+        }
+
+        @keyframes drift {
+            0% { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(50px, -80px) scale(1.15); }
+        }
+
+        /* Quest Card (Glassmorphism styling) */
+        .quest-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            border: 1px solid #f3e8ff; /* Lys lilla border */
+            border-radius: 2rem;
+            padding: 1.75rem;
+            transition: all 0.4s var(--ease-out-expo);
+            position: relative;
+            overflow: hidden;
+            border-left: 6px solid var(--accent, #a855f7);
+        }
+
+        .quest-card.interactive:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 20px 40px -10px var(--accent-glow, rgba(168, 85, 247, 0.2));
+            border-color: var(--accent, #a855f7);
+        }
+
+        /* Knap-design */
+        .btn-action {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.65rem 1.25rem;
+            border-radius: 9999px;
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+            font-family: 'Space Grotesk', sans-serif;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-size: 0.75rem;
+            background: white;
+            cursor: pointer;
+        }
+
+        .btn-action:hover {
+            border-color: var(--primary);
+            box-shadow: 0 8px 25px -5px var(--primary-glow);
+            color: var(--primary);
+        }
+
+        /* Active indicator states */
+        .feature-box {
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+        .feature-box:hover {
+            background: rgba(168, 85, 247, 0.05);
+            border-color: rgba(168, 85, 247, 0.3);
+        }
+        .feature-box.active {
+            background: rgba(168, 85, 247, 0.08);
+            border-color: var(--primary);
+            box-shadow: 0 4px 20px -5px rgba(168, 85, 247, 0.15);
+        }
+
+        /* Tab buttons */
+        .tab-btn {
+            font-family: 'Space Grotesk', sans-serif;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+        .tab-btn.active {
+            border-bottom-color: var(--accent, #a855f7);
+            color: var(--accent, #a855f7);
+        }
+
+        /* Flashcards 3D Styling */
+        .perspective-1000 { perspective: 1000px; }
+        .backface-hidden { backface-visibility: hidden; }
+        .rotate-y-180 { transform: rotateY(180deg); }
+        .transform-style-3d { transform-style: preserve-3d; }
+
+        /* Overskrifts-cursor animation */
+        #typewriter::after {
+            content: "|";
+            animation: blink 1s step-end infinite;
+            margin-left: 2px;
+            color: var(--primary);
+        }
+
+        @keyframes blink {
+            from, to { opacity: 1; }
+            50% { opacity: 0; }
+        }
+    </style>
+</head>
+<body class="min-h-screen pb-20">
+
+    <!-- Animeret Partikel System -->
+    <canvas id="particle-canvas"></canvas>
+
+    <!-- Background Blobs -->
+    <div class="bg-blob w-[600px] h-[600px] bg-purple-400 top-[-10%] left-[-10%]"></div>
+    <div class="bg-blob w-[500px] h-[500px] bg-pink-300 bottom-[20%] right-[-5%]"></div>
+
+    <!-- Navigation Bar -->
+    <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-md border-b border-purple-100 shadow-sm">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <div class="flex items-center gap-4 cursor-pointer" onclick="window.location.href='sidste-forloeb.html'">
+                <div class="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-600 rounded-2xl flex items-center justify-center shadow-lg shadow-purple-500/30">
+                    <span class="text-white font-black text-2xl">ß</span>
+                </div>
+                <div>
+                    <span class="text-xl font-black tracking-tight block leading-none text-slate-900 uppercase">TYSK <span class="text-purple-500">B</span></span>
+                    <span class="text-[10px] font-bold text-slate-500 uppercase tracking-widest mt-1">Undervisningsværktøj: Der Expressionismus</span>
+                </div>
+            </div>
+            <div class="flex items-center gap-6">
+                <a href="sidste-forloeb.html" class="text-xs font-black text-slate-500 hover:text-purple-600 transition uppercase tracking-widest flex items-center gap-2">
+                    <i class="fa-solid fa-arrow-left"></i> Tilbage til Weimarer Rep.
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Header Section -->
+    <header class="max-w-7xl mx-auto px-6 pt-24 pb-16 text-center relative">
+        <div class="inline-block mb-4 px-4 py-1.5 rounded-full bg-purple-50 border border-purple-100 text-purple-600 font-bold text-xs tracking-widest uppercase shadow-sm">
+            Kunst, Litteratur & Følelser (1905-1925)
+        </div>
+        <h1 class="text-5xl md:text-7xl lg:text-8xl font-black tracking-tighter text-slate-900 mb-6 uppercase leading-[0.9]">
+            Der <br><span id="typewriter" class="text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-pink-500 italic">Expressionismus</span>
+        </h1>
+        <p class="text-slate-600 text-lg md:text-xl max-w-3xl mx-auto leading-relaxed font-medium">
+            Oplev det dramatiske oprør mod industrialiseringens kolde virkelighed og mellemkrigstidens traumer. Ekspressionismen skildrer ikke den ydre verden – den maler sjælens intense indre råb.
+        </p>
+    </header>
+
+    <!-- Quick Facts Row -->
+    <main class="max-w-7xl mx-auto px-6 space-y-24">
+        <section class="grid grid-cols-2 md:grid-cols-4 gap-6">
+            <div class="bg-white p-6 rounded-2xl border border-purple-100 shadow-sm text-center">
+                <span class="text-xs font-bold text-purple-400 uppercase tracking-widest block mb-2">Tidsperiode</span>
+                <span class="text-lg font-extrabold text-slate-800">1905 - 1925</span>
+            </div>
+            <div class="bg-white p-6 rounded-2xl border border-purple-100 shadow-sm text-center">
+                <span class="text-xs font-bold text-purple-400 uppercase tracking-widest block mb-2">Hovedfokus</span>
+                <span class="text-lg font-extrabold text-slate-800">Indre følelser (Gefühle)</span>
+            </div>
+            <div class="bg-white p-6 rounded-2xl border border-purple-100 shadow-sm text-center">
+                <span class="text-xs font-bold text-purple-400 uppercase tracking-widest block mb-2">Oprør mod</span>
+                <span class="text-lg font-extrabold text-slate-800">Bürgertum & Maskiner</span>
+            </div>
+            <div class="bg-white p-6 rounded-2xl border border-purple-100 shadow-sm text-center">
+                <span class="text-xs font-bold text-purple-400 uppercase tracking-widest block mb-2">Nøglebegreb</span>
+                <span class="text-lg font-extrabold text-slate-800">Die Entfremdung</span>
+            </div>
+        </section>
+
+        <!-- Interactive Visual Analyzer -->
+        <section id="visual-analyzer" class="scroll-mt-28">
+            <div class="flex items-center gap-6 mb-10">
+                <div class="w-16 h-1.5 bg-purple-500 rounded-full shadow-sm"></div>
+                <h2 class="text-xs font-black uppercase tracking-[0.4em] text-purple-500/80">Kunstens tre søjler (Die Merkmale)</h2>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                
+                <!-- Left: Interactive Søjler Selector -->
+                <div class="lg:col-span-6 space-y-4">
+                    <p class="text-xs text-slate-400 font-bold uppercase tracking-wider mb-2">
+                        <i class="fa-solid fa-hand-pointer text-purple-400"></i> Klik på et stiltræk for at se den dybe analyse og de tyske begreber:
+                    </p>
+                    
+                    <!-- Feature 1: Farben -->
+                    <div id="feat-1" onclick="selectFeature(1)" class="feature-box active border border-slate-200 p-6 rounded-2xl bg-white">
+                        <div class="flex items-center gap-3 mb-2">
+                            <span class="text-purple-500 text-lg"><i class="fa-solid fa-palette"></i></span>
+                            <span class="text-xs font-bold text-purple-500 block">Visuelt Kendetegn 1</span>
+                        </div>
+                        <h4 class="text-lg font-black text-slate-800 mb-1">Unaturlige & voldsomme farver (Farben)</h4>
+                        <p class="text-xs text-slate-500">Løsrivelse fra realismens farver. Farven er et direkte sprog for sjælen.</p>
+                    </div>
+
+                    <!-- Feature 2: Formen -->
+                    <div id="feat-2" onclick="selectFeature(2)" class="feature-box border border-slate-200 p-6 rounded-2xl bg-white">
+                        <div class="flex items-center gap-3 mb-2">
+                            <span class="text-purple-500 text-lg"><i class="fa-solid fa-wand-magic-sparkles"></i></span>
+                            <span class="text-xs font-bold text-purple-500 block">Visuelt Kendetegn 2</span>
+                        </div>
+                        <h4 class="text-lg font-black text-slate-800 mb-1">Forvridte & kaotiske former (Verzerrung)</h4>
+                        <p class="text-xs text-slate-500">Det vinklede, skarpe og deforme fremhæver angst og indre opløsning.</p>
+                    </div>
+
+                    <!-- Feature 3: Abstraktion -->
+                    <div id="feat-3" onclick="selectFeature(3)" class="feature-box border border-slate-200 p-6 rounded-2xl bg-white">
+                        <div class="flex items-center gap-3 mb-2">
+                            <span class="text-purple-500 text-lg"><i class="fa-solid fa-ghost"></i></span>
+                            <span class="text-xs font-bold text-purple-500 block">Visuelt Kendetegn 3</span>
+                        </div>
+                        <h4 class="text-lg font-black text-slate-800 mb-1">Subjektiv virkelighed (Abstraktion)</h4>
+                        <p class="text-xs text-slate-500">Væk med det naturtro spejlbillede. Det handler kun om den indre oplevelse.</p>
+                    </div>
+                </div>
+
+                <!-- Right: Analysis Output Card -->
+                <div class="lg:col-span-6 sticky top-28 space-y-6">
+                    <div class="quest-card" style="--accent: #a855f7;">
+                        <h3 class="text-2xl font-black text-slate-900 mb-4 flex items-center gap-2">
+                            <i class="fa-solid fa-magnifying-glass text-purple-500"></i>
+                            <span id="feat-title">Farbe als Schrei der Seele</span>
+                        </h3>
+                        
+                        <!-- Analysis Description -->
+                        <div class="mb-6">
+                            <span class="text-[10px] text-purple-500 font-bold uppercase tracking-widest block mb-2">Faglig forklaring</span>
+                            <p id="feat-desc" class="text-sm text-slate-600 leading-relaxed font-medium bg-purple-50/50 p-4 rounded-xl border border-purple-100">
+                                Ekspressionisterne bruger farverne subjektivt og symbolsk frem for naturtro. En himmel behøver ikke at være blå; den kan være blodrød for at signalere krigens rædsler, og en hest kan være blå for at repræsentere ren åndelighed. Farverne er rå følelser smurt direkte på lærredet.
+                            </p>
+                        </div>
+
+                        <!-- Poetic Point in German -->
+                        <div class="mb-6">
+                            <span class="text-[10px] text-purple-500 font-bold uppercase tracking-widest block mb-2">Guld-argument til eksamen (Tysk)</span>
+                            <p id="feat-german" class="text-sm text-slate-700 leading-relaxed font-semibold italic border-l-4 border-purple-500 pl-4">
+                                "Die Expressionisten nutzen unnatürliche Farben, um die innere Realität der Seele auszudrücken. Ein Beispiel ist der rote Himmel in Munchs 'Der Schrei', der Angst und Panik symbolisiert."
+                            </p>
+                        </div>
+
+                        <!-- Vocabulary Box -->
+                        <div>
+                            <span class="text-[10px] text-purple-500 font-bold uppercase tracking-widest block mb-2">Begreber til kunstanalysen</span>
+                            <div id="feat-vocab" class="grid grid-cols-2 gap-2 text-xs font-bold text-slate-600">
+                                <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-150"><span class="text-purple-600">unnatürliche Farben</span> = unaturlige farver</div>
+                                <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-150"><span class="text-purple-600">die Stimmung</span> = stemningen</div>
+                                <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-150"><span class="text-purple-600">ausdrücken</span> = at udtrykke</div>
+                                <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-150"><span class="text-purple-600">subjektiv</span> = subjektiv / personlig</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Interactive Virtual Gallery -->
+        <section id="gallery" class="scroll-mt-28">
+            <div class="flex items-center gap-6 mb-10">
+                <div class="w-16 h-1.5 bg-pink-500 rounded-full shadow-sm"></div>
+                <h2 class="text-xs font-black uppercase tracking-[0.4em] text-pink-500/80">Die Meisterwerke (Galleri)</h2>
+            </div>
+
+            <!-- Tabs Navigation -->
+            <div class="flex flex-wrap border-b border-slate-200 gap-2 mb-8" style="--accent: #ec4899;">
+                <button onclick="switchGalleryTab('munch', this)" class="tab-btn active px-4 py-3 text-sm font-bold text-slate-500 hover:text-slate-850 flex items-center gap-2">
+                    <i class="fa-solid fa-face-grimace"></i> Edvard Munch: Der Schrei
+                </button>
+                <button onclick="switchGalleryTab('kirchner', this)" class="tab-btn px-4 py-3 text-sm font-bold text-slate-500 hover:text-slate-850 flex items-center gap-2">
+                    <i class="fa-solid fa-city"></i> E. L. Kirchner: Straßenszene
+                </button>
+                <button onclick="switchGalleryTab('marc', this)" class="tab-btn px-4 py-3 text-sm font-bold text-slate-500 hover:text-slate-850 flex items-center gap-2">
+                    <i class="fa-solid fa-horse"></i> Franz Marc: Blaue Pferde
+                </button>
+            </div>
+
+            <!-- Tab Content: Munch -->
+            <div id="gallery-munch" class="gallery-content block animate-fadeIn">
+                <div class="quest-card" style="--accent: #ec4899;">
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                        <!-- Left: Visual Placeholder of Munch's The Scream -->
+                        <div class="lg:col-span-4 bg-gradient-to-tr from-amber-500 via-red-600 to-purple-800 p-8 rounded-2xl border border-pink-200 flex flex-col items-center justify-center text-white text-center shadow-inner h-64">
+                            <i class="fa-solid fa-face-grimace text-6xl mb-4 animate-bounce"></i>
+                            <h4 class="font-bold text-lg">Der Schrei</h4>
+                            <span class="text-[10px] uppercase font-bold tracking-widest opacity-85">Edvard Munch (1893)</span>
+                        </div>
+                        <!-- Right: Deep Analytical Breakdown -->
+                        <div class="lg:col-span-8 space-y-4">
+                            <span class="text-xs font-bold text-pink-600 block uppercase tracking-widest">Ur-eksemplet på ekspressionismen</span>
+                            <h3 class="text-2xl font-black text-slate-800">Sjælens eksistentielle panik</h3>
+                            <p class="text-sm text-slate-600 leading-relaxed">
+                                Selvom Munch var norsk, dannede dette maleri fundamentet for hele den tyske ekspressionistiske bevægelse. Ansigtet er forvredet som en kranie-lignende maske, og landskabets bølgende, kaotiske linjer indhyller figuren i ren rædsel. Naturen og himlen "skriger" af angst (angst vor der Modernisierung).
+                            </p>
+                            <div class="bg-pink-50/50 p-4 rounded-xl border border-pink-100 text-xs">
+                                <span class="font-bold text-pink-800 block mb-1">Eksamens-Kobling:</span>
+                                <p class="text-slate-600">Dette værk viser den totale orienteringsløshed og isolation, som det moderne storby-menneske mærker – det er et fantastisk sammenligningsgrundlag for Kästners *Besuch vom Lande*.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Content: Kirchner -->
+            <div id="gallery-kirchner" class="gallery-content hidden animate-fadeIn">
+                <div class="quest-card" style="--accent: #ec4899;">
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                        <!-- Left: Visual Placeholder of Kirchner -->
+                        <div class="lg:col-span-4 bg-gradient-to-tr from-purple-800 via-pink-700 to-indigo-900 p-8 rounded-2xl border border-pink-200 flex flex-col items-center justify-center text-white text-center shadow-inner h-64">
+                            <i class="fa-solid fa-people-group text-6xl mb-4"></i>
+                            <h4 class="font-bold text-lg">Berliner Straßenszene</h4>
+                            <span class="text-[10px] uppercase font-bold tracking-widest opacity-85">E. L. Kirchner (1913)</span>
+                        </div>
+                        <!-- Right: Analytical Breakdown -->
+                        <div class="lg:col-span-8 space-y-4">
+                            <span class="text-xs font-bold text-pink-600 block uppercase tracking-widest">Storby-neuroser & Prostitution</span>
+                            <h3 class="text-2xl font-black text-slate-800">Den fremmedgørende asfalt-jungle</h3>
+                            <p class="text-sm text-slate-600 leading-relaxed">
+                                Kirchner maler Berlins borgere med spidse, kantede og deforme ansigter. Farverne er giftige (kemisk grøn og skarp lyserød). Personerne er tæt presset sammen på fortovet, men ingen har øjenkontakt. De er fuldstændig ensomme og anonyme i mængden. Prostitutionen er symbolet på den moralske opløsning.
+                            </p>
+                            <div class="bg-pink-50/50 p-4 rounded-xl border border-pink-100 text-xs">
+                                <span class="font-bold text-pink-800 block mb-1">Eksamens-Kobling:</span>
+                                <p class="text-slate-600">Her ses "Die Großstadt" som det fremmedgørende monster, længe før film som *Babylon Berlin* eller Neue Sachlichkeit-malerne dokumenterede det. Det er det psykologiske forstadie til krigen.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tab Content: Franz Marc -->
+            <div id="gallery-marc" class="gallery-content hidden animate-fadeIn">
+                <div class="quest-card" style="--accent: #ec4899;">
+                    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+                        <!-- Left: Visual Placeholder of Franz Marc -->
+                        <div class="lg:col-span-4 bg-gradient-to-tr from-blue-600 via-teal-500 to-blue-900 p-8 rounded-2xl border border-pink-200 flex flex-col items-center justify-center text-white text-center shadow-inner h-64">
+                            <i class="fa-solid fa-horse text-6xl mb-4"></i>
+                            <h4 class="font-bold text-lg">Die großen blauen Pferde</h4>
+                            <span class="text-[10px] uppercase font-bold tracking-widest opacity-85">Franz Marc (1911)</span>
+                        </div>
+                        <!-- Right: Analytical Breakdown -->
+                        <div class="lg:col-span-8 space-y-4">
+                            <span class="text-xs font-bold text-pink-600 block uppercase tracking-widest">Åndelighed & Natur</span>
+                            <h3 class="text-2xl font-black text-slate-800">Dyr som symbol på uskyld og ånd</h3>
+                            <p class="text-sm text-slate-600 leading-relaxed">
+                                Modsat Kirchner flygtede Franz Marc ud af storbyen. Han malede dyr for at skildre en ren, uforstyrret og åndelig verden, fri for menneskelig grådighed og maskiner. Den blå farve symboliserer det maskuline og det åndelige, mens de bløde, buede linjer signalerer harmoni med naturen.
+                            </p>
+                            <div class="bg-pink-50/50 p-4 rounded-xl border border-pink-100 text-xs">
+                                <span class="font-bold text-pink-800 block mb-1">Eksamens-Kobling:</span>
+                                <p class="text-slate-600">Dette værk illustrerer den ekspressionistiske eskapisme – ønsket om at slippe væk fra det industrialiserede klassesamfund, som senere knuser personerne i mellemkrigstiden.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Context & Synthesis Connections -->
+        <section id="syntese" class="section-syntese scroll-mt-28">
+            <div class="flex items-center gap-6 mb-10">
+                <div class="w-16 h-1.5 bg-blue-500 rounded-full shadow-sm"></div>
+                <h2 class="text-xs font-black uppercase tracking-[0.4em] text-blue-500/80">Eksamens-Syntese (Marius' Genvej til 12)</h2>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <!-- Kobling 1: Babylon Berlin -->
+                <div class="quest-card interactive" style="--accent: #3b82f6; --accent-glow: rgba(59, 130, 246, 0.2);">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold shadow-sm">
+                            <i class="fa-solid fa-film"></i>
+                        </div>
+                        <h3 class="text-xl font-bold tracking-tight text-slate-800 uppercase">Expressionismus vs. Babylon Berlin</h3>
+                    </div>
+                    <p class="text-sm text-slate-600 leading-relaxed font-medium mb-4">
+                        Gereon Raths svære PTSD-anfald og skræmmende hallucinationer (granatchok) skildres i tv-serien med **ekspressionistiske filmgreb**: rystende billeder, mørke skygger, forvridte vinkler og intens, lammende panik.
+                    </p>
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 text-xs">
+                        <span class="font-bold text-slate-700 block mb-1">Tysk argument til oplægget:</span>
+                        <p class="italic text-slate-600">"Die Halluzinationen von Gereon Rath in 'Babylon Berlin' werden mit expressionistischen Mitteln dargestellt. Seine Angst, sein Trauma und seine Orientierungslosigkeit sind wie ein stummer Schrei aus der Seele."</p>
+                    </div>
+                </div>
+
+                <!-- Kobling 2: Otto Dix & Neue Sachlichkeit -->
+                <div class="quest-card interactive" style="--accent: #3b82f6; --accent-glow: rgba(59, 130, 246, 0.2);">
+                    <div class="flex items-center gap-3 mb-4">
+                        <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold shadow-sm">
+                            <i class="fa-solid fa-palette"></i>
+                        </div>
+                        <h3 class="text-xl font-bold tracking-tight text-slate-800 uppercase">Ekspressionisme vs. Otto Dix (Großstadt)</h3>
+                    </div>
+                    <p class="text-sm text-slate-600 leading-relaxed font-medium mb-4">
+                        Otto Dix tilhører *Neue Sachlichkeit* (han vil dokumentere den grimme realitet usminket), men han tager den **ekspressionistiske deformation** med sig for at overdrive de groteske detaljer ved overklassens grimme ansigter og krigsinvalidernes amputerede kroppe.
+                    </p>
+                    <div class="bg-slate-50 p-4 rounded-xl border border-slate-100 text-xs">
+                        <span class="font-bold text-slate-700 block mb-1">Tysk argument til oplægget:</span>
+                        <p class="italic text-slate-600">"Obwohl Otto Dix zur 'Neuen Sachlichkeit' gehört, sehen wir expressionistische Spuren in seinem Werk. Die Gesichter und Körper sind deformiert, um die moralische Hässlichkeit der Gesellschaft zu zeigen."</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Blitz-Karten (Flashcards for Vocabulary) -->
+        <section id="flashcards" class="scroll-mt-28">
+            <div class="flex items-center gap-6 mb-10">
+                <div class="w-16 h-1.5 bg-yellow-400 rounded-full shadow-sm"></div>
+                <h2 class="text-xs font-black uppercase tracking-[0.4em] text-yellow-500/80">Blitz-Karten: Epokens vigtigste begreber</h2>
+            </div>
+            
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                <!-- Card 1 -->
+                <div class="w-full h-40 perspective-1000 cursor-pointer group" onclick="this.querySelector('.card-inner').classList.toggle('rotate-y-180')">
+                    <div class="card-inner relative w-full h-full transition-transform duration-500 transform-style-3d">
+                        <div class="absolute w-full h-full bg-white border border-slate-200 rounded-2xl flex items-center justify-center p-4 backface-hidden shadow-sm group-hover:border-yellow-400">
+                            <h4 class="font-bold text-slate-800 text-center">die Entfremdung</h4>
+                        </div>
+                        <div class="absolute w-full h-full bg-gradient-to-br from-yellow-400 to-amber-500 text-white rounded-2xl flex flex-col items-center justify-center p-4 backface-hidden rotate-y-180 shadow-lg text-center text-sm font-medium">
+                            <span class="text-xs uppercase opacity-70 mb-1">Glose</span>
+                            Fremmedgørelse (følelsen af at være isoleret i storbyen)
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="w-full h-40 perspective-1000 cursor-pointer group" onclick="this.querySelector('.card-inner').classList.toggle('rotate-y-180')">
+                    <div class="card-inner relative w-full h-full transition-transform duration-500 transform-style-3d">
+                        <div class="absolute w-full h-full bg-white border border-slate-200 rounded-2xl flex items-center justify-center p-4 backface-hidden shadow-sm group-hover:border-yellow-400">
+                            <h4 class="font-bold text-slate-800 text-center">die Verzerrung</h4>
+                        </div>
+                        <div class="absolute w-full h-full bg-gradient-to-br from-yellow-400 to-amber-500 text-white rounded-2xl flex flex-col items-center justify-center p-4 backface-hidden rotate-y-180 shadow-lg text-center text-sm font-medium">
+                            <span class="text-xs uppercase opacity-70 mb-1">Glose</span>
+                            Forvridning / Deformering (af former og kroppe)
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="w-full h-40 perspective-1000 cursor-pointer group" onclick="this.querySelector('.card-inner').classList.toggle('rotate-y-180')">
+                    <div class="card-inner relative w-full h-full transition-transform duration-500 transform-style-3d">
+                        <div class="absolute w-full h-full bg-white border border-slate-200 rounded-2xl flex items-center justify-center p-4 backface-hidden shadow-sm group-hover:border-yellow-400">
+                            <h4 class="font-bold text-slate-800 text-center">das Bürgertum</h4>
+                        </div>
+                        <div class="absolute w-full h-full bg-gradient-to-br from-yellow-400 to-amber-500 text-white rounded-2xl flex flex-col items-center justify-center p-4 backface-hidden rotate-y-180 shadow-lg text-center text-sm font-medium">
+                            <span class="text-xs uppercase opacity-70 mb-1">Glose</span>
+                            Det rige borgerskab (som de unge gjorde oprør mod)
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 4 -->
+                <div class="w-full h-40 perspective-1000 cursor-pointer group" onclick="this.querySelector('.card-inner').classList.toggle('rotate-y-180')">
+                    <div class="card-inner relative w-full h-full transition-transform duration-500 transform-style-3d">
+                        <div class="absolute w-full h-full bg-white border border-slate-200 rounded-2xl flex items-center justify-center p-4 backface-hidden shadow-sm group-hover:border-yellow-400">
+                            <h4 class="font-bold text-slate-800 text-center">der innere Schrei</h4>
+                        </div>
+                        <div class="absolute w-full h-full bg-gradient-to-br from-yellow-400 to-amber-500 text-white rounded-2xl flex flex-col items-center justify-center p-4 backface-hidden rotate-y-180 shadow-lg text-center text-sm font-medium">
+                            <span class="text-xs uppercase opacity-70 mb-1">Glose</span>
+                            Det indre råb / råbet fra sjælen
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Strategy for Marius (Oral Exam simulation) -->
+        <section id="marius-strategy" class="pb-20 scroll-mt-28">
+            <div class="bg-white/80 backdrop-blur-xl border border-purple-200/50 rounded-[2.5rem] p-8 md:p-12 relative overflow-hidden shadow-2xl">
+                <div class="relative z-10 grid grid-cols-1 lg:grid-cols-3 gap-12">
+                    
+                    <div class="lg:col-span-1">
+                        <div class="flex items-center gap-4 mb-6">
+                            <div class="h-8 w-1.5 bg-purple-500 rounded-full"></div>
+                            <h3 class="text-3xl font-black uppercase tracking-tight text-slate-900">Eksamenstips</h3>
+                        </div>
+                        <p class="text-slate-600 text-sm font-medium leading-relaxed mb-6">Hvis du trækker *Der Expressionismus* til den mundtlige eksamen, skal du fokusere på disse tre faglige råd for at sikre 10-12:</p>
+                        
+                        <div class="space-y-4">
+                            <div class="bg-purple-50 p-4 rounded-xl border border-purple-100">
+                                <span class="block font-bold text-purple-800 text-xs uppercase mb-1">Visuelle kontraster</span>
+                                <p class="text-[11px] text-slate-600 leading-relaxed">Ekspressionisme handler om stærke farver og mørke skygger. Forklar, at kunsten vil "synliggøre det usynlige" (angsten).</p>
+                            </div>
+                            <div class="bg-purple-50 p-4 rounded-xl border border-purple-100">
+                                <span class="block font-bold text-purple-800 text-xs uppercase mb-1">Forbind til historien</span>
+                                <p class="text-[11px] text-slate-600 leading-relaxed">Forklar altid, *hvorfor* de råbte: pga. industrialiseringens fremmedgørelse og 1. verdenskrigs ufattelige menneskelige traumer.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Interactive Oral Guide step by step -->
+                    <div class="lg:col-span-2 space-y-6">
+                        <div class="bg-purple-50 border border-purple-100 rounded-2xl p-6">
+                            <span class="text-xs font-bold text-purple-500 uppercase tracking-widest block mb-1">Oplægs-Struktur: Ekspressionisme</span>
+                            <h4 class="text-xl font-bold italic text-slate-800 mb-4">Udforsk strukturen for dit 5-minutters oplæg:</h4>
+                            
+                            <!-- Interactive Steps -->
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs font-medium">
+                                <div onclick="toggleStep(1)" id="step-btn-1" class="step-card active cursor-pointer border border-purple-200 bg-white p-4 rounded-xl shadow-sm hover:border-purple-500 transition">
+                                    <span class="w-6 h-6 rounded-full bg-purple-100 text-purple-600 font-bold flex items-center justify-center mb-2">1</span>
+                                    <span class="font-bold text-slate-800 text-sm block mb-1">Einleitung</span>
+                                    <p class="text-slate-500 leading-relaxed">Præsenter epoken (1905-1925) og dens historiske chok.</p>
+                                </div>
+                                <div onclick="toggleStep(2)" id="step-btn-2" class="step-card cursor-pointer border border-slate-200 bg-white p-4 rounded-xl shadow-sm hover:border-purple-500 transition">
+                                    <span class="w-6 h-6 rounded-full bg-slate-100 text-slate-600 font-bold flex items-center justify-center mb-2">2</span>
+                                    <span class="font-bold text-slate-800 text-sm block mb-1">Analyse</span>
+                                    <p class="text-slate-500 leading-relaxed">Dyk ned i Munch, Kirchner og de forvridte former.</p>
+                                </div>
+                                <div onclick="toggleStep(3)" id="step-btn-3" class="step-card cursor-pointer border border-slate-200 bg-white p-4 rounded-xl shadow-sm hover:border-purple-500 transition">
+                                    <span class="w-6 h-6 rounded-full bg-slate-100 text-slate-600 font-bold flex items-center justify-center mb-2">3</span>
+                                    <span class="font-bold text-slate-800 text-sm block mb-1">Syntese</span>
+                                    <p class="text-slate-500 leading-relaxed">Perspektiver til Raths PTSD i Babylon Berlin.</p>
+                                </div>
+                            </div>
+
+                            <!-- Step description output -->
+                            <div class="mt-6 bg-white p-5 rounded-xl border border-purple-100">
+                                <h5 class="text-xs font-bold text-purple-500 uppercase tracking-widest block mb-2" id="step-title">Fase 1: Einleitung (Ca. 1.5 minutter)</h5>
+                                <p id="step-desc" class="text-sm text-slate-700 leading-relaxed">
+                                    Slå tonen an med en stærk tysk indledning: <br>
+                                    <strong class="text-slate-900 italic">"Ich möchte heute über den Expressionismus sprechen. Diese Epoche dauerte von 1905 bis 1925. Sie war ein radikaler Protest gegen das bürgerliche Leben und die Industrialisierung."</strong><br><br>
+                                    Forklar, at kunstnerne ikke ville kopiere den kolde virkelighed, men vise sjælens indre angst.
+                                </p>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+                <div class="absolute -right-20 -bottom-20 w-96 h-96 bg-gradient-to-tl from-purple-400/20 to-pink-400/10 rounded-full blur-3xl pointer-events-none"></div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="text-center py-16 border-t border-purple-100 text-slate-400 text-[10px] font-black uppercase tracking-[0.2em] relative z-10">
+        <p>Sankt Annæ Gymnasium • 2.A Tysk B • Udviklet til Marius</p>
+    </footer>
+
+    <!-- Scripts Logic -->
+    <script>
+        // --- Typewriter Animation ---
+        const words = ["den innere Schrei", "Edvard Munch", "Gefühle", "Berliner Straßenszenen", "subjektive Realität"];
+        let wordIndex = 0;
+        let charIndex = 0;
+        let isDeleting = false;
+        const typewriterElement = document.getElementById('typewriter');
+        const typeSpeed = 150;
+        const backSpeed = 80;
+        const delay = 2000;
+
+        function type() {
+            const currentWord = words[wordIndex];
+            
+            if (isDeleting) {
+                typewriterElement.textContent = currentWord.substring(0, charIndex - 1);
+                charIndex--;
+            } else {
+                typewriterElement.textContent = currentWord.substring(0, charIndex + 1);
+                charIndex++;
+            }
+
+            let currentSpeed = isDeleting ? backSpeed : typeSpeed;
+
+            if (!isDeleting && charIndex === currentWord.length) {
+                isDeleting = true;
+                currentSpeed = delay;
+            } else if (isDeleting && charIndex === 0) {
+                isDeleting = false;
+                wordIndex = (wordIndex + 1) % words.length;
+                currentSpeed = 500;
+            }
+
+            setTimeout(type, currentSpeed);
+        }
+
+        // --- Partikel Animation ---
+        const canvas = document.getElementById('particle-canvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+
+        function resize() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * canvas.width;
+                this.y = Math.random() * canvas.height;
+                this.size = Math.random() * 2 + 1;
+                this.speedX = (Math.random() - 0.5) * 0.4;
+                this.speedY = (Math.random() - 0.5) * 0.4;
+                this.color = Math.random() > 0.5 ? '#a855f7' : '#ec4899'; 
+            }
+            update() {
+                this.x += this.speedX;
+                this.y += this.speedY;
+                if (this.x > canvas.width) this.x = 0;
+                if (this.x < 0) this.x = canvas.width;
+                if (this.y > canvas.height) this.y = 0;
+                if (this.y < 0) this.y = canvas.height;
+            }
+            draw() {
+                ctx.fillStyle = this.color;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function initParticles() {
+            particles = [];
+            for (let i = 0; i < 30; i++) {
+                particles.push(new Particle());
+            }
+        }
+
+        function animateParticles() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            particles.forEach(p => {
+                p.update();
+                p.draw();
+            });
+            requestAnimationFrame(animateParticles);
+        }
+
+        window.addEventListener('resize', resize);
+        window.onload = () => {
+            resize();
+            initParticles();
+            animateParticles();
+            type();
+        };
+
+        // --- Interactive Søjler (Features) ---
+        const featureData = {
+            1: {
+                title: "Farbe als Schrei der Seele",
+                desc: "Ekspressionisterne bruger farverne subjektivt og symbolsk frem for naturtro. En himmel behøver ikke at være blå; den kan være blodrød for at signalere krigens rædsler, og en hest kan være blå for at repræsentere ren åndelighed. Farverne er rå følelser smurt direkte på lærredet.",
+                german: "\"Die Expressionisten nutzen unnatürliche Farben, um die innere Realität der Seele auszudrücken. Ein Beispiel ist der rote Himmel in Munchs 'Der Schrei', der Angst und Panik symbolisiert.\"",
+                vocab: [
+                    { de: "unnatürliche Farben", da: "unaturlige farver" },
+                    { de: "die Stimmung", da: "stemningen" },
+                    { de: "ausdrücken", da: "at udtrykke" },
+                    { de: "subjektiv", da: "subjektiv / personlig" }
+                ]
+            },
+            2: {
+                title: "Deformation & die Verzerrung",
+                desc: "Former og figurer deformeres og gøres skarpe, kantede og kaotiske. Dette bryder med det klassiske harmoniske skønhedsideal. Det grimme og forvredne bruges bevidst som et redskab til at visualisere det moderne menneskes splittelse, rædsel og angst.",
+                german: "\"Durch die Verzerrung der Formen zeigen die Künstler das Gefühl von Chaos und innerer Zerrissenheit in einer unruhigen Welt.\"",
+                vocab: [
+                    { de: "die Verzerrung", da: "forvridningen" },
+                    { de: "zerrissen", da: "splittet / rystet" },
+                    { de: "das Hässliche", da: "det grimme" },
+                    { de: "die Angst", da: "angst / frygt" }
+                ]
+            },
+            3: {
+                title: "Abschied von der Mimesis",
+                desc: "Kunstneren vil IKKE afbilde virkeligheden naturtro eller fotografisk (Mimesis). I stedet opløses virkeligheden til fordel for abstraktion. Det er et bevidst oprør mod det borgerlige samfunds trygge og pæne værdier, som ekspressionisterne fandt hule efter industrialiseringens chok.",
+                german: "\"Die Expressionisten lehnen die fotografische Realität ab. Sie wollen nicht die äußere Welt kopieren, sondern das innere Gefühl sichtbar machen.\"",
+                vocab: [
+                    { de: "ablehnen", da: "at afvise" },
+                    { de: "sichtbar machen", da: "at synliggøre" },
+                    { de: "das Bürgertum", da: "borgerskabet" },
+                    { de: "die innere Welt", da: "den indre verden" }
+                ]
+            }
+        };
+
+        function selectFeature(num) {
+            document.querySelectorAll('.feature-box').forEach(el => el.classList.remove('active'));
+            document.getElementById('feat-' + num).classList.add('active');
+            
+            const data = featureData[num];
+            document.getElementById('feat-title').innerText = data.title;
+            document.getElementById('feat-desc').innerText = data.desc;
+            document.getElementById('feat-german').innerText = data.german;
+            
+            const vocabContainer = document.getElementById('feat-vocab');
+            vocabContainer.innerHTML = '';
+            data.vocab.forEach(item => {
+                vocabContainer.innerHTML += `
+                    <div class="bg-slate-50 p-2.5 rounded-lg border border-slate-150">
+                        <span class="text-purple-600 font-mono">${item.de}</span> = ${item.da}
+                    </div>
+                `;
+            });
+        }
+
+        // --- Tabs Logic (Gallery) ---
+        function switchGalleryTab(tabId, btn) {
+            document.querySelectorAll('.gallery-content').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.tab-btn').forEach(el => {
+                el.classList.remove('active');
+                el.classList.add('text-slate-500');
+            });
+            document.getElementById('gallery-' + tabId).classList.remove('hidden');
+            btn.classList.add('active');
+            btn.classList.remove('text-slate-500');
+        }
+
+        // --- Oral Presentation Steps ---
+        const stepData = {
+            1: {
+                title: "Fase 1: Einleitung (Ca. 1.5 minutter)",
+                desc: "Slå tonen an med en stærk tysk indledning: <br><strong class='text-slate-900 italic'>\"Ich möchte heute über den Expressionismus sprechen. Diese Epoche dauerte von 1905 bis 1925. Sie war ein radikaler Protest gegen das bürgerliche Leben und die Industrialisierung.\"</strong><br><br>Forklar, at kunstnerne ikke ville kopiere den kolde virkelighed, men vise sjælens indre angst. Dette viser med det samme din stærke litterære fundering."
+            },
+            2: {
+                title: "Fase 2: Analyse & Merkmale (Ca. 2 minutter)",
+                desc: "Analyser et konkret værk (f.eks. Munchs 'Der Schrei' eller Kirchners storbybilleder). <br><strong class='text-slate-900 italic'>\"In Munchs Gemälde sehen wir eine extreme Verzerrung. Der rote Himmel und der offene Mund zeigen die existenzielle Angst des modernen Menschen. Es gibt keine Harmonie.\"</strong><br><br>Gør rede for brugen af de unaturlige farver og de vilde, kantede linjer."
+            },
+            3: {
+                title: "Fase 3: Syntese & Perspektiv (Ca. 1.5 minutter)",
+                desc: "Nu skal topkarakteren sikres! Forbind epoken til dit mellemkrigstids-pensum: <br><strong class='text-slate-900 italic'>\"Wenn man diese Angst mit 'Babylon Berlin' vergleicht, sieht man, dass Gereon Raths PTSD mit expressionistischen Mitteln gefilmt wird. Und in Otto Dix' 'Großstadt' sehen wir auch eine Verzerrung der Gesichter, obwohl er zur Neuen Sachlichkeit gehört.\"</strong>"
+            }
+        };
+
+        function toggleStep(stepNum) {
+            document.querySelectorAll('.step-card').forEach(el => {
+                el.classList.remove('border-purple-500', 'active');
+                el.querySelector('span').classList.remove('bg-purple-100', 'text-purple-600');
+                el.querySelector('span').classList.add('bg-slate-100', 'text-slate-600');
+            });
+            
+            const activeCard = document.getElementById('step-btn-' + stepNum);
+            activeCard.classList.add('border-purple-500', 'active');
+            
+            const badge = activeCard.querySelector('span');
+            badge.classList.remove('bg-slate-100', 'text-slate-600');
+            badge.classList.add('bg-purple-100', 'text-purple-600');
+            
+            const data = stepData[stepNum];
+            document.getElementById('step-title').innerHTML = data.title;
+            document.getElementById('step-desc').innerHTML = data.desc;
+        }
+    </script>
+</body>
+</html>

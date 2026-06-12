@@ -10,12 +10,9 @@
     <style>
         :root {
             --bg-color: #f8fafc;
-            --card-bg: #ffffff;
+            --card-bg: rgba(255, 255, 255, 0.85);
             --text-main: #0f172a;
             --text-muted: #64748b;
-            --accent-amber: #f59e0b;
-            --accent-blue: #3b82f6;
-            --accent-red: #ef4444;
         }
 
         body {
@@ -26,111 +23,137 @@
             overflow-x: hidden;
         }
 
-        /* Baggrunds-effekter for dybde */
+        /* Ambient Glows */
         .ambient-glow {
             position: fixed;
             width: 800px;
             height: 800px;
             border-radius: 50%;
-            filter: blur(150px);
-            opacity: 0.4;
+            filter: blur(140px);
+            opacity: 0.35;
             pointer-events: none;
             z-index: -1;
         }
-        .glow-top { top: -400px; right: -200px; background: radial-gradient(circle, rgba(245,158,11,0.15) 0%, rgba(255,255,255,0) 70%); }
-        .glow-bottom { bottom: -400px; left: -200px; background: radial-gradient(circle, rgba(59,130,246,0.15) 0%, rgba(255,255,255,0) 70%); }
+        .glow-top { top: -400px; right: -200px; background: radial-gradient(circle, rgba(245,158,11,0.2) 0%, rgba(255,255,255,0) 70%); }
+        .glow-bottom { bottom: -400px; left: -200px; background: radial-gradient(circle, rgba(59,130,246,0.2) 0%, rgba(255,255,255,0) 70%); }
 
-        /* Animationer */
+        /* Smooth UI Animations */
         @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(20px); }
+            from { opacity: 0; transform: translateY(30px); }
             to { opacity: 1; transform: translateY(0); }
         }
         .animate-fade-up {
-            animation: fadeUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            animation: fadeUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) forwards;
             opacity: 0;
         }
         .delay-100 { animation-delay: 100ms; }
         .delay-200 { animation-delay: 200ms; }
         .delay-300 { animation-delay: 300ms; }
 
-        /* UI Komponenter */
+        /* Premium Glass Cards */
         .premium-card {
             background: var(--card-bg);
-            border: 1px solid rgba(226, 232, 240, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
             border-radius: 1.5rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.02), 0 10px 15px -3px rgba(0, 0, 0, 0.02);
-            transition: all 0.3s ease;
+            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0,0,0,0.01);
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .premium-card:hover {
+            box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.08);
+            transform: translateY(-4px);
         }
 
+        /* Phrase Copy Cards */
         .phrase-card {
             display: flex;
             justify-content: space-between;
             align-items: center;
             padding: 1rem 1.25rem;
             border-radius: 1rem;
-            background: #f8fafc;
+            background: #ffffff;
             border: 1px solid #e2e8f0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.01);
             cursor: pointer;
-            transition: all 0.2s ease;
+            transition: all 0.3s ease;
             position: relative;
             overflow: hidden;
         }
-
         .phrase-card:hover {
-            background: #fff;
             border-color: #cbd5e1;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+            box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.05);
             transform: translateY(-2px);
         }
-
         .phrase-card .copy-icon {
             opacity: 0;
             color: var(--text-muted);
-            transition: all 0.2s ease;
-            transform: scale(0.8);
+            transition: all 0.3s ease;
+            transform: scale(0.8) translateX(10px);
         }
-
         .phrase-card:hover .copy-icon {
             opacity: 1;
-            transform: scale(1);
+            transform: scale(1) translateX(0);
         }
-
         .phrase-card.copied {
-            background: #ecfdf5; /* Emerald 50 */
-            border-color: #34d399; /* Emerald 400 */
+            background: #ecfdf5;
+            border-color: #34d399;
         }
 
         .number-font { font-family: 'Space Grotesk', sans-serif; }
+
+        /* Print Optimization */
+        @media print {
+            nav, .ambient-glow, #download-modal, .btn-print, .no-print {
+                display: none !important;
+            }
+            body { background-color: white !important; padding: 0 !important; overflow: auto !important; }
+            .premium-card {
+                box-shadow: none !important;
+                border: 2px solid #e2e8f0 !important;
+                break-inside: avoid;
+                margin-bottom: 1rem;
+            }
+            main { margin-top: 0 !important; padding-top: 0 !important; }
+            header { padding-top: 1rem !important; }
+        }
     </style>
 </head>
 <body class="min-h-screen pb-24">
 
-    <!-- Ambient Backgrounds -->
     <div class="ambient-glow glow-top"></div>
     <div class="ambient-glow glow-bottom"></div>
 
-    <!-- Navigation -->
-    <nav class="sticky top-0 z-50 bg-white/80 backdrop-blur-xl border-b border-slate-200 shadow-sm">
-        <div class="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+    <nav class="sticky top-0 z-40 bg-white/70 backdrop-blur-xl border-b border-slate-200/60 shadow-sm">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
             <a href="Tysk-Index.html" class="flex items-center gap-2 text-slate-500 hover:text-amber-600 transition-colors font-bold text-sm tracking-wide uppercase">
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M15 19l-7-7 7-7"/></svg>
-                Tilbage
+                <span class="hidden sm:inline">Tilbage</span>
             </a>
+            
             <div class="flex items-center gap-3">
-                <span class="w-8 h-8 bg-amber-500 rounded-lg flex items-center justify-center text-white font-black text-lg">ß</span>
-                <span class="font-bold tracking-tight text-slate-900 uppercase">Eksamens-Kit</span>
+                <div class="w-10 h-10 bg-gradient-to-br from-amber-400 to-amber-600 rounded-xl flex items-center justify-center text-white font-black text-xl shadow-md shadow-amber-500/20">ß</div>
+                <span class="font-black tracking-tight text-slate-900 uppercase text-lg hidden sm:inline">Eksamens-Kit</span>
             </div>
-            <div class="w-20"></div> <!-- Spacer for centering -->
+
+            <!-- Massive PDF/Print Button -->
+            <div>
+                <button onclick="window.print()" class="btn-print relative group flex items-center gap-2 bg-gradient-to-r from-red-600 to-red-500 text-white font-black text-xs sm:text-sm uppercase tracking-widest px-6 py-3 rounded-xl shadow-[0_0_25px_rgba(220,38,38,0.4)] transition-all hover:scale-105 active:scale-95 overflow-hidden">
+                    <div class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out"></div>
+                    <svg class="w-5 h-5 relative z-10 animate-bounce group-hover:animate-none" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+                    <span class="relative z-10 hidden sm:inline">Hent som PDF</span>
+                    <span class="relative z-10 sm:hidden">PDF</span>
+                </button>
+            </div>
         </div>
     </nav>
 
-    <!-- Header -->
     <header class="max-w-3xl mx-auto px-6 pt-20 pb-16 text-center animate-fade-up">
-        <div class="inline-flex items-center gap-2 px-3 py-1 bg-amber-100 text-amber-700 rounded-full text-xs font-bold uppercase tracking-widest mb-6">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+        <div class="inline-flex items-center gap-2 px-4 py-1.5 bg-amber-50 border border-amber-100 text-amber-600 rounded-full text-xs font-bold uppercase tracking-widest mb-6 shadow-sm">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
             Tysk B Cheat Sheet
         </div>
-        <h1 class="text-4xl md:text-5xl font-black tracking-tighter text-slate-900 mb-6 uppercase">
+        <h1 class="text-5xl md:text-6xl font-black tracking-tighter text-slate-900 mb-6 uppercase">
             Overlevelsesguiden
         </h1>
         <p class="text-slate-500 text-lg md:text-xl font-medium leading-relaxed">
@@ -138,110 +161,110 @@
         </p>
     </header>
 
-    <main class="max-w-6xl mx-auto px-6 space-y-24">
+    <main class="max-w-7xl mx-auto px-6 space-y-24">
         
-        <!-- SEKTION 1: Oplægget (Step-by-step) -->
         <section class="animate-fade-up delay-100">
-            <div class="flex items-end justify-between mb-8">
+            <div class="flex flex-col sm:flex-row sm:items-end justify-between mb-8 gap-4">
                 <div>
                     <h2 class="text-2xl font-black uppercase tracking-tight text-slate-900 flex items-center gap-3">
-                        <span class="w-10 h-10 bg-slate-900 text-white rounded-xl flex items-center justify-center">1</span>
+                        <span class="w-10 h-10 bg-slate-900 text-white rounded-xl flex items-center justify-center shadow-lg">1</span>
                         Dit Oplæg
                     </h2>
                     <p class="text-slate-500 font-medium mt-2">Den perfekte struktur til dine 5-7 minutter.</p>
                 </div>
-                <div class="hidden sm:block text-sm font-bold text-slate-400 uppercase tracking-widest">Tid: 5-7 Min</div>
+                <div class="inline-flex items-center gap-2 bg-slate-100 border border-slate-200 px-4 py-2 rounded-xl text-sm font-bold text-slate-500 uppercase tracking-widest">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                    Tid: 5-7 Min
+                </div>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
                 <!-- Step 1 -->
-                <div class="premium-card p-6 relative overflow-hidden group">
-                    <div class="number-font absolute -right-2 -bottom-6 text-9xl font-black text-slate-50 z-0 group-hover:scale-110 transition-transform duration-500">1</div>
+                <div class="premium-card p-8 relative overflow-hidden group">
+                    <div class="number-font absolute -right-4 -bottom-8 text-[10rem] font-black text-slate-50 z-0 group-hover:scale-110 group-hover:text-blue-50/50 transition-all duration-500">1</div>
                     <div class="relative z-10">
-                        <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold mb-4">A</div>
-                        <h3 class="text-xl font-bold mb-3 text-slate-800">Einleitung</h3>
-                        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 border-b border-slate-100 pb-2">Indledning</p>
-                        <ul class="text-sm space-y-3 text-slate-600 font-medium">
-                            <li class="flex items-start gap-2"><svg class="w-4 h-4 text-blue-500 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg> Præsentér titel & forfatter</li>
-                            <li class="flex items-start gap-2"><svg class="w-4 h-4 text-blue-500 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg> Hvilket emne tilhører den?</li>
-                            <li class="flex items-start gap-2"><svg class="w-4 h-4 text-blue-500 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg> Teksttype (novelle/artikel)</li>
+                        <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-lg mb-6 border border-blue-100">A</div>
+                        <h3 class="text-2xl font-bold mb-2 text-slate-800 tracking-tight">Einleitung</h3>
+                        <p class="text-xs font-bold text-blue-500 uppercase tracking-widest mb-6 border-b border-slate-100 pb-3">Indledning</p>
+                        <ul class="text-sm space-y-4 text-slate-600 font-medium">
+                            <li class="flex items-start gap-3"><svg class="w-5 h-5 text-blue-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg> Præsentér titel & forfatter</li>
+                            <li class="flex items-start gap-3"><svg class="w-5 h-5 text-blue-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg> Hvilket emne tilhører den?</li>
+                            <li class="flex items-start gap-3"><svg class="w-5 h-5 text-blue-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg> Teksttype (novelle/artikel)</li>
                         </ul>
                     </div>
                 </div>
 
                 <!-- Step 2 -->
-                <div class="premium-card p-6 relative overflow-hidden group">
-                    <div class="number-font absolute -right-2 -bottom-6 text-9xl font-black text-slate-50 z-0 group-hover:scale-110 transition-transform duration-500">2</div>
+                <div class="premium-card p-8 relative overflow-hidden group">
+                    <div class="number-font absolute -right-4 -bottom-8 text-[10rem] font-black text-slate-50 z-0 group-hover:scale-110 group-hover:text-blue-50/50 transition-all duration-500">2</div>
                     <div class="relative z-10">
-                        <div class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-bold mb-4">B</div>
-                        <h3 class="text-xl font-bold mb-3 text-slate-800 break-words">Zusammenfassung</h3>
-                        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 border-b border-slate-100 pb-2">Resumé (KORT!)</p>
-                        <ul class="text-sm space-y-3 text-slate-600 font-medium">
-                            <li class="flex items-start gap-2"><svg class="w-4 h-4 text-amber-500 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg> <span class="text-amber-600 font-bold">Max 1-1.5 minut!</span></li>
-                            <li class="flex items-start gap-2"><svg class="w-4 h-4 text-blue-500 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg> Kun hovedpunkter</li>
-                            <li class="flex items-start gap-2"><svg class="w-4 h-4 text-blue-500 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg> Fortæl altid i nutid</li>
+                        <div class="w-10 h-10 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-lg mb-6 border border-blue-100">B</div>
+                        <h3 class="text-2xl font-bold mb-2 text-slate-800 tracking-tight break-words">Zusammenfassung</h3>
+                        <p class="text-xs font-bold text-blue-500 uppercase tracking-widest mb-6 border-b border-slate-100 pb-3">Resumé (KORT!)</p>
+                        <ul class="text-sm space-y-4 text-slate-600 font-medium">
+                            <li class="flex items-start gap-3"><svg class="w-5 h-5 text-amber-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg> <span class="text-amber-600 font-bold bg-amber-50 px-2 py-0.5 rounded">Max 1.5 minut!</span></li>
+                            <li class="flex items-start gap-3"><svg class="w-5 h-5 text-blue-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg> Kun hovedpunkter</li>
+                            <li class="flex items-start gap-3"><svg class="w-5 h-5 text-blue-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg> Fortæl altid i nutid</li>
                         </ul>
                     </div>
                 </div>
 
                 <!-- Step 3 -->
-                <div class="premium-card p-6 relative overflow-hidden group border-amber-200/60 shadow-amber-500/5">
-                    <div class="number-font absolute -right-2 -bottom-6 text-9xl font-black text-amber-50/50 z-0 group-hover:scale-110 transition-transform duration-500">3</div>
+                <div class="premium-card p-8 relative overflow-hidden group border-amber-200/60 shadow-amber-500/5">
+                    <div class="number-font absolute -right-4 -bottom-8 text-[10rem] font-black text-amber-50/40 z-0 group-hover:scale-110 transition-all duration-500">3</div>
                     <div class="relative z-10">
-                        <div class="w-8 h-8 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center font-bold mb-4">C</div>
-                        <h3 class="text-xl font-bold mb-3 text-slate-800">Analyse</h3>
-                        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 border-b border-slate-100 pb-2 text-amber-600/70">Her scorer du point</p>
-                        <ul class="text-sm space-y-3 text-slate-600 font-medium">
-                            <li class="flex items-start gap-2"><svg class="w-4 h-4 text-amber-500 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg> Karakteristik af personer</li>
-                            <li class="flex items-start gap-2"><svg class="w-4 h-4 text-amber-500 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg> Konflikter i teksten</li>
-                            <li class="flex items-start gap-2"><svg class="w-4 h-4 text-amber-500 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg> Budskab (Die Botschaft)</li>
+                        <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold text-lg mb-6 border border-amber-100 shadow-inner">C</div>
+                        <h3 class="text-2xl font-bold mb-2 text-slate-800 tracking-tight">Analyse</h3>
+                        <p class="text-xs font-bold text-amber-600 uppercase tracking-widest mb-6 border-b border-slate-100 pb-3">Her scorer du point</p>
+                        <ul class="text-sm space-y-4 text-slate-600 font-medium">
+                            <li class="flex items-start gap-3"><svg class="w-5 h-5 text-amber-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg> Karakteristik af personer</li>
+                            <li class="flex items-start gap-3"><svg class="w-5 h-5 text-amber-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg> Konflikter i teksten</li>
+                            <li class="flex items-start gap-3"><svg class="w-5 h-5 text-amber-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg> Budskab (Die Botschaft)</li>
                         </ul>
                     </div>
                 </div>
 
                 <!-- Step 4 -->
-                <div class="premium-card p-6 relative overflow-hidden group border-amber-200/60 shadow-amber-500/5">
-                    <div class="number-font absolute -right-2 -bottom-6 text-9xl font-black text-amber-50/50 z-0 group-hover:scale-110 transition-transform duration-500">4</div>
+                <div class="premium-card p-8 relative overflow-hidden group border-amber-200/60 shadow-amber-500/5">
+                    <div class="number-font absolute -right-4 -bottom-8 text-[10rem] font-black text-amber-50/40 z-0 group-hover:scale-110 transition-all duration-500">4</div>
                     <div class="relative z-10">
-                        <div class="w-8 h-8 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center font-bold mb-4">D</div>
-                        <h3 class="text-xl font-bold mb-3 text-slate-800">Perspektivierung</h3>
-                        <p class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 border-b border-slate-100 pb-2 text-amber-600/70">Vis det store billede</p>
-                        <ul class="text-sm space-y-3 text-slate-600 font-medium">
-                            <li class="flex items-start gap-2"><svg class="w-4 h-4 text-amber-500 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg> Relatér til emnet</li>
-                            <li class="flex items-start gap-2"><svg class="w-4 h-4 text-amber-500 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg> Sammenlign med andre tekster</li>
-                            <li class="flex items-start gap-2"><svg class="w-4 h-4 text-amber-500 mt-0.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/></svg> Din egen holdning</li>
+                        <div class="w-10 h-10 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-bold text-lg mb-6 border border-amber-100 shadow-inner">D</div>
+                        <h3 class="text-2xl font-bold mb-2 text-slate-800 tracking-tight">Perspektivierung</h3>
+                        <p class="text-xs font-bold text-amber-600 uppercase tracking-widest mb-6 border-b border-slate-100 pb-3">Vis det store billede</p>
+                        <ul class="text-sm space-y-4 text-slate-600 font-medium">
+                            <li class="flex items-start gap-3"><svg class="w-5 h-5 text-amber-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg> Relatér til emnet</li>
+                            <li class="flex items-start gap-3"><svg class="w-5 h-5 text-amber-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg> Sammenlign m. andre tekster</li>
+                            <li class="flex items-start gap-3"><svg class="w-5 h-5 text-amber-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/></svg> Din egen holdning</li>
                         </ul>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- SEKTION 2: Guld-Gloser -->
         <section class="animate-fade-up delay-200">
             <div class="flex items-end justify-between mb-8">
                 <div>
                     <h2 class="text-2xl font-black uppercase tracking-tight text-slate-900 flex items-center gap-3">
-                        <span class="w-10 h-10 bg-amber-500 text-white rounded-xl flex items-center justify-center">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
+                        <span class="w-10 h-10 bg-amber-500 text-white rounded-xl flex items-center justify-center shadow-lg shadow-amber-500/30">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"/></svg>
                         </span>
                         Redemittel
                     </h2>
-                    <p class="text-slate-500 font-medium mt-2">Klik på en boks for at kopiere frasen.</p>
+                    <p class="text-slate-500 font-medium mt-2">Klik på en boks for at kopiere frasen direkte.</p>
                 </div>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                
                 <!-- Kategori 1 -->
-                <div class="premium-card p-6">
-                    <h3 class="text-sm font-black text-slate-400 uppercase tracking-widest mb-5">1. Struktur & Indledning</h3>
-                    <div class="space-y-3">
+                <div class="premium-card p-8">
+                    <h3 class="text-sm font-black text-slate-400 uppercase tracking-widest mb-6">1. Struktur & Indledning</h3>
+                    <div class="space-y-4">
                         <div class="phrase-card" onclick="copyPhrase(this)">
                             <div>
                                 <p class="font-bold text-slate-800 text-base mb-1 german-text">Der Text handelt von...</p>
                                 <p class="text-xs text-slate-500 font-medium">Teksten handler om...</p>
                             </div>
-                            <svg class="w-5 h-5 copy-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"/></svg>
+                            <svg class="w-5 h-5 copy-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
                         </div>
                         <div class="phrase-card" onclick="copyPhrase(this)">
                             <div>
@@ -261,9 +284,9 @@
                 </div>
 
                 <!-- Kategori 2 -->
-                <div class="premium-card p-6">
-                    <h3 class="text-sm font-black text-slate-400 uppercase tracking-widest mb-5">2. Meninger & Analyse</h3>
-                    <div class="space-y-3">
+                <div class="premium-card p-8">
+                    <h3 class="text-sm font-black text-slate-400 uppercase tracking-widest mb-6">2. Meninger & Analyse</h3>
+                    <div class="space-y-4">
                         <div class="phrase-card" onclick="copyPhrase(this)">
                             <div>
                                 <p class="font-bold text-slate-800 text-base mb-1 german-text">Meiner Meinung nach ist...</p>
@@ -278,10 +301,10 @@
                             </div>
                             <svg class="w-5 h-5 copy-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
                         </div>
-                        <div class="phrase-card border-amber-200 bg-amber-50/30" onclick="copyPhrase(this)">
+                        <div class="phrase-card border-amber-200 bg-amber-50/50" onclick="copyPhrase(this)">
                             <div>
-                                <p class="font-bold text-amber-800 text-base mb-1 german-text">Die Botschaft des Textes ist, dass...</p>
-                                <p class="text-xs text-amber-700/70 font-medium">Tekstens budskab er, at...</p>
+                                <p class="font-bold text-amber-900 text-base mb-1 german-text">Die Botschaft des Textes ist, dass...</p>
+                                <p class="text-xs text-amber-700/80 font-medium">Tekstens budskab er, at...</p>
                             </div>
                             <svg class="w-5 h-5 copy-icon text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
                         </div>
@@ -289,27 +312,27 @@
                 </div>
 
                 <!-- Kategori 3 -->
-                <div class="premium-card p-6 border-slate-300 shadow-lg shadow-slate-200/50">
-                    <h3 class="text-sm font-black text-slate-900 uppercase tracking-widest mb-5 flex items-center gap-2">
-                        <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
+                <div class="premium-card p-8 border-slate-300 shadow-xl shadow-slate-200/50">
+                    <h3 class="text-sm font-black text-slate-900 uppercase tracking-widest mb-6 flex items-center gap-2">
+                        <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg>
                         3. Perspektivering
                     </h3>
-                    <div class="space-y-3">
-                        <div class="phrase-card bg-white border-slate-200" onclick="copyPhrase(this)">
+                    <div class="space-y-4">
+                        <div class="phrase-card border-slate-200" onclick="copyPhrase(this)">
                             <div>
                                 <p class="font-bold text-slate-900 text-base mb-1 german-text">Man kann den Text mit [Titel] vergleichen.</p>
                                 <p class="text-xs text-slate-500 font-medium">Man kan sammenligne teksten med [Titel].</p>
                             </div>
                             <svg class="w-5 h-5 copy-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
                         </div>
-                        <div class="phrase-card bg-white border-slate-200" onclick="copyPhrase(this)">
+                        <div class="phrase-card border-slate-200" onclick="copyPhrase(this)">
                             <div>
                                 <p class="font-bold text-slate-900 text-base mb-1 german-text">Beide Texte behandeln das Thema...</p>
                                 <p class="text-xs text-slate-500 font-medium">Begge tekster behandler emnet...</p>
                             </div>
                             <svg class="w-5 h-5 copy-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
                         </div>
-                        <div class="phrase-card bg-white border-slate-200" onclick="copyPhrase(this)">
+                        <div class="phrase-card border-slate-200" onclick="copyPhrase(this)">
                             <div>
                                 <p class="font-bold text-slate-900 text-base mb-1 german-text">Ein Unterschied ist, dass...</p>
                                 <p class="text-xs text-slate-500 font-medium">En forskel er, at...</p>
@@ -321,92 +344,91 @@
             </div>
         </section>
 
-        <!-- SEKTION 3 & 4: Nødhjælp & Grammatik (Side-by-side) -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 animate-fade-up delay-300">
             
             <!-- Nødhjælpskassen -->
-            <section class="premium-card p-8 border-l-4 border-l-red-500 bg-gradient-to-br from-white to-red-50/30">
-                <div class="flex items-center gap-4 mb-6">
-                    <div class="w-12 h-12 bg-red-100 text-red-600 rounded-xl flex items-center justify-center font-black">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+            <section class="premium-card p-10 border-l-8 border-l-red-500 bg-gradient-to-br from-white to-red-50/20">
+                <div class="flex items-center gap-5 mb-8">
+                    <div class="w-14 h-14 bg-red-50 text-red-600 rounded-2xl flex items-center justify-center font-black shadow-inner border border-red-100">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
                     </div>
                     <div>
-                        <h2 class="text-2xl font-black tracking-tight text-slate-900 uppercase">Nødhjælp</h2>
+                        <h2 class="text-3xl font-black tracking-tight text-slate-900 uppercase">Nødhjælp</h2>
                         <p class="text-sm font-bold text-red-500 uppercase tracking-widest mt-1">Når klappen går ned</p>
                     </div>
                 </div>
-                <p class="text-sm text-slate-600 font-medium mb-8 leading-relaxed">
+                <p class="text-base text-slate-600 font-medium mb-10 leading-relaxed">
                     Sig aldrig "øhhh, hvad hedder det på tysk?". Løs problemet <span class="font-bold text-red-600">på tysk</span> – censor elsker det, da det viser sprogligt overskud.
                 </p>
                 
-                <div class="space-y-4">
-                    <div class="bg-white p-4 rounded-xl border border-red-100 shadow-sm flex items-center justify-between">
+                <div class="space-y-5">
+                    <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm flex items-center justify-between group hover:border-red-200 transition-colors">
                         <div>
                             <p class="font-bold text-slate-900 text-lg mb-1">Können Sie das bitte wiederholen?</p>
-                            <p class="text-xs text-slate-500 font-medium uppercase tracking-wider">Kan De venligst gentage det?</p>
+                            <p class="text-xs text-slate-500 font-bold uppercase tracking-wider">Kan De venligst gentage det?</p>
                         </div>
                     </div>
-                    <div class="bg-white p-4 rounded-xl border border-red-100 shadow-sm flex items-center justify-between">
+                    <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm flex items-center justify-between group hover:border-red-200 transition-colors">
                         <div>
-                            <p class="font-bold text-slate-900 text-lg mb-1">Wie sagt man <span class="text-red-500 bg-red-50 px-2 py-0.5 rounded">[Dansk ord]</span> auf Deutsch?</p>
-                            <p class="text-xs text-slate-500 font-medium uppercase tracking-wider">Hvordan siger man X på tysk?</p>
+                            <p class="font-bold text-slate-900 text-lg mb-1">Daran kann ich mich leider nicht erinnern.</p>
+                            <p class="text-xs text-slate-500 font-bold uppercase tracking-wider">Det kan jeg desværre ikke huske.</p>
                         </div>
                     </div>
-                    <div class="bg-white p-4 rounded-xl border border-red-100 shadow-sm flex items-center justify-between">
+                    <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm flex items-center justify-between group hover:border-red-200 transition-colors">
                         <div>
-                            <p class="font-bold text-slate-900 text-lg mb-1">Entschuldigung, ich habe den Faden verloren.</p>
-                            <p class="text-xs text-slate-500 font-medium uppercase tracking-wider">Undskyld, jeg har tabt tråden.</p>
+                            <p class="font-bold text-slate-900 text-lg mb-1">Das Wort fällt mir gerade nicht ein.</p>
+                            <p class="text-xs text-slate-500 font-bold uppercase tracking-wider">Jeg kan ikke lige komme i tanke om ordet.</p>
                         </div>
                     </div>
                 </div>
             </section>
 
             <!-- De Gyldne Grammatik-regler -->
-            <section class="premium-card p-8 border-l-4 border-l-blue-500 bg-gradient-to-br from-white to-blue-50/30">
-                <div class="flex items-center gap-4 mb-6">
-                    <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-xl flex items-center justify-center font-black">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+            <section class="premium-card p-10 border-l-8 border-l-blue-500 bg-gradient-to-br from-white to-blue-50/20">
+                <div class="flex items-center gap-5 mb-8">
+                    <div class="w-14 h-14 bg-blue-50 text-blue-600 rounded-2xl flex items-center justify-center font-black shadow-inner border border-blue-100">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
                     </div>
                     <div>
-                        <h2 class="text-2xl font-black tracking-tight text-slate-900 uppercase">Undgå T-Fejl</h2>
+                        <h2 class="text-3xl font-black tracking-tight text-slate-900 uppercase">Undgå T-Fejl</h2>
                         <p class="text-sm font-bold text-blue-500 uppercase tracking-widest mt-1">De 3 vigtigste regler</p>
                     </div>
                 </div>
-                <p class="text-sm text-slate-600 font-medium mb-8 leading-relaxed">
+                <p class="text-base text-slate-600 font-medium mb-10 leading-relaxed">
                     Drop at bøje alle adjektiver perfekt. Hvis du har styr på disse 3 regler i din talestrøm, lyder dit tysk <span class="font-bold text-blue-600">flydende og stærkt</span>.
                 </p>
 
-                <div class="space-y-4">
-                    <div class="bg-white p-4 rounded-xl border border-blue-100 shadow-sm">
-                        <div class="flex items-center gap-2 mb-2">
-                            <span class="bg-blue-600 text-white text-[10px] font-bold px-2 py-0.5 rounded uppercase">Regel 1</span>
-                            <h4 class="font-bold text-slate-900">V2-Reglen (Udsagnsord på plads 2)</h4>
+                <div class="space-y-5">
+                    <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm group hover:border-blue-200 transition-colors">
+                        <div class="flex items-center gap-3 mb-2">
+                            <span class="bg-blue-600 text-white text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-wider">Regel 1</span>
+                            <h4 class="font-bold text-slate-900 text-lg">V2-Reglen (Verbum på plads 2)</h4>
                         </div>
-                        <p class="text-sm text-slate-600 font-medium">
-                            "Heute <span class="text-blue-600 font-bold bg-blue-50 px-1 rounded">gehe</span> ich ins Kino" <br>
-                            <span class="text-red-400 text-xs line-through mt-1 block">"Heute ich gehe ins Kino"</span>
+                        <p class="text-sm text-slate-600 font-medium mt-3">
+                            "Heute <span class="text-blue-600 font-bold bg-blue-50 px-2 py-0.5 rounded">gehe</span> ich ins Kino" <br>
+                            <span class="text-red-400 text-xs line-through mt-2 block">"Heute ich gehe ins Kino"</span>
                         </p>
                     </div>
                     
-                    <div class="bg-white p-4 rounded-xl border border-blue-100 shadow-sm">
-                        <div class="flex items-center gap-2 mb-2">
-                            <span class="bg-blue-600 text-white text-[10px] font-bold px-2 py-0.5 rounded uppercase">Regel 2</span>
-                            <h4 class="font-bold text-slate-900">Verbet til sidst i ledsætninger</h4>
+                    <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm group hover:border-blue-200 transition-colors">
+                        <div class="flex items-center gap-3 mb-2">
+                            <span class="bg-blue-600 text-white text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-wider">Regel 2</span>
+                            <h4 class="font-bold text-slate-900 text-lg">Verbet i bunden</h4>
                         </div>
-                        <p class="text-sm text-slate-600 font-medium">
-                            Efter <i>weil</i>, <i>dass</i> og <i>wenn</i> skal verbet sparkes i bunden. <br>
-                            "Ich denke, dass der Film gut <span class="text-blue-600 font-bold bg-blue-50 px-1 rounded">ist</span>."
+                        <p class="text-sm text-slate-600 font-medium mt-3">
+                            Efter <i>weil</i>, <i>dass</i> og <i>wenn</i> skal verbet sparkes helt i bunden. <br>
+                            "Ich denke, dass der Film gut <span class="text-blue-600 font-bold bg-blue-50 px-2 py-0.5 rounded">ist</span>."
                         </p>
                     </div>
 
-                    <div class="bg-white p-4 rounded-xl border border-blue-100 shadow-sm">
-                        <div class="flex items-center gap-2 mb-2">
-                            <span class="bg-blue-600 text-white text-[10px] font-bold px-2 py-0.5 rounded uppercase">Regel 3</span>
-                            <h4 class="font-bold text-slate-900">Husk person-endelsen</h4>
+                    <div class="bg-white p-5 rounded-2xl border border-slate-100 shadow-sm group hover:border-blue-200 transition-colors">
+                        <div class="flex items-center gap-3 mb-2">
+                            <span class="bg-blue-600 text-white text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-wider">Regel 3</span>
+                            <h4 class="font-bold text-slate-900 text-lg">Husk person-endelsen</h4>
                         </div>
-                        <p class="text-sm text-slate-600 font-medium">
-                            "Ich" slutter oftest på <span class="font-bold text-blue-600">-e</span> (Ich finde).<br>
-                            "Er/Sie" slutter på <span class="font-bold text-blue-600">-t</span> (Er findet).
+                        <p class="text-sm text-slate-600 font-medium mt-3">
+                            "Ich" slutter oftest på <span class="font-bold text-blue-600 bg-blue-50 px-1 rounded">-e</span> (Ich finde).<br>
+                            "Er/Sie" slutter på <span class="font-bold text-blue-600 bg-blue-50 px-1 rounded">-t</span> (Er findet).
                         </p>
                     </div>
                 </div>
@@ -415,12 +437,94 @@
 
     </main>
 
-    <script>
-        function copyPhrase(element) {
-            // Find den tyske tekst inde i elementet
-            const textToCopy = element.querySelector('.german-text').innerText;
+    <!-- Top-Drop Modal for PDF Download -->
+    <div id="download-modal" class="fixed inset-0 z-[100] hidden bg-slate-900/50 backdrop-blur-sm items-start justify-center pt-8 sm:pt-16 transition-opacity duration-400 opacity-0">
+        <div id="download-modal-card" class="bg-white rounded-3xl p-8 sm:p-10 max-w-xl w-[92%] shadow-2xl border border-slate-100 transform -translate-y-[150%] transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]">
             
-            // Opret tekstområde og kopier (pålidelig metode for iframes)
+            <div class="flex justify-between items-start mb-6">
+                <div class="w-16 h-16 bg-red-50 border border-red-100 text-red-600 rounded-2xl flex items-center justify-center shadow-inner">
+                    <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg>
+                </div>
+                <button onclick="closeModal()" class="text-slate-400 hover:text-slate-700 transition bg-slate-50 hover:bg-slate-100 p-2 rounded-full">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+                </button>
+            </div>
+
+            <h3 class="text-3xl font-black text-slate-900 uppercase tracking-tight mb-3">Tag kittet med ind!</h3>
+            <p class="text-slate-500 font-medium leading-relaxed mb-8 text-sm">
+                Det er en ekstremt god idé at gemme denne side som PDF. Så kan du printe den og have Guld-Gloserne og nødhjælpskassen fysisk med ind til forberedelsen.
+            </p>
+            
+            <div class="flex flex-col sm:flex-row gap-4">
+                <button onclick="downloadAsPDF()" class="flex-1 bg-gradient-to-r from-red-600 to-red-500 hover:from-red-500 hover:to-red-400 text-white font-black text-sm uppercase tracking-widest py-4 rounded-xl shadow-[0_5px_20px_rgba(220,38,38,0.4)] transition-all flex items-center justify-center gap-2 hover:-translate-y-1">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+                    Print / PDF
+                </button>
+                <button onclick="closeModal()" class="flex-1 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-500 font-bold text-xs uppercase tracking-widest py-4 rounded-xl transition-all">
+                    Nej tak
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Modal & Scroll Lock Logic
+        document.addEventListener('DOMContentLoaded', () => {
+            const hasSeenModal = localStorage.getItem('hasSeenPdfModalModern');
+            if (!hasSeenModal) {
+                // Show modal slightly after load for a nice effect
+                setTimeout(() => {
+                    openModal();
+                    localStorage.setItem('hasSeenPdfModalModern', 'true');
+                }, 800);
+            }
+        });
+
+        function openModal() {
+            const modal = document.getElementById('download-modal');
+            const card = document.getElementById('download-modal-card');
+            
+            // Prevent background scrolling
+            document.body.style.overflow = 'hidden';
+            
+            // Unhide modal
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            
+            // Trigger animation frame for CSS transitions
+            requestAnimationFrame(() => {
+                modal.classList.remove('opacity-0');
+                card.classList.remove('-translate-y-[150%]');
+                card.classList.add('translate-y-0');
+            });
+        }
+
+        function closeModal() {
+            const modal = document.getElementById('download-modal');
+            const card = document.getElementById('download-modal-card');
+            
+            // Slide up animation
+            card.classList.remove('translate-y-0');
+            card.classList.add('-translate-y-[150%]');
+            modal.classList.add('opacity-0');
+            
+            // Wait for transition, then hide and unlock scroll
+            setTimeout(() => {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+                document.body.style.overflow = ''; // Restore scrolling
+            }, 500);
+        }
+
+        function downloadAsPDF() {
+            closeModal();
+            setTimeout(() => {
+                window.print();
+            }, 600); // Wait for modal to fully close before opening print dialog
+        }
+
+        function copyPhrase(element) {
+            const textToCopy = element.querySelector('.german-text').innerText;
             const textArea = document.createElement("textarea");
             textArea.value = textToCopy;
             document.body.appendChild(textArea);
@@ -428,28 +532,24 @@
             
             try {
                 document.execCommand('copy');
-                
-                // Visuel feedback (skift farve og ikon midlertidigt)
                 const originalBg = element.style.backgroundColor;
                 const icon = element.querySelector('.copy-icon');
                 const originalIconPath = icon.innerHTML;
                 
                 element.classList.add('copied');
-                // Skift ikon til et checkmark
                 icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"/>';
                 icon.classList.add('text-emerald-600');
+                icon.classList.remove('text-slate-400');
                 
-                // Gendan efter 1.5 sekund
                 setTimeout(() => {
                     element.classList.remove('copied');
                     icon.innerHTML = originalIconPath;
                     icon.classList.remove('text-emerald-600');
+                    icon.classList.add('text-slate-400');
                 }, 1500);
-
             } catch (err) {
                 console.error('Kunne ikke kopiere teksten: ', err);
             }
-            
             document.body.removeChild(textArea);
         }
     </script>
